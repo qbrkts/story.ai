@@ -26,6 +26,30 @@ const StorageKey = {
   STORY_CONTENTS: `${STORY_AI_NS}:story-contents`,
 };
 
+const AppText = {
+    API_KEY_SAVED: "API Key updated successfully!",
+  COPYRIGHT: "Copyright",
+  ENTER_GEMINI_API_KEY: "Enter your Gemini API Key",
+  ENTER_NEW_STORY: "Enter new story title",
+  ENTER_TITLE: "Enter title",
+  GEMINI_API_KEY: "Gemini API Key",
+  GO_TO_STORY: "Go to story",
+  INFINITE_STORIES: "Enter the world of infinite tales",
+  INVALID_API_KEY: "Please enter a valid API Key.",
+  NO_API_KEY: "If you do not have an api key, visit here to generate one.",
+  NO_STORIES_YET: "No stories yet... continue above",
+  OWNER_NAME: "Quantum Brackets",
+  PREVIOUSLY_ON: "Previously on...",
+  RANDOM: "Random",
+  START: "Start",
+  STORY_AI_DESCRIPTION: "A tool to generate stories using AI",
+  STORY_AI: "Story AI",
+  STORY: "Story",
+  UPDATE_GEMINI_API_KEY: "Update",
+  VISIT_STORIES: "Visit stories",
+  WELCOME: "Welcome",
+};
+
 // --- helper functions
 function getProgressDialog() {
   const PROGRESS_DIALOG_ID = "progress-dialog";

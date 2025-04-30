@@ -1,9 +1,9 @@
 const GEMINI_API_KEY_CODE_TEMPLATE = `
 <details style="margin: 10px">
-<summary style="cursor:pointer; margin-bottom:10px">Gemini API Key</summary>
-<line-input id="gemini-api-key" placeholder="Enter Gemini API Key" style="width: 400px;"></line-input>
-<paper-button id="update-gemini-api-key">Update</paper-button>
-<p><a href="https://aistudio.google.com/app/apikey" target="_blank" style="text-decoration: none;">If you do not have an api key, visit here to generate one.</a></p>
+<summary style="cursor:pointer; margin-bottom:10px">${AppText.GEMINI_API_KEY}</summary>
+<line-input id="gemini-api-key" placeholder="${AppText.ENTER_GEMINI_API_KEY}" style="width: 400px;"></line-input>
+<paper-button id="update-gemini-api-key">${AppText.UPDATE_GEMINI_API_KEY}</paper-button>
+<p><a href="https://aistudio.google.com/app/apikey" target="_blank" style="text-decoration: none;">${AppText.NO_API_KEY}</a></p>
 </details>
 `;
 
@@ -57,9 +57,9 @@ customElements.define(
         const apiKey = this.apiKeyInput.value.trim();
         if (apiKey) {
           storeGeminiKeyInLocalStorage(apiKey);
-          alert("API Key updated successfully!");
+          alert(AppText.API_KEY_SAVED);
         } else {
-          alert("Please enter a valid API Key.");
+          alert(AppText.INVALID_API_KEY);
         }
       });
     }
