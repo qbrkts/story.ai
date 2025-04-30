@@ -25,8 +25,44 @@ customElements.define(
       this.render();
     }
 
+    createLink(page, includeDivider, container) {
+      const link = document.createElement("a");
+      link.textContent = page;
+      link.style.textDecoration = "none";
+      link.style.cursor = "pointer";
+      link.addEventListener("click", () => {
+        gotoPage({ page });
+      });
+      const url = new URL(window.location.href);
+      const isCurrentPage = page.includes(url.searchParams.get(UrlParams.PAGE));
+      if (isCurrentPage) {
+        link.textContent = `[ ${link.textContent} ]`;
+        link.style.fontWeight = "bold";
+      }
+      container.appendChild(link);
+      if (includeDivider) {
+        container.appendChild(document.createTextNode(" | "));
+      }
+      return link;
+    }
+
+    createLinks(containerEl) {
+      containerEl.innerHTML = PAGE_NAVIGATION_CODE_TEMPLATE;
+      const linksContainer = containerEl.querySelector(`#${PAGE_LINKS_ID}`);
+      if (!linksContainer) {
+        throw new Error("Links container not found");
+      }
+      for (let i = 0; i < PageNames.length; i++) {
+        const page = PageNames[i].toLowerCase();
+        this.createLink(page, i < PageNames.length - 1, linksContainer);
+      }
+      return containerEl;
+    }
+
     copyToPageEnd() {
       const bottomNavigation = document.createElement("div");
+      bottomNavigation.style.display = "none";
+      document.body.appendChild(bottomNavigation);
       bottomNavigation.style.backgroundColor = "white";
       bottomNavigation.style.border = "solid 1px #ccc";
       bottomNavigation.style.borderRadius = "2px";
@@ -35,39 +71,12 @@ customElements.define(
       bottomNavigation.style.position = "fixed";
       bottomNavigation.style.right = "2px";
       document.body.style.paddingBottom = "20px";
-      bottomNavigation.innerHTML = this.root.innerHTML;
-      document.body.appendChild(bottomNavigation);
-    }
-
-    createLink(page, includeDivider) {
-      const pageLinks = this.root.getElementById(PAGE_LINKS_ID);
-      if (!pageLinks) {
-        throw new Error(PAGE_LINKS_ID);
-      }
-      const link = document.createElement("a");
-      link.textContent = page;
-      link.style.textDecoration = "none";
-      link.style.cursor = "pointer";
-      link.onclick = () => void gotoPage({ page });
-      const url = new URL(window.location.href);
-      const isCurrentPage = page.includes(url.searchParams.get("page"));
-      if (isCurrentPage) {
-        link.textContent = `[ ${link.textContent} ]`;
-        link.style.fontWeight = "bold";
-      }
-      pageLinks.appendChild(link);
-      if (includeDivider) {
-        pageLinks.appendChild(document.createTextNode(" | "));
-      }
-      return link;
+      this.createLinks(bottomNavigation);
+      bottomNavigation.style.display = "unset";
     }
 
     render() {
-      this.root.innerHTML = PAGE_NAVIGATION_CODE_TEMPLATE;
-      for (let i = 0; i < PageNames.length; i++) {
-        const page = PageNames[i].toLowerCase();
-        this.createLink(page, i < PageNames.length - 1);
-      }
+      this.createLinks(this.root);
       // create another version at the end of page
       this.copyToPageEnd();
     }

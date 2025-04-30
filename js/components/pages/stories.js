@@ -15,9 +15,7 @@ const STORY_PAGE_CODE_TEMPLATE = `
 
     <div id="story-key-list">
         <h3>${AppText.PREVIOUSLY_ON}</h3>
-        <div id="existing-keys">
-            <p>${AppText.NO_STORIES_YET}</p>
-        </div>
+        <div id="existing-keys"></div>
     </div>
 `;
 
@@ -61,20 +59,56 @@ customElements.define(
       this.startStoryButton.disabled = !this.storyTitleInput.value;
     }
 
+    get existingStoriesContainer() {
+      const container = /** @type {HTMLDivElement} */ (
+        this.root.getElementById("existing-keys")
+      );
+      if (!container) {
+        throw new Error("Existing stories container not found");
+      }
+      return container;
+    }
+
+    loadExistingStories() {
+      const existingStories = getStoryTitlesFromLocalStorage();
+      this.existingStoriesContainer.innerHTML = "";
+      if (existingStories.size === 0) {
+        this.existingStoriesContainer.innerHTML = `<p>${AppText.NO_STORIES_YET}</p>`;
+      } else {
+        existingStories.forEach((storyTitle) => {
+          const storyButton = document.createElement("paper-button");
+          storyButton.textContent = getStoryDocumentByTitle(storyTitle).title;
+          storyButton.addEventListener("click", () => {
+            setCurrentStoryTitle(storyTitle);
+            gotoPage({
+              page: Page.WRITE,
+            });
+          });
+          this.existingStoriesContainer.appendChild(storyButton);
+        });
+      }
+    }
+
     connectedCallback() {
       this.storyTitleInput.addEventListener("input", () => {
+        setCurrentStoryTitle(this.storyTitleInput.value);
         this.toggleStartStoryButton();
       });
       this.render();
     }
 
     render() {
+      this.loadExistingStories();
       this.startStoryButton.addEventListener("click", () => {
         const title = this.storyTitleInput.value;
         if (!title) {
           this.storyTitleInput.focus();
         } else {
           addStoryTitleToLocalStorage(title);
+          addStoryDocumentToLocalStorage(title);
+          gotoPage({
+            page: Page.WRITE,
+          });
         }
       });
     }

@@ -2,10 +2,11 @@
 const STORY_AI_NS = "https://qbrkts.com/story-ai";
 
 const DEFAULT_PAGE = "HOME";
-const PageNames = [DEFAULT_PAGE, "STORIES"];
+const PageNames = [DEFAULT_PAGE, "STORIES", "WRITE"];
 /** @type {{
   HOME: 'home';
   STORIES: 'stories';
+  WRITE: 'write';
 }} */
 const Page = Object.assign(
   {},
@@ -14,11 +15,17 @@ const Page = Object.assign(
 /** @type {{
   HOME: 'home-page';
   STORIES: 'stories-page';
+  WRITE: 'write-page';
 }} */
 const ComponentName = Object.assign(
   {},
   ...Object.keys(Page).map((key) => ({ [key]: `${Page[key]}-page` }))
 );
+
+const UrlParams = {
+  PAGE: "page",
+  TITLE: "title",
+};
 
 const StorageKey = {
   GEMINI_API: `${STORY_AI_NS}:gemini-api-key`,
@@ -113,14 +120,17 @@ function NotFound(id) {
 
 function getCurrentPage() {
   const url = new URL(window.location.href);
-  const page = url.searchParams.get("page");
+  const page = url.searchParams.get(UrlParams.PAGE);
   return (page ?? DEFAULT_PAGE).toUpperCase();
 }
 
-function gotoPage({ page, hash = "" }) {
+function gotoPage({ page = "", hash = "" }) {
+  if (!page) {
+    throw new Error("No page specified");
+  }
   const url = new URL(window.location.href);
-  url.searchParams.delete("page");
-  url.searchParams.set("page", page);
+  url.searchParams.delete(UrlParams.PAGE);
+  url.searchParams.set(UrlParams.PAGE, page);
   if (hash) url.hash = hash;
   window.location.href = url.toString();
 }
@@ -176,6 +186,7 @@ function storageKeyAsTitleCase(title) {
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
+/** @returns {Set<string>} */
 function getStoryTitlesFromLocalStorage() {
   return new Set(
     getValueFromLocalStorage(StorageKey.STORY_TITLES)?.filter(Boolean) ?? []
@@ -199,9 +210,17 @@ function storyContentStorageKey(title) {
   return `${StorageKey.STORY_CONTENTS}:${titleStorageKey(title)}`;
 }
 
+function setCurrentStoryTitle(title) {
+  const titleKey = titleStorageKey(title);
+  const url = new URL(window.location.href);
+  url.searchParams.delete(UrlParams.TITLE);
+  url.searchParams.set(UrlParams.TITLE, titleKey);
+  window.history.replaceState({}, "", url.toString());
+}
+
 function getCurrentTitleKey() {
   const url = new URL(window.location.href);
-  const title = url.searchParams.get("title");
+  const title = url.searchParams.get(UrlParams.TITLE);
   if (!title) {
     throw new Error("Title not found in URL");
   }
@@ -391,7 +410,7 @@ function getStoryDocumentByTitle(title) {
     /** User written brain dump to guide the story generation */
     summary: "",
     /** User generated title for the story */
-    title: "",
+    title,
     /** User specified genre for generating synopsis, outline, scenes and chapters */
     genre: "",
     /** User specified style for generating outlines and scenes  */
@@ -447,5 +466,6 @@ function getStoryDocumentByTitle(title) {
 }
 
 function addStoryDocumentToLocalStorage(title, document) {
-  storeValueInLocalStorage(storyContentStorageKey(title), document);
+  const storyDocument = document ?? getStoryDocumentByTitle(title);
+  storeValueInLocalStorage(storyContentStorageKey(title), storyDocument);
 }
