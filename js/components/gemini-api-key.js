@@ -1,8 +1,8 @@
 const GEMINI_API_KEY_CODE_TEMPLATE = `
 <details style="margin: 10px">
-<summary>Gemini API Key</summary>
-<input type="text" id="gemini-api-key" placeholder="Enter Gemini API Key" style="width: 400px;">
-<button id="update-gemini-api-key">Update</button>
+<summary style="cursor:pointer; margin-bottom:10px">Gemini API Key</summary>
+<line-input id="gemini-api-key" placeholder="Enter Gemini API Key" style="width: 400px;"></line-input>
+<paper-button id="update-gemini-api-key">Update</paper-button>
 <p><a href="https://aistudio.google.com/app/apikey" target="_blank" style="text-decoration: none;">If you do not have an api key, visit here to generate one.</a></p>
 </details>
 `;

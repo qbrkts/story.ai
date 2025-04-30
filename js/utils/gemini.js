@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 const GeminiConfig = {
   Temperature: {
     DETERMINISTIC: 0.1,

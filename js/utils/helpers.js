@@ -1,14 +1,15 @@
-// @ts-nocheck
+// --- helper constants
 const STORY_AI_NS = "https://qbrkts.com/story-ai";
 
 const DEFAULT_PAGE = "HOME";
+const PageNames = [DEFAULT_PAGE, "STORIES"];
 /** @type {{
   HOME: 'home';
   STORIES: 'stories';
 }} */
-const Pages = Object.assign(
+const Page = Object.assign(
   {},
-  ...[DEFAULT_PAGE, "STORIES"].map((page) => ({ [page]: page.toLowerCase() }))
+  ...PageNames.map((page) => ({ [page]: page.toLowerCase() }))
 );
 /** @type {{
   HOME: 'home-page';
@@ -16,7 +17,7 @@ const Pages = Object.assign(
 }} */
 const ComponentName = Object.assign(
   {},
-  ...Object.keys(Pages).map((key) => ({ [key]: `${Pages[key]}-page` }))
+  ...Object.keys(Page).map((key) => ({ [key]: `${Page[key]}-page` }))
 );
 
 const StorageKey = {
@@ -25,6 +26,7 @@ const StorageKey = {
   STORY_CONTENTS: `${STORY_AI_NS}:story-contents`,
 };
 
+// --- helper functions
 function getProgressDialog() {
   const PROGRESS_DIALOG_ID = "progress-dialog";
   const progressDialog =
@@ -54,6 +56,9 @@ function showProgressDialog(ratio) {
   _progressRatio = Math.max(0, Math.min(ratio, 1));
   const progressDialog = getProgressDialog();
   const progressBar = document.getElementById("progress-bar");
+  if (!progressBar) {
+    throw new Error("Progress bar not found");
+  }
   const progressPercent = Math.round(ratio * 100);
   progressBar.innerHTML = `&nbsp;&nbsp;&nbsp;&nbsp;${progressPercent}%`;
   progressBar.style.width = `${progressPercent}%`;
@@ -90,7 +95,7 @@ function getCurrentPage() {
   return (page ?? DEFAULT_PAGE).toUpperCase();
 }
 
-function gotoPage({ page, hash }) {
+function gotoPage({ page, hash = "" }) {
   const url = new URL(window.location.href);
   url.searchParams.delete("page");
   url.searchParams.set("page", page);
@@ -107,6 +112,17 @@ function toggleCheckBoxList(checkBoxList) {
     checkbox.checked = !checkbox.checked;
     checkbox.dispatchEvent(new Event("change"));
   });
+}
+
+function copyAttributes(source, target, exclude = ["style"]) {
+  const attributes = source.attributes;
+  for (let i = 0; i < attributes.length; i++) {
+    const attr = attributes[i];
+    if (!exclude.includes(attr.name)) {
+      target.setAttribute(attr.name, attr.value);
+    }
+  }
+  target.style.cssText = source.style.cssText;
 }
 
 function getValueFromLocalStorage(key) {

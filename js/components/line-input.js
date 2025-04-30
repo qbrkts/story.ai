@@ -1,11 +1,10 @@
-const PAPER_BUTTON_CODE_TEMPLATE = `
-<button id="paper-button" class="paper-button">
-  <slot></slot>
-</button>`;
-const PAPER_BUTTON_COMPONENT_NAME = "paper-button";
-const PAPER_BUTTON_ID = "paper-button";
-const PAPER_BUTTON_STYLE = `
-  .paper-button {
+const LINE_INPUT_CODE_TEMPLATE = `
+<input id="line-input" class="line-input" type="text">
+</input>`;
+const LINE_INPUT_COMPONENT_NAME = "line-input";
+const LINE_INPUT_ID = "line-input";
+const LINE_INPUT_STYLE = `
+  .line-input {
     background-color: #f0f0f0;
     border: none;
     border-radius: 4px;
@@ -18,24 +17,24 @@ const PAPER_BUTTON_STYLE = `
     transition: background-color 0.3s, transform 0.3s;
   }
 
-  .paper-button:hover {
+  .line-input:hover {
     background-color: #e0e0e0;
   }
 
-  .paper-button:active {
+  .line-input:active {
     transform: scale(0.95);
   }
 `;
 
 customElements.define(
-  PAPER_BUTTON_COMPONENT_NAME,
+  LINE_INPUT_COMPONENT_NAME,
   class extends HTMLElement {
     constructor() {
       super();
       this.attachShadow({ mode: "open" });
-      this.root.innerHTML = PAPER_BUTTON_CODE_TEMPLATE;
+      this.root.innerHTML = LINE_INPUT_CODE_TEMPLATE;
       const style = document.createElement("style");
-      style.textContent = PAPER_BUTTON_STYLE;
+      style.textContent = LINE_INPUT_STYLE;
       this.root.appendChild(style);
     }
     get root() {
@@ -44,18 +43,26 @@ customElements.define(
       }
       return this.shadowRoot;
     }
-    get buttonEl() {
-      const button = this.root.getElementById(PAPER_BUTTON_ID);
-      if (!button) {
-        throw new Error(PAPER_BUTTON_ID);
+    get inputEl() {
+      const inputEl = /** @type {HTMLInputElement} */ (
+        this.root.getElementById(LINE_INPUT_ID)
+      );
+      if (!inputEl) {
+        throw new Error(LINE_INPUT_ID);
       }
-      return button;
+      return inputEl;
+    }
+    get value() {
+      return this.inputEl.value.trim();
+    }
+    set value(v) {
+      this.inputEl.value = v;
     }
     connectedCallback() {
       this.render();
     }
     render() {
-      copyAttributes(this, this.buttonEl, ["id"]);
+      copyAttributes(this, this.inputEl, ["id"]);
     }
   }
 );

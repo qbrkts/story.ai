@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 const HOME_PAGE_TEMPLATE = `
     <h1>Story AI</h1>
     <div>
@@ -9,7 +7,7 @@ const HOME_PAGE_TEMPLATE = `
     </div>
     <br />
     <div>
-        <paper-button onclick="gotoPage({ page: Pages.STORIES })">Visit Stories</paper-button>
+        <paper-button onclick="gotoPage({ page: Page.STORIES })">Visit Stories</paper-button>
     </div>
     <br /><br /><br />
     <div>

@@ -1,7 +1,5 @@
-// @ts-nocheck
-
 const PAGE_NAVIGATION_CODE_TEMPLATE = `
-<div id="page-links" style="font-size: 0.7em;"></div>
+<div id="page-links" style="font-size: 0.7em; text-transform: capitalize"></div>
 `;
 
 const PAGE_NAVIGATION_COMPONENT_NAME = "page-navigation";
@@ -17,10 +15,10 @@ customElements.define(
     }
 
     get root() {
-        if (!this.shadowRoot) {
-            throw new Error("Shadow DOM not supported");
-        }
-        return this.shadowRoot;
+      if (!this.shadowRoot) {
+        throw new Error("Shadow DOM not supported");
+      }
+      return this.shadowRoot;
     }
 
     connectedCallback() {
@@ -37,20 +35,23 @@ customElements.define(
       bottomNavigation.style.position = "fixed";
       bottomNavigation.style.right = "2px";
       document.body.style.paddingBottom = "20px";
-      bottomNavigation.innerHTML = this.shadowRoot.innerHTML;
+      bottomNavigation.innerHTML = this.root.innerHTML;
       document.body.appendChild(bottomNavigation);
     }
 
-    createLink(page, text, includeDivider) {
+    createLink(page, includeDivider) {
       const pageLinks = this.root.getElementById(PAGE_LINKS_ID);
       if (!pageLinks) {
         throw new Error(PAGE_LINKS_ID);
       }
       const link = document.createElement("a");
-      link.href = `${page}#${titleAsKey(getCurrentTitle())}`;
-      link.textContent = text;
+      link.textContent = page;
       link.style.textDecoration = "none";
-      if (location.pathname.endsWith(page)) {
+      link.style.cursor = "pointer";
+      link.onclick = () => void gotoPage({ page });
+      const url = new URL(window.location.href);
+      const isCurrentPage = page.includes(url.searchParams.get("page"));
+      if (isCurrentPage) {
         link.textContent = `[ ${link.textContent} ]`;
         link.style.fontWeight = "bold";
       }
@@ -63,11 +64,9 @@ customElements.define(
 
     render() {
       this.root.innerHTML = PAGE_NAVIGATION_CODE_TEMPLATE;
-      const minPage = 1;
-      const maxPage = 9;
-      this.createLink(`/`, `📓`, true);
-      for (const page of []) {
-        this.createLink(`step${i}.html`, `Step ${i}`, i < maxPage);
+      for (let i = 0; i < PageNames.length; i++) {
+        const page = PageNames[i].toLowerCase();
+        this.createLink(page, i < PageNames.length - 1);
       }
       // create another version at the end of page
       this.copyToPageEnd();

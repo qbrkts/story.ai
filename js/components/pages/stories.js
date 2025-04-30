@@ -1,21 +1,20 @@
 const STORY_PAGE_CODE_TEMPLATE = `
-    <h1>
-        <script>document.write(document.title);</script>
-    </h1>
+    <page-navigation></page-navigation>
+
     <div>
         <gemini-api-key></gemini-api-key>
     </div>
 
     <div>
-        <h2>Start new story</h2>
-        <input type="text" id="new-story-key" placeholder="Enter new story title" style="width: 400px">
+        <h2>Story</h2>
+        <line-input id="new-story-key" placeholder="Enter new story title" style="width: 400px"></line-input>
         <br /><br />
-        <button id="add-story-key">Add</button>
-        <button id="continue-story-key">Continue</button>
+        <paper-button id="add-story-key">Add</paper-button>
+        <paper-button id="continue-story-key">Continue</paper-button>
     </div>
 
     <div id="story-key-list">
-        <h2>Existing stories</h2>
+        <h3>Previously on...</h3>
         <div id="existing-keys">
             <p>No stories yet... continue above</p>
         </div>
@@ -42,6 +41,8 @@ customElements.define(
       this.render();
     }
 
-    render() {}
+    render() {
+
+    }
   }
 );
