@@ -27,13 +27,11 @@ const StorageKey = {
 };
 
 const AppText = {
-    API_KEY_SAVED: "API Key updated successfully!",
+  API_KEY_SAVED: "API Key updated successfully!",
   COPYRIGHT: "Copyright",
   ENTER_GEMINI_API_KEY: "Enter your Gemini API Key",
   ENTER_NEW_STORY: "Enter new story title",
-  ENTER_TITLE: "Enter title",
   GEMINI_API_KEY: "Gemini API Key",
-  GO_TO_STORY: "Go to story",
   INFINITE_STORIES: "Enter the world of infinite tales",
   INVALID_API_KEY: "Please enter a valid API Key.",
   NO_API_KEY: "If you do not have an api key, visit here to generate one.",

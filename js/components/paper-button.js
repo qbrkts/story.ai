@@ -25,6 +25,12 @@ const PAPER_BUTTON_STYLE = `
   .paper-button:active {
     transform: scale(0.95);
   }
+
+  .paper-button:disabled {
+    background-color: #ccc;
+    color: #999;
+    cursor: not-allowed;
+  }
 `;
 
 customElements.define(
@@ -45,11 +51,19 @@ customElements.define(
       return this.shadowRoot;
     }
     get buttonEl() {
-      const button = this.root.getElementById(PAPER_BUTTON_ID);
+      const button = /** @type {HTMLButtonElement} */ (
+        this.root.getElementById(PAPER_BUTTON_ID)
+      );
       if (!button) {
         throw new Error(PAPER_BUTTON_ID);
       }
       return button;
+    }
+    set disabled(value) {
+      this.buttonEl.disabled = !!value;
+    }
+    get disabled() {
+      return this.buttonEl.disabled;
     }
     connectedCallback() {
       this.render();

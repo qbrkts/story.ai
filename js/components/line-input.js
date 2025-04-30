@@ -37,12 +37,14 @@ customElements.define(
       style.textContent = LINE_INPUT_STYLE;
       this.root.appendChild(style);
     }
+
     get root() {
       if (!this.shadowRoot) {
         throw new Error("Shadow DOM not supported");
       }
       return this.shadowRoot;
     }
+
     get inputEl() {
       const inputEl = /** @type {HTMLInputElement} */ (
         this.root.getElementById(LINE_INPUT_ID)
@@ -52,15 +54,23 @@ customElements.define(
       }
       return inputEl;
     }
+
     get value() {
       return this.inputEl.value.trim();
     }
+
     set value(v) {
       this.inputEl.value = v;
     }
+
+    focus() {
+      this.inputEl.focus();
+    }
+
     connectedCallback() {
       this.render();
     }
+
     render() {
       copyAttributes(this, this.inputEl, ["id"]);
     }
