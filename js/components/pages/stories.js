@@ -97,6 +97,16 @@ customElements.define(
       this.render();
     }
 
+    get randomStoryButton() {
+      const btnEl = /** @type {import("../../../types").PaperButton} */ (
+        this.root.getElementById("random-story-key")
+      );
+      if (!btnEl) {
+        throw new Error("Random story button not found");
+      }
+      return btnEl;
+    }
+
     render() {
       this.loadExistingStories();
       this.startStoryButton.addEventListener("click", () => {
@@ -111,6 +121,7 @@ customElements.define(
           });
         }
       });
+      this.randomStoryButton.disabled = true;
     }
   }
 );

@@ -41,18 +41,22 @@ const AppText = {
   GEMINI_API_KEY: "Gemini API Key",
   INFINITE_STORIES: "Enter the world of infinite tales",
   INVALID_API_KEY: "Please enter a valid API Key.",
+  LOADING: "Loading...",
   NO_API_KEY: "If you do not have an api key, visit here to generate one.",
   NO_STORIES_YET: "No stories yet... continue above",
   OWNER_NAME: "Quantum Brackets",
   PREVIOUSLY_ON: "Previously on...",
   RANDOM: "Random",
+  SAVE: "Save",
   START: "Start",
   STORY_AI_DESCRIPTION: "A tool to generate stories using AI",
   STORY_AI: "Story AI",
   STORY: "Story",
   UPDATE_GEMINI_API_KEY: "Update",
+  UPDATE_STORY_TITLE: "Update story title",
   VISIT_STORIES: "Visit stories",
   WELCOME: "Welcome",
+  WRITE: "Write",
 };
 
 // --- helper functions
@@ -468,4 +472,18 @@ function getStoryDocumentByTitle(title) {
 function addStoryDocumentToLocalStorage(title, document) {
   const storyDocument = document ?? getStoryDocumentByTitle(title);
   storeValueInLocalStorage(storyContentStorageKey(title), storyDocument);
+  addStoryTitleToLocalStorage(title);
+}
+
+function removeStoryDocumentFromLocalStorage(title) {
+  const storyDocument = getStoryDocumentByTitle(title);
+  if (!storyDocument) return;
+  localStorage.removeItem(storyContentStorageKey(title));
+  removeStoryTitleFromLocalStorage(title);
+}
+
+function renameStoryTitle(title, newTitle) {
+  const storyDocument = getStoryDocumentByTitle(title);
+  addStoryDocumentToLocalStorage(newTitle, storyDocument);
+  removeStoryDocumentFromLocalStorage(title);
 }
