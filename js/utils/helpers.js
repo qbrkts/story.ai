@@ -34,11 +34,21 @@ const StorageKey = {
 };
 
 const AppText = {
+  ADD_CHARACTER: "Add Character",
   API_KEY_SAVED: "API Key updated successfully!",
+  BRAIN_DUMP:
+    "Dump your story ideas here. Anything goes and everything helps. If you want a more dramatic twist, add that idea here and regenerate the synopsis.",
   COPYRIGHT: "Copyright",
+  CHARACTERS: "Characters",
   ENTER_GEMINI_API_KEY: "Enter your Gemini API Key",
+  ENTER_GENRE: "Enter genre e.g. Sci-Fi Fantasy, Thriller Romance",
+  ENTER_STYLE:
+    "Enter a sample of your writing to get a similar style or use descriptors e.g. First Person, Third Person, Omniscient etc.",
   ENTER_NEW_STORY: "Enter new story title",
   GEMINI_API_KEY: "Gemini API Key",
+  GENERATE_SYNOPSIS: "Generate synopsis",
+  GENERATE_SYNOPSIS_INSTRUCTIONS:
+    "Generated synopsis goes here. You can modify it to your liking or update your summary and regenerate the synopsis.",
   INFINITE_STORIES: "Enter the world of infinite tales",
   INVALID_API_KEY: "Please enter a valid API Key.",
   LOADING: "Loading...",
@@ -52,6 +62,7 @@ const AppText = {
   STORY_AI_DESCRIPTION: "A tool to generate stories using AI",
   STORY_AI: "Story AI",
   STORY: "Story",
+  SUMMARY: "Summary",
   UPDATE_GEMINI_API_KEY: "Update",
   UPDATE_STORY_TITLE: "Update story title",
   VISIT_STORIES: "Visit stories",
@@ -409,63 +420,43 @@ const StoryDefaults = {
   },
 };
 
+const DEFAULT_DOCUMENT = {
+  /** User written brain dump to guide the story generation */
+  summary: "",
+  /** User generated title for the story */
+  title: "",
+  /** User specified genre for generating synopsis, outline, scenes and chapters */
+  genre: "",
+  /** User specified style for generating outlines and scenes  */
+  style: "",
+  /** User created story world setting for generating synopsis, outline and scenes */
+  setting: [],
+  /** AI generated synopsis of the story for generating characters */
+  synopsis: "",
+  /**
+   * AI generated characters for generating outline and scenes
+   * @typedef {{ "Name of the character": "physical description, personality, background, dialog and conversational style, including thier role in the story, relationships with other characters, and any other relevant traits and details" }}
+   */
+  characters: {},
+  /**
+   * AI generated outline of the story
+   * @typedef {{
+   *    name: "Name of the chapter",
+   *    description: "Summary description of the chapter for generating the scenes",
+   *    scenes: "Scenes in the chapter for generating the full content",
+   *    content: "Full content of the chapter",
+   *    characters: ["Name of the character"],
+   * }[]}
+   */
+  outline: [],
+};
+/** @returns {typeof DEFAULT_DOCUMENT} */
 function getStoryDocumentByTitle(title) {
-  const DEFAULT_DOCUMENT = {
-    /** User written brain dump to guide the story generation */
-    summary: "",
-    /** User generated title for the story */
-    title,
-    /** User specified genre for generating synopsis, outline, scenes and chapters */
-    genre: "",
-    /** User specified style for generating outlines and scenes  */
-    style: "",
-    /** User created story world setting for generating synopsis, outline and scenes */
-    setting: [],
-    /** AI generated synopsis of the story for generating characters */
-    synopsis: "",
-    /** AI generated characters for generating outline and scenes */
-    characters: [
-      {
-        name: "",
-        traits: [
-          {
-            name: "Other names",
-            details: "",
-          },
-          {
-            name: "Background",
-            details: "",
-          },
-          {
-            name: "Personality",
-            details: "",
-          },
-          {
-            name: "Physical description",
-            details: "",
-          },
-          {
-            name: "Story role",
-            details: "",
-          },
-        ],
-      },
-    ],
-    /** AI generated outline of the story */
-    outline: [
-      {
-        name: "Name of the chapter",
-        description:
-          "Summary description of the chapter for generating the scenes",
-        scenes: "Scenes in the chapter for generating the full content",
-        content: "Full content of the chapter",
-        characters: ["name of the character"],
-      },
-    ],
-  };
   const storyDocument =
     getValueFromLocalStorage(storyContentStorageKey(title)) ?? DEFAULT_DOCUMENT;
-
+  if (!storyDocument.title) {
+    storyDocument.title = titleStorageKey(title);
+  }
   return storyDocument;
 }
 

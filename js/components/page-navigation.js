@@ -1,9 +1,10 @@
-const PAGE_NAVIGATION_CODE_TEMPLATE = `
-<div id="page-links" style="font-size: 0.7em; text-transform: capitalize"></div>
-`;
-
 const PAGE_NAVIGATION_COMPONENT_NAME = "page-navigation";
-const PAGE_LINKS_ID = "page-links";
+const PageNavigationIds = {
+  PAGE_LINKS: "page-links",
+}
+const PAGE_NAVIGATION_CODE_TEMPLATE = `
+<div id="${PageNavigationIds.PAGE_LINKS}" style="font-size: 0.7em; text-transform: capitalize"></div>
+`;
 
 customElements.define(
   PAGE_NAVIGATION_COMPONENT_NAME,
@@ -48,7 +49,7 @@ customElements.define(
 
     createLinks(containerEl) {
       containerEl.innerHTML = PAGE_NAVIGATION_CODE_TEMPLATE;
-      const linksContainer = containerEl.querySelector(`#${PAGE_LINKS_ID}`);
+      const linksContainer = containerEl.querySelector(`#${PageNavigationIds.PAGE_LINKS}`);
       if (!linksContainer) {
         throw new Error("Links container not found");
       }

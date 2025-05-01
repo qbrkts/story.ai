@@ -1,22 +1,39 @@
+const StoriesPageIds = {
+  EXISTING_STORIES: "existing",
+  RANDOM_STORY_BTN: "random-story",
+  STORIES_LIST_CONTAINER: "stories-list",
+  STORY_TITLE_INPUT: "new-story",
+  STORY_START_BTN: "start-story",
+};
+
 const STORY_PAGE_CODE_TEMPLATE = `
-    <page-navigation></page-navigation>
+  <page-navigation></page-navigation>
 
-    <div>
-        <gemini-api-key></gemini-api-key>
-    </div>
+  <div>
+    <h2>${AppText.STORY}</h2>
+    <line-input
+      id="${StoriesPageIds.STORY_TITLE_INPUT}"
+      placeholder="${AppText.ENTER_NEW_STORY}"
+      style="width: 400px">
+    </line-input>
+    <br /><br />
+    <paper-button
+      id="${StoriesPageIds.STORY_START_BTN}"
+      title="${AppText.ENTER_NEW_STORY}">
+      ${AppText.START}
+    </paper-button>
+    <paper-button
+      id="${StoriesPageIds.RANDOM_STORY_BTN}">
+      ${AppText.RANDOM}
+      </paper-button>
+  </div>
 
-    <div>
-        <h2>${AppText.STORY}</h2>
-        <line-input id="new-story-key" placeholder="${AppText.ENTER_NEW_STORY}" style="width: 400px"></line-input>
-        <br /><br />
-        <paper-button id="start-story-key" title="${AppText.ENTER_NEW_STORY}">${AppText.START}</paper-button>
-        <paper-button id="random-story-key">${AppText.RANDOM}</paper-button>
-    </div>
-
-    <div id="story-key-list">
-        <h3>${AppText.PREVIOUSLY_ON}</h3>
-        <div id="existing-keys"></div>
-    </div>
+  <div id="${StoriesPageIds.STORIES_LIST_CONTAINER}">
+    <h3>${AppText.PREVIOUSLY_ON}</h3>
+    <div id="${StoriesPageIds.EXISTING_STORIES}"></div>
+  </div>
+  <br /><br /><br />
+  <qb-copyright></qb-copyright>
 `;
 
 customElements.define(
@@ -37,7 +54,7 @@ customElements.define(
 
     get storyTitleInput() {
       const inputEl = /** @type {import("../../../types").LineInput} */ (
-        this.root.getElementById("new-story-key")
+        this.root.getElementById(StoriesPageIds.STORY_TITLE_INPUT)
       );
       if (!inputEl) {
         throw new Error("Story title input not found");
@@ -47,7 +64,7 @@ customElements.define(
 
     get startStoryButton() {
       const btnEl = /** @type {import("../../../types").PaperButton} */ (
-        this.root.getElementById("start-story-key")
+        this.root.getElementById(StoriesPageIds.STORY_START_BTN)
       );
       if (!btnEl) {
         throw new Error("Start story button not found");
@@ -61,7 +78,7 @@ customElements.define(
 
     get existingStoriesContainer() {
       const container = /** @type {HTMLDivElement} */ (
-        this.root.getElementById("existing-keys")
+        this.root.getElementById(StoriesPageIds.EXISTING_STORIES)
       );
       if (!container) {
         throw new Error("Existing stories container not found");
@@ -99,7 +116,7 @@ customElements.define(
 
     get randomStoryButton() {
       const btnEl = /** @type {import("../../../types").PaperButton} */ (
-        this.root.getElementById("random-story-key")
+        this.root.getElementById(StoriesPageIds.RANDOM_STORY_BTN)
       );
       if (!btnEl) {
         throw new Error("Random story button not found");

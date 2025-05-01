@@ -1,8 +1,7 @@
-const LINE_INPUT_COMPONENT_NAME = "line-input";
-const LINE_INPUT_ID = "line-input";
-const LINE_INPUT_CLS = "line-input";
-const LINE_INPUT_STYLE = `
-  .${LINE_INPUT_CLS} {
+const TEXT_INPUT_COMPONENT_NAME = "text-input";
+const TEXT_INPUT_ID = "text-input";
+const TEXT_INPUT_STYLE = `
+  .${TEXT_INPUT_ID} {
     background-color: #f0f0f0;
     border: none;
     border-radius: 4px;
@@ -14,27 +13,27 @@ const LINE_INPUT_STYLE = `
     transition: background-color 0.3s, transform 0.3s;
   }
 
-  .${LINE_INPUT_CLS}:hover {
+  .${TEXT_INPUT_ID}:hover {
     background-color: #e0e0e0;
   }
 
-  .${LINE_INPUT_CLS}:active {
+  .${TEXT_INPUT_ID}:active {
     transform: scale(0.95);
   }
 `;
-const LINE_INPUT_CODE_TEMPLATE = `
-<input id="${LINE_INPUT_ID}" class="${LINE_INPUT_CLS}" type="text">
-</input>`;
+const TEXT_INPUT_CODE_TEMPLATE = `
+<textarea id="${TEXT_INPUT_ID}" class="${TEXT_INPUT_ID}">
+</textarea>`;
 
 customElements.define(
-  LINE_INPUT_COMPONENT_NAME,
+  TEXT_INPUT_COMPONENT_NAME,
   class extends HTMLElement {
     constructor() {
       super();
       this.attachShadow({ mode: "open" });
-      this.root.innerHTML = LINE_INPUT_CODE_TEMPLATE;
+      this.root.innerHTML = TEXT_INPUT_CODE_TEMPLATE;
       const style = document.createElement("style");
-      style.textContent = LINE_INPUT_STYLE;
+      style.textContent = TEXT_INPUT_STYLE;
       this.root.appendChild(style);
     }
 
@@ -45,26 +44,26 @@ customElements.define(
       return this.shadowRoot;
     }
 
-    get inputEl() {
+    get textAreaEl() {
       const inputEl = /** @type {HTMLInputElement} */ (
-        this.root.getElementById(LINE_INPUT_ID)
+        this.root.getElementById(TEXT_INPUT_ID)
       );
       if (!inputEl) {
-        throw new Error(LINE_INPUT_ID);
+        throw new Error(TEXT_INPUT_ID);
       }
       return inputEl;
     }
 
     get value() {
-      return this.inputEl.value.trim();
+      return this.textAreaEl.value.trim();
     }
 
     set value(v) {
-      this.inputEl.value = v;
+      this.textAreaEl.value = v;
     }
 
     focus() {
-      this.inputEl.focus();
+      this.textAreaEl.focus();
     }
 
     connectedCallback() {
@@ -72,7 +71,7 @@ customElements.define(
     }
 
     render() {
-      copyAttributes(this, this.inputEl, ["id"]);
+      copyAttributes(this, this.textAreaEl, ["id"]);
     }
   }
 );
