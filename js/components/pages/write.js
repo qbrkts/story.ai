@@ -1,21 +1,24 @@
 const CHARACTER_DELETE_TIMEOUT_MS = 5000;
 const WritePageIds = {
-  ADD_CHARACTER_BTN_ID: "add-character-btn",
-  CHARACTERS_CONTAINER_ID: "characters-container",
-  GENRE_LIST_ID: "genre-datalist",
-  GENRE_TEXT_INPUT_ID: "story-genre",
-  NEW_CHARACTER_INPUT_ID: "new-character",
-  STORY_CHARACTERS_SECTION_ID: "story-characters-section",
-  STORY_STYLE_SETTING_GENRE_BTN_ID: "story-style-setting-genre-btn",
-  STORY_SETTING_INPUT_ID: "story-setting",
-  STORY_STYLE_MATCH_BTN_ID: "story-style-match-btn",
-  STORY_SUMMARY_SECTION_ID: "story-summary-section",
-  STORY_SYNOPSIS_GEN_BTN_ID: "story-synopsis-gen-btn",
-  STORY_SYNOPSIS_ID: "story-synopsis",
-  STORY_TITLE_INPUT_ID: "story-title",
-  STORY_TITLE_UPDATE_BTN_ID: "update-story-title-btn",
-  STYLE_TEXT_INPUT_ID: "story-style",
-  SUMMARY_TEXT_INPUT_ID: "brain-dump",
+  ADD_CHARACTER_BTN: "add-character-btn",
+  CHARACTERS_CONTAINER: "characters-container",
+  GENERATE_OUTLINE: "generate-outline-btn",
+  GENERATE_OUTLINE_INPUT: "create-outline-guide",
+  GENRE_LIST: "genre-datalist",
+  GENRE_TEXT_INPUT: "story-genre",
+  NEW_CHARACTER_INPUT: "new-character",
+  STORY_CHARACTERS_SECTION: "story-characters-section",
+  STORY_OUTLINE_SECTION: "story-outline-section",
+  STORY_STYLE_SETTING_GENRE_BTN: "story-style-setting-genre-btn",
+  STORY_SETTING_INPUT: "story-setting",
+  STORY_STYLE_MATCH_BTN: "story-style-match-btn",
+  STORY_SUMMARY_SECTION: "story-summary-section",
+  STORY_SYNOPSIS_GEN_BTN: "story-synopsis-gen-btn",
+  STORY_SYNOPSIS: "story-synopsis",
+  STORY_TITLE_INPUT: "story-title",
+  STORY_TITLE_UPDATE_BTN: "update-story-title-btn",
+  STYLE_TEXT_INPUT: "story-style",
+  SUMMARY_TEXT_INPUT: "brain-dump",
 };
 const TEXT_INPUT_INLINE_STYLE =
   "max-width: calc(100vw - 70px); min-width: calc(100vw - 70px); min-height: 180px; font-family: sans-serif;";
@@ -28,40 +31,40 @@ const WRITE_PAGE_CODE_TEMPLATE = () => `
     <h2>${AppText.WRITE}</h2>
     <div style="display: flex; flex-direction: row; gap: 48px;">
       <line-input
-        id="${WritePageIds.STORY_TITLE_INPUT_ID}"
+        id="${WritePageIds.STORY_TITLE_INPUT}"
         placeholder="${AppText.ENTER_NEW_STORY}"
         style="width: calc(100vw - 155px)" value="${getCurrentTitle()}">
       </line-input>
       <paper-button
-        id="${WritePageIds.STORY_TITLE_UPDATE_BTN_ID}"
+        id="${WritePageIds.STORY_TITLE_UPDATE_BTN}"
         title="${AppText.UPDATE_STORY_TITLE}">
         ${AppText.SAVE}
       </paper-button>
     </div>
 
-    <details open id=${WritePageIds.STORY_SUMMARY_SECTION_ID}>
+    <details open id=${WritePageIds.STORY_SUMMARY_SECTION}>
       <summary style="cursor: pointer; margin: 10px;">
         ${AppText.SUMMARY}
       </summary>
       <div style="display: flex; flex-direction: column;">
         <text-input
-          id="${WritePageIds.SUMMARY_TEXT_INPUT_ID}"
+          id="${WritePageIds.SUMMARY_TEXT_INPUT}"
           style="${TEXT_INPUT_INLINE_STYLE}"
           placeholder="${AppText.BRAIN_DUMP}">
         </text-input>
         <br />
         <paper-button
-          id="${WritePageIds.STORY_STYLE_SETTING_GENRE_BTN_ID}"
+          id="${WritePageIds.STORY_STYLE_SETTING_GENRE_BTN}"
           title="${AppText.GENERATE_STYLE_AND_SETTING}">
           ${AppText.GENERATE_STYLE_AND_SETTING}
         </paper-button>
         <br />
         <line-input
-          id="${WritePageIds.GENRE_TEXT_INPUT_ID}"
-          list="${WritePageIds.GENRE_LIST_ID}"
+          id="${WritePageIds.GENRE_TEXT_INPUT}"
+          list="${WritePageIds.GENRE_LIST}"
           style="width: calc(100vw - 70px);"
           placeholder="${AppText.ENTER_GENRE}">
-          <datalist id="${WritePageIds.GENRE_LIST_ID}">
+          <datalist id="${WritePageIds.GENRE_LIST}">
             ${StoryDefaults.GENRES.map(
               (g) => `<option value="${g}"></option>`
             ).join("")}
@@ -69,51 +72,72 @@ const WRITE_PAGE_CODE_TEMPLATE = () => `
         </line-input>
         <br />
         <text-input
-          id="${WritePageIds.STYLE_TEXT_INPUT_ID}"
+          id="${WritePageIds.STYLE_TEXT_INPUT}"
           style="${TEXT_INPUT_INLINE_STYLE}"
           placeholder="${StoryDefaults.STYLE_TEMPLATE}">
         </text-input>
         <br />
         <text-input
-          id="${WritePageIds.STORY_SETTING_INPUT_ID}"
+          id="${WritePageIds.STORY_SETTING_INPUT}"
           style="${TEXT_INPUT_INLINE_STYLE}"
           placeholder="${AppText.ENTER_SETTING}">
         </text-input>
         <br />
         <paper-button
-          id="${WritePageIds.STORY_SYNOPSIS_GEN_BTN_ID}"
+          id="${WritePageIds.STORY_SYNOPSIS_GEN_BTN}"
           title="${AppText.GENERATE_SYNOPSIS}">
           ${AppText.GENERATE_SYNOPSIS}
         </paper-button>
         <br />
         <text-input
-          id="${WritePageIds.STORY_SYNOPSIS_ID}"
+          id="${WritePageIds.STORY_SYNOPSIS}"
           style="${TEXT_INPUT_INLINE_STYLE}"
           placeholder="${AppText.GENERATE_SYNOPSIS_INSTRUCTIONS}">
         </text-input>
       </div>
+      <br />
     </details>
-    <br />
-    <details open id=${WritePageIds.STORY_CHARACTERS_SECTION_ID}>
+
+    <details id=${WritePageIds.STORY_CHARACTERS_SECTION}>
       <summary style="cursor: pointer; margin: 10px;">
         ${AppText.CHARACTERS}
       </summary>
       <div
         style="display: flex; flex-direction: column;"
-        id=${WritePageIds.CHARACTERS_CONTAINER_ID}>
+        id=${WritePageIds.CHARACTERS_CONTAINER}>
       </div>
       <div style="display: flex; flex-direction: row; gap: 48px;">
         <line-input
-          id="${WritePageIds.NEW_CHARACTER_INPUT_ID}"
+          id="${WritePageIds.NEW_CHARACTER_INPUT}"
           placeholder="${AppText.NEW_CHARACTER_GUIDELINE}"
           style="width: calc(100vw - 223px)">
         </line-input>
         <paper-button
-          id="${WritePageIds.ADD_CHARACTER_BTN_ID}"
+          id="${WritePageIds.ADD_CHARACTER_BTN}"
           title="${AppText.ADD_CHARACTER}">
           ${AppText.ADD_CHARACTER}
         </paper-button>
       </div>
+      <br />
+    </details>
+
+    <details id=${WritePageIds.STORY_OUTLINE_SECTION}>
+      <summary style="cursor: pointer; margin: 10px;">
+        ${AppText.OUTLINE}
+      </summary>
+      <div style="display: flex; flex-direction: row; gap: 48px;">
+        <line-input
+          id="${WritePageIds.GENERATE_OUTLINE_INPUT}"
+          placeholder="${AppText.GENERATE_OUTLINE_GUIDE}"
+          style="width: calc(100vw - 236px)">
+        </line-input>
+        <paper-button
+          id="${WritePageIds.GENERATE_OUTLINE}"
+          title="${AppText.GENERATE_OUTLINE}">
+          ${AppText.GENERATE_OUTLINE}
+        </paper-button>
+       </div>
+       <br />
     </details>
   </div>
   <br /><br /><br />
@@ -135,6 +159,10 @@ customElements.define(
     }
 
     connectComponents() {
+      this.storySummarySection.onclick = this.openSectionOnClick;
+      this.storyCharactersSection.onclick = this.openSectionOnClick;
+      this.storyOutlineSection.onclick = this.openSectionOnClick;
+
       this.storyTitleUpdateBtn.handler = () => {
         const currentTitle = getCurrentTitle();
         const newTitle = this.storyTitleInput.value;
@@ -237,6 +265,26 @@ customElements.define(
           });
         });
     }
+
+    closeAllSections = () => {
+      this.root
+        .querySelectorAll("details")
+        .forEach((section) => section.removeAttribute("open"));
+    };
+
+    openSectionOnClick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.target.tagName !== "SUMMARY") return;
+      const target = e.target.closest("details");
+      const wasOpen = target.hasAttribute("open");
+      this.closeAllSections();
+      if (!wasOpen) target.setAttribute("open", true);
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    };
 
     /**
      * Generate style and setting for current story using Gemini API.
@@ -465,7 +513,7 @@ customElements.define(
 
     get storyTitleInput() {
       const inputEl = /** @type {import("../../../types").LineInput} */ (
-        this.root.querySelector(`#${WritePageIds.STORY_TITLE_INPUT_ID}`)
+        this.root.querySelector(`#${WritePageIds.STORY_TITLE_INPUT}`)
       );
       if (!inputEl) {
         throw new Error("Story title input not found");
@@ -475,7 +523,7 @@ customElements.define(
 
     get storyTitleUpdateBtn() {
       const btnEl = /** @type {import("../../../types").PaperButton} */ (
-        this.root.querySelector(`#${WritePageIds.STORY_TITLE_UPDATE_BTN_ID}`)
+        this.root.querySelector(`#${WritePageIds.STORY_TITLE_UPDATE_BTN}`)
       );
       if (!btnEl) {
         throw new Error("Story title update button not found");
@@ -483,9 +531,19 @@ customElements.define(
       return btnEl;
     }
 
+    get storySummarySection() {
+      const sectionEl = /** @type {HTMLDetailsElement} */ (
+        this.root.querySelector(`#${WritePageIds.STORY_SUMMARY_SECTION}`)
+      );
+      if (!sectionEl) {
+        throw new Error("Story summary section not found");
+      }
+      return sectionEl;
+    }
+
     get storySummaryBrainDumpInput() {
       const inputEl = /** @type {import("../../../types").TextInput} */ (
-        this.root.querySelector(`#${WritePageIds.SUMMARY_TEXT_INPUT_ID}`)
+        this.root.querySelector(`#${WritePageIds.SUMMARY_TEXT_INPUT}`)
       );
       if (!inputEl) {
         throw new Error("Story summary brain dump input not found");
@@ -495,7 +553,7 @@ customElements.define(
 
     get storyGenreInput() {
       const inputEl = /** @type {import("../../../types").LineInput} */ (
-        this.root.querySelector(`#${WritePageIds.GENRE_TEXT_INPUT_ID}`)
+        this.root.querySelector(`#${WritePageIds.GENRE_TEXT_INPUT}`)
       );
       if (!inputEl) {
         throw new Error("Story genre input not found");
@@ -505,7 +563,7 @@ customElements.define(
 
     get storyStyleInput() {
       const inputEl = /** @type {import("../../../types").TextInput} */ (
-        this.root.querySelector(`#${WritePageIds.STYLE_TEXT_INPUT_ID}`)
+        this.root.querySelector(`#${WritePageIds.STYLE_TEXT_INPUT}`)
       );
       if (!inputEl) {
         throw new Error("Story style input not found");
@@ -515,7 +573,7 @@ customElements.define(
 
     get storySynopsisInput() {
       const inputEl = /** @type {import("../../../types").TextInput} */ (
-        this.root.querySelector(`#${WritePageIds.STORY_SYNOPSIS_ID}`)
+        this.root.querySelector(`#${WritePageIds.STORY_SYNOPSIS}`)
       );
       if (!inputEl) {
         throw new Error("Story synopsis input not found");
@@ -525,7 +583,7 @@ customElements.define(
 
     get storySettingInput() {
       const inputEl = /** @type {import("../../../types").TextInput} */ (
-        this.root.querySelector(`#${WritePageIds.STORY_SETTING_INPUT_ID}`)
+        this.root.querySelector(`#${WritePageIds.STORY_SETTING_INPUT}`)
       );
       if (!inputEl) {
         throw new Error("Story setting input not found");
@@ -536,7 +594,7 @@ customElements.define(
     get styleSettingGenBtn() {
       const btnEl = /** @type {import("../../../types").PaperButton} */ (
         this.root.querySelector(
-          `#${WritePageIds.STORY_STYLE_SETTING_GENRE_BTN_ID}`
+          `#${WritePageIds.STORY_STYLE_SETTING_GENRE_BTN}`
         )
       );
       if (!btnEl) {
@@ -547,7 +605,7 @@ customElements.define(
 
     get synopsisGenBtn() {
       const btnEl = /** @type {import("../../../types").PaperButton} */ (
-        this.root.querySelector(`#${WritePageIds.STORY_SYNOPSIS_GEN_BTN_ID}`)
+        this.root.querySelector(`#${WritePageIds.STORY_SYNOPSIS_GEN_BTN}`)
       );
       if (!btnEl) {
         throw new Error("Story synopsis generation button not found");
@@ -555,9 +613,19 @@ customElements.define(
       return btnEl;
     }
 
+    get storyCharactersSection() {
+      const sectionEl = /** @type {HTMLDetailsElement} */ (
+        this.root.querySelector(`#${WritePageIds.STORY_CHARACTERS_SECTION}`)
+      );
+      if (!sectionEl) {
+        throw new Error("Story characters section not found");
+      }
+      return sectionEl;
+    }
+
     get newCharacterInput() {
       const inputEl = /** @type {import("../../../types").LineInput} */ (
-        this.root.querySelector(`#${WritePageIds.NEW_CHARACTER_INPUT_ID}`)
+        this.root.querySelector(`#${WritePageIds.NEW_CHARACTER_INPUT}`)
       );
       if (!inputEl) {
         throw new Error("New character input not found");
@@ -567,7 +635,7 @@ customElements.define(
 
     get addCharacterBtn() {
       const btnEl = /** @type {import("../../../types").PaperButton} */ (
-        this.root.querySelector(`#${WritePageIds.ADD_CHARACTER_BTN_ID}`)
+        this.root.querySelector(`#${WritePageIds.ADD_CHARACTER_BTN}`)
       );
       if (!btnEl) {
         throw new Error("Add character button not found");
@@ -577,12 +645,22 @@ customElements.define(
 
     get charactersContainer() {
       const containerEl = /** @type {HTMLDivElement} */ (
-        this.root.querySelector(`#${WritePageIds.CHARACTERS_CONTAINER_ID}`)
+        this.root.querySelector(`#${WritePageIds.CHARACTERS_CONTAINER}`)
       );
       if (!containerEl) {
         throw new Error("Characters container not found");
       }
       return containerEl;
+    }
+
+    get storyOutlineSection() {
+      const sectionEl = /** @type {HTMLDetailsElement} */ (
+        this.root.querySelector(`#${WritePageIds.STORY_OUTLINE_SECTION}`)
+      );
+      if (!sectionEl) {
+        throw new Error("Story outline section not found");
+      }
+      return sectionEl;
     }
   }
 );

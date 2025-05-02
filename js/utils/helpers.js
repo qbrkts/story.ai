@@ -62,6 +62,8 @@ const AppText = {
   ENTER_NEW_STORY: "Enter new story title",
   GEMINI_API_KEY: "Gemini",
   GEMINI_API_KEY_NOT_SET: "Gemini API Key not set",
+  GENERATE_OUTLINE: "Generate outline",
+  GENERATE_OUTLINE_GUIDE: "Include any specific directions for the outline you want to create. This will replace existing chapters and scenes.",
   GENERATE_STYLE_AND_SETTING: "Generate style and setting for story",
   GENERATE_SYNOPSIS: "Generate synopsis",
   GENERATE_SYNOPSIS_INSTRUCTIONS:
@@ -72,6 +74,7 @@ const AppText = {
   NEW_CHARACTER_GUIDELINE: "Optionally enter the name and any traits to guide character generation.",
   NO_API_KEY: "If you do not have an api key, visit here to generate one.",
   NO_STORIES_YET: "No stories yet... continue above",
+  OUTLINE: "Outline",
   OWNER_NAME: "Quantum Brackets",
   PREVIOUSLY_ON: "Previously on...",
   RANDOM: "Random",
