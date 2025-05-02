@@ -71,6 +71,7 @@ customElements.define(
     }
 
     render() {
+      this.textAreaEl.name = this.id;
       copyAttributes(this, this.textAreaEl, ["id"]);
     }
   }

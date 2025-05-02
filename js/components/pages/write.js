@@ -1,15 +1,18 @@
-const STORY_TITLE_INPUT_ID = "story-title";
-const STORY_TITLE_UPDATE_BTN_ID = "update-story-title-btn";
-const SUMMARY_TEXT_INPUT_ID = "braindump-text-input";
-const GENRE_TEXT_INPUT_ID = "genre-text-input";
-const STYLE_TEXT_INPUT_ID = "style-text-input";
-const STORY_STYLE_MATCH_BTN_ID = "story-style-match-btn";
-const STORY_SYNOPSIS_GEN_BTN_ID = "story-synopsis-gen-btn";
-const STORY_SYNOPSIS_ID = "story-synopsis";
-const CHARACTERS_CONTAINER_ID = "characters-container";
-const ADD_CHARACTER_BTN_ID = "add-character-btn";
-const STORY_SUMMARY_SECTION_ID = "story-summary-section";
-const STORY_CHARACTERS_SECTION_ID = "story-characters-section";
+const WritePageIds = {
+  STORY_TITLE_INPUT_ID: "story-title",
+  STORY_TITLE_UPDATE_BTN_ID: "update-story-title-btn",
+  SUMMARY_TEXT_INPUT_ID: "braindump-text-input",
+  GENRE_TEXT_INPUT_ID: "genre-text-input",
+  GENRE_LIST_ID: "genre-datalist",
+  STYLE_TEXT_INPUT_ID: "style-text-input",
+  STORY_STYLE_MATCH_BTN_ID: "story-style-match-btn",
+  STORY_SYNOPSIS_GEN_BTN_ID: "story-synopsis-gen-btn",
+  STORY_SYNOPSIS_ID: "story-synopsis",
+  CHARACTERS_CONTAINER_ID: "characters-container",
+  ADD_CHARACTER_BTN_ID: "add-character-btn",
+  STORY_SUMMARY_SECTION_ID: "story-summary-section",
+  STORY_CHARACTERS_SECTION_ID: "story-characters-section",
+};
 const TEXT_INPUT_INLINE_STYLE =
   "max-width: calc(100vw - 70px); min-width: calc(100vw - 70px); min-height: 180px; font-family: sans-serif;";
 const WRITE_PAGE_CODE_TEMPLATE = () => `
@@ -23,63 +26,73 @@ const WRITE_PAGE_CODE_TEMPLATE = () => `
     <h2>${AppText.WRITE}</h2>
     <div style="display: flex; flex-direction: row; gap: 48px;">
     <line-input
-      id="${STORY_TITLE_INPUT_ID}"
+      id="${WritePageIds.STORY_TITLE_INPUT_ID}"
       placeholder="${AppText.ENTER_NEW_STORY}"
       style="width: calc(100vw - 155px)" value="${getCurrentTitle()}">
     </line-input>
     <paper-button
-      id="${STORY_TITLE_UPDATE_BTN_ID}"
+      id="${WritePageIds.STORY_TITLE_UPDATE_BTN_ID}"
       title="${AppText.UPDATE_STORY_TITLE}">
       ${AppText.SAVE}
     </paper-button>
     </div>
 
-    <details open id=${STORY_SUMMARY_SECTION_ID}>
+    <details open id=${WritePageIds.STORY_SUMMARY_SECTION_ID}>
       <summary style="cursor: pointer; margin: 10px;">
         ${AppText.SUMMARY}
       </summary>
       <div style="display: flex; flex-direction: column;">
         <text-input
-          id="${SUMMARY_TEXT_INPUT_ID}"
+          id="${WritePageIds.SUMMARY_TEXT_INPUT_ID}"
           style="${TEXT_INPUT_INLINE_STYLE}"
           placeholder="${AppText.BRAIN_DUMP}">
         </text-input>
         <br />
-        <br />
         <line-input
-          id="${GENRE_TEXT_INPUT_ID}"
+          id="${WritePageIds.GENRE_TEXT_INPUT_ID}"
+          list="${WritePageIds.GENRE_LIST_ID}"
           style="width: calc(100vw - 70px);"
           placeholder="${AppText.ENTER_GENRE}">
+          <datalist id="${WritePageIds.GENRE_LIST_ID}">
+            ${StoryDefaults.GENRES.map(g => `<option value="${g}"></option>`).join("")}
+          </datalist>
         </line-input>
         <br />
         <text-input
-          id="${STYLE_TEXT_INPUT_ID}"
+          id="${WritePageIds.STYLE_TEXT_INPUT_ID}"
           style="${TEXT_INPUT_INLINE_STYLE}"
           placeholder="${AppText.ENTER_STYLE}">
         </text-input>
         <br />
+        <text-input
+          id="${WritePageIds.STORY_SETTING_INPUT_ID}"
+          style="${TEXT_INPUT_INLINE_STYLE}"
+          placeholder="${AppText.ENTER_SETTING}">
+        </text-input>
         <br />
         <paper-button
-          id="${STORY_SYNOPSIS_GEN_BTN_ID}"
+          id="${WritePageIds.STORY_SYNOPSIS_GEN_BTN_ID}"
           title="${AppText.UPDATE_STORY_TITLE}">
           ${AppText.GENERATE_SYNOPSIS}
         </paper-button>
         <br />
         <text-input
-          id="${STORY_SYNOPSIS_ID}"
+          id="${WritePageIds.STORY_SYNOPSIS_ID}"
           style="${TEXT_INPUT_INLINE_STYLE}"
           placeholder="${AppText.GENERATE_SYNOPSIS_INSTRUCTIONS}">
         </text-input>
       </div>
     </details>
     <br />
-    <details open id=${STORY_CHARACTERS_SECTION_ID}>
+    <details open id=${WritePageIds.STORY_CHARACTERS_SECTION_ID}>
       <summary style="cursor: pointer; margin: 10px;">
         ${AppText.CHARACTERS}
       </summary>
-      <div style="display: flex; flex-direction: column;" id=${CHARACTERS_CONTAINER_ID}>
+      <div style="display: flex; flex-direction: column;" id=${
+        WritePageIds.CHARACTERS_CONTAINER_ID
+      }>
       </div>
-      <paper-button id=${ADD_CHARACTER_BTN_ID}>
+      <paper-button id=${WritePageIds.ADD_CHARACTER_BTN_ID}>
         ${AppText.ADD_CHARACTER}
       </paper-button>
     </details>
@@ -104,6 +117,10 @@ customElements.define(
     render() {
       const storyDocument = getStoryDocumentByTitle(getCurrentTitle());
       this.storySummaryBrainDumpInput.value = storyDocument.summary;
+      this.storyGenreInput.value = storyDocument.genre;
+      this.storyStyleInput.value = storyDocument.style;
+      this.storySynopsisInput.value = storyDocument.synopsis;
+      this.storySettingInput.value = storyDocument.setting;
 
       this.storyTitleUpdateBtn.addEventListener("click", () => {
         const currentTitle = getCurrentTitle();
@@ -121,6 +138,27 @@ customElements.define(
         storyDocument.summary = this.storySummaryBrainDumpInput.value;
         addStoryDocumentToLocalStorage(currentTitle, storyDocument);
       });
+
+      this.storyGenreInput.addEventListener("input", () => {
+        const currentTitle = getCurrentTitle();
+        const storyDocument = getStoryDocumentByTitle(currentTitle);
+        storyDocument.genre = this.storyGenreInput.value;
+        addStoryDocumentToLocalStorage(currentTitle, storyDocument);
+      });
+
+      this.storyStyleInput.addEventListener("input", () => {
+        const currentTitle = getCurrentTitle();
+        const storyDocument = getStoryDocumentByTitle(currentTitle);
+        storyDocument.style = this.storyStyleInput.value;
+        addStoryDocumentToLocalStorage(currentTitle, storyDocument);
+      });
+
+      this.storySynopsisInput.addEventListener("input", () => {
+        const currentTitle = getCurrentTitle();
+        const storyDocument = getStoryDocumentByTitle(currentTitle);
+        storyDocument.synopsis = this.storySynopsisInput.value;
+        addStoryDocumentToLocalStorage(currentTitle, storyDocument);
+      });
     }
 
     get root() {
@@ -132,7 +170,7 @@ customElements.define(
 
     get storyTitleInput() {
       const inputEl = /** @type {import("../../../types").LineInput} */ (
-        this.root.querySelector(`#${STORY_TITLE_INPUT_ID}`)
+        this.root.querySelector(`#${WritePageIds.STORY_TITLE_INPUT_ID}`)
       );
       if (!inputEl) {
         throw new Error("Story title input not found");
@@ -142,7 +180,7 @@ customElements.define(
 
     get storyTitleUpdateBtn() {
       const btnEl = /** @type {import("../../../types").PaperButton} */ (
-        this.root.querySelector(`#${STORY_TITLE_UPDATE_BTN_ID}`)
+        this.root.querySelector(`#${WritePageIds.STORY_TITLE_UPDATE_BTN_ID}`)
       );
       if (!btnEl) {
         throw new Error("Story title update button not found");
@@ -152,10 +190,50 @@ customElements.define(
 
     get storySummaryBrainDumpInput() {
       const inputEl = /** @type {import("../../../types").TextInput} */ (
-        this.root.querySelector(`#${SUMMARY_TEXT_INPUT_ID}`)
+        this.root.querySelector(`#${WritePageIds.SUMMARY_TEXT_INPUT_ID}`)
       );
       if (!inputEl) {
         throw new Error("Story summary brain dump input not found");
+      }
+      return inputEl;
+    }
+
+    get storyGenreInput() {
+      const inputEl = /** @type {import("../../../types").LineInput} */ (
+        this.root.querySelector(`#${WritePageIds.GENRE_TEXT_INPUT_ID}`)
+      );
+      if (!inputEl) {
+        throw new Error("Story genre input not found");
+      }
+      return inputEl;
+    }
+
+    get storyStyleInput() {
+      const inputEl = /** @type {import("../../../types").TextInput} */ (
+        this.root.querySelector(`#${WritePageIds.STYLE_TEXT_INPUT_ID}`)
+      );
+      if (!inputEl) {
+        throw new Error("Story style input not found");
+      }
+      return inputEl;
+    }
+
+    get storySynopsisInput() {
+      const inputEl = /** @type {import("../../../types").TextInput} */ (
+        this.root.querySelector(`#${WritePageIds.STORY_SYNOPSIS_ID}`)
+      );
+      if (!inputEl) {
+        throw new Error("Story synopsis input not found");
+      }
+      return inputEl;
+    }
+
+    get storySettingInput() {
+      const inputEl = /** @type {import("../../../types").TextInput} */ (
+        this.root.querySelector(`#${WritePageIds.STORY_SETTING_INPUT_ID}`)
+      );
+      if (!inputEl) {
+        throw new Error("Story setting input not found");
       }
       return inputEl;
     }

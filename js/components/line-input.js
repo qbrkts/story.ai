@@ -23,8 +23,7 @@ const LINE_INPUT_STYLE = `
   }
 `;
 const LINE_INPUT_CODE_TEMPLATE = `
-<input id="${LINE_INPUT_ID}" class="${LINE_INPUT_CLS}" type="text">
-</input>`;
+<input id="${LINE_INPUT_ID}" class="${LINE_INPUT_CLS}" type="text"></input>`;
 
 customElements.define(
   LINE_INPUT_COMPONENT_NAME,
@@ -72,7 +71,12 @@ customElements.define(
     }
 
     render() {
+      this.inputEl.name = this.id;
       copyAttributes(this, this.inputEl, ["id"]);
+      // add any children of the parent to the shadow dom
+      Array.from(this.childNodes).forEach((child) => {
+        this.root.appendChild(child);
+      });
     }
   }
 );

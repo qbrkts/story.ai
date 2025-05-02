@@ -44,6 +44,7 @@ const AppText = {
   ENTER_GENRE: "Enter genre e.g. Sci-Fi Fantasy, Thriller Romance",
   ENTER_STYLE:
     "Enter a sample of your writing to get a similar style or use descriptors e.g. First Person, Third Person, Omniscient etc.",
+  ENTER_SETTING: "Enter setting e.g. Earth, Mars, Fantasy World",
   ENTER_NEW_STORY: "Enter new story title",
   GEMINI_API_KEY: "Gemini API Key",
   GENERATE_SYNOPSIS: "Generate synopsis",
@@ -248,175 +249,161 @@ function getCurrentTitle() {
 }
 
 const StoryDefaults = {
+  GENRES: [
+    "Action",
+    "Adult",
+    "Adventure",
+    "Alternate History",
+    "Artificial Intelligence",
+    // "Astrobiology",
+    // "Astrophysics",
+    // "Biopunk",
+    // "Black Holes",
+    // "Colonization",
+    "Comedy",
+    // "Coming of Age",
+    // "Cosmic Strings",
+    "Cyberpunk",
+    // "Dark Energy",
+    // "Dark Fantasy",
+    // "Dark Matter",
+    "Drama",
+    "Dystopian",
+    "Epic Fantasy",
+    "Family",
+    "Fantasy",
+    // "Faster Than Light Travel",
+    // "Genetic Engineering",
+    // "Gravitational Waves",
+    // "Hard Science Fiction",
+    // "High Fantasy",
+    "Historical",
+    "Horror",
+    // "Low Fantasy",
+    "Magical Realism",
+    "Multiverse",
+    "Mystery",
+    // "Nanotechnology",
+    // "Parallel Universe",
+    "Paranormal",
+    "Post-apocalyptic",
+    // "Quantum Mechanics",
+    "Robotics",
+    "Romance",
+    "Science Fiction",
+    "Slice of Life",
+    // "Soft Science Fiction",
+    // "Space Exploration",
+    "Space Opera",
+    // "Space-Time Continuum",
+    "Sports",
+    "Steampunk",
+    // "String Theory",
+    "Superhero",
+    // "Sword and Sorcery",
+    // "Teleportation",
+    // "Terraforming",
+    "Thriller",
+    // "Time Dilation",
+    // "Time Travel",
+    // "Urban Fantasy",
+    // "Virtual Reality",
+    "Western",
+    // "Wormholes",
+    "Young Adult",
+  ],
   setting: {
-    EARTH: {
-      name: "Earth",
-      description: "A planet with diverse cultures and landscapes.",
-      lore: [
-        {
-          name: "The Observable Universe",
-          description:
-            "Extending approximately 93 billion light-years in diameter, containing hundreds of billions of galaxies, each with hundreds of billions of stars. Dominated by dark energy and dark matter, with ordinary matter making up a small percentage. Expanding and evolving since the Big Bang. Contains vast empty spaces (voids) and dense clusters of galaxies. Background microwave radiation provides evidence of the early universe.",
-          time: "13.8 billion years ago - present",
-          keyFigures: [
-            {
-              name: "Edwin Hubble",
-              description:
-                "Astronomer who provided evidence of the expanding universe.",
-            },
-            {
-              name: "Albert Einstein",
-              description:
-                "Developed the theory of General Relativity, crucial for understanding cosmology.",
-            },
-            {
-              name: "Vera Rubin",
-              description:
-                "Pioneering astronomer who provided evidence for dark matter.",
-            },
-          ],
-        },
-        {
-          name: "The Milky Way Galaxy",
-          description:
-            "A barred spiral galaxy approximately 100,000 light-years in diameter, containing our Solar System and hundreds of billions of stars. Features spiral arms, a central bulge, and a supermassive black hole at its center (Sagittarius A*). Surrounded by a halo of dark matter and globular clusters. Orbiting the center takes our Solar System roughly 230 million years (a Galactic year).",
-          time: "Billions of years ago - present",
-          keyFigures: [
-            {
-              name: "Galileo Galilei",
-              description:
-                "Early astronomer who observed the Milky Way's composition with a telescope.",
-            },
-            {
-              name: "Karl Jansky",
-              description:
-                "Discovered radio waves emanating from the center of the Milky Way.",
-            },
-          ],
-        },
-        {
-          name: "The Solar System",
-          description:
-            "A system consisting of the Sun, eight planets (Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune), numerous dwarf planets (including Pluto and Ceres), asteroids, comets, and other small bodies. Held together by the Sun's gravity. Located in the Orion Arm of the Milky Way. The inner planets are rocky, while the outer planets are gas and ice giants.",
-          time: "4.6 billion years ago - present",
-          keyFigures: [
-            {
-              name: "Nicolaus Copernicus",
-              description:
-                "Developed the heliocentric model of the Solar System.",
-            },
-            {
-              name: "Johannes Kepler",
-              description: "Formulated the laws of planetary motion.",
-            },
-            {
-              name: "Isaac Newton",
-              description: "Developed the law of universal gravitation.",
-            },
-          ],
-        },
-        {
-          name: "Planet Earth",
-          description:
-            "The third planet from the Sun, the only known celestial body to harbor life. Characterized by its diverse biosphere, liquid water on its surface, tectonic plates, and a magnetic field. Composed primarily of iron, oxygen, silicon, magnesium, sulfur, nickel, calcium, and aluminum. Its atmosphere is about 78% nitrogen, 21% oxygen, and trace amounts of other gases. Experiences seasons due to its axial tilt.",
-          time: "4.54 billion years ago - present",
-          keyFigures: [
-            {
-              name: "James Hutton",
-              description: "Considered the father of modern geology.",
-            },
-            {
-              name: "Charles Darwin",
-              description:
-                "Developed the theory of evolution by natural selection.",
-            },
-            {
-              name: "Rachel Carson",
-              description:
-                "Marine biologist and conservationist who highlighted the impact of pesticides.",
-            },
-          ],
-        },
-        {
-          name: "Earth's Continents (Present Day)",
-          description:
-            "Large, continuous masses of land on Earth's surface, currently divided into seven: Africa, Antarctica, Asia, Australia, Europe, North America, and South America. Their shapes and positions have changed over geological time due to plate tectonics. Each continent has unique geological features, climates, and ecosystems.",
-          time: "Millions of years ago - present (current configuration relatively recent in geological terms)",
-          keyFigures: [
-            {
-              name: "Alfred Wegener",
-              description: "Proposed the theory of continental drift.",
-            },
-            {
-              name: "Marie Tharp",
-              description:
-                "Oceanographic cartographer who helped prove plate tectonics.",
-            },
-          ],
-        },
-        {
-          name: "Earth's Oceans (Present Day)",
-          description:
-            "The interconnected body of saltwater covering over 70% of Earth's surface. Divided into five main basins: Pacific, Atlantic, Indian, Arctic, and Southern. Plays a crucial role in regulating climate, supporting biodiversity, and influencing weather patterns. Contains diverse marine ecosystems, from shallow coral reefs to deep-sea trenches.",
-          time: "Billions of years ago - present",
-          keyFigures: [
-            {
-              name: "Jacques Cousteau",
-              description:
-                "Oceanographer and filmmaker who popularized marine biology.",
-            },
-            {
-              name: "Sylvia Earle",
-              description:
-                "Marine biologist and oceanographer, a leading advocate for ocean conservation.",
-            },
-          ],
-        },
-        {
-          name: "Human History (Present Day Context)",
-          description:
-            "The history of Homo sapiens, from the Paleolithic era to the present day. Includes the development of agriculture, the rise and fall of civilizations, major technological advancements (e.g., the Industrial Revolution, the Information Age), significant social and political movements, and the formation of diverse cultures and societies across the globe. Marked by periods of conflict and cooperation, innovation and stagnation.",
-          time: "Roughly 300,000 years ago - present",
-          keyFigures: [
-            {
-              name: "Various (representing early hominids)",
-              description: "Australopithecus, Homo habilis, Homo erectus, etc.",
-            },
-            {
-              name: "Key figures from various historical periods",
-              description:
-                "Leaders, thinkers, artists, scientists from different eras and cultures (e.g., Julius Caesar, Confucius, Leonardo da Vinci, Marie Curie, Nelson Mandela).",
-            },
-          ],
-        },
-        {
-          name: "Present Day Global Cultures",
-          description:
-            "The diverse array of human societies, practices, beliefs, values, traditions, and artistic expressions that exist across the world today. Characterized by a complex interplay of local customs and global influences (globalization). Includes a wide range of languages, religions, social structures, political systems, and economic models. Continuously evolving and interacting.",
-          time: "Present",
-          keyFigures: [
-            {
-              name: "Various (representing cultural figures)",
-              description:
-                "Artists, musicians, writers, activists, religious leaders from different cultures and regions.",
-            },
-          ],
-        },
-        {
-          name: "Present Day Science and Technology",
-          description:
-            "The accumulated body of knowledge about the natural world and the application of this knowledge for practical purposes. Characterized by the scientific method, peer review, and ongoing research across numerous fields (e.g., physics, chemistry, biology, medicine, computer science, engineering). Drives technological innovation, shaping modern society and our understanding of the universe.",
-          time: "Present (built upon centuries of scientific discovery)",
-          keyFigures: [
-            {
-              name: "Leading scientists and engineers in various fields",
-              description:
-                "Researchers pushing the boundaries of knowledge in areas like artificial intelligence, biotechnology, space exploration, climate science, etc.",
-            },
-          ],
-        },
-      ],
-    },
+    EARTH: `Earth, A planet with diverse cultures and landscapes.
+
+The Observable Universe
+13.8 billion years ago - present
+Extending approximately 93 billion light-years in diameter.
+Containing hundreds of billions of galaxies, each with hundreds of billions of stars.
+Dominated by dark energy and dark matter, with ordinary matter making up a small percentage.
+Expanding and evolving since the Big Bang.
+Contains vast empty spaces (voids) and dense clusters of galaxies.
+Background microwave radiation provides evidence of the early universe.
+Edwin Hubble, Astronomer who provided evidence of the expanding universe.
+Albert Einstein, Developed the theory of General Relativity, crucial for understanding cosmology.
+Vera Rubin, ScientistPioneering astronomer who provided evidence for dark matter.
+
+The Milky Way Galaxy
+Billions of years ago - present
+A barred spiral galaxy approximately 100,000 light-years in diameter, containing our Solar System and hundreds of billions of stars.
+Features spiral arms, a central bulge, and a supermassive black hole at its center (Sagittarius A*).
+Surrounded by a halo of dark matter and globular clusters.
+Orbiting the center takes our Solar System roughly 230 million years (a Galactic year).
+Galileo Galilei, Early astronomer who observed the Milky Way's composition with a telescope.
+Karl Jansky, Discovered radio waves emanating from the center of the Milky Way.
+
+The Solar System
+4.6 billion years ago - present
+A system consisting of the Sun, eight planets (Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune), numerous dwarf planets (including Pluto and Ceres), asteroids, comets, and other small bodies.
+Held together by the Sun's gravity.
+Located in the Orion Arm of the Milky Way.
+The inner planets are rocky, while the outer planets are gas and ice giants.
+Nicolaus Copernicus, Developed the heliocentric model of the Solar System.
+Johannes Kepler, Formulated the laws of planetary motion.
+Isaac Newton, Developed the law of universal gravitation.
+
+Planet Earth
+4.54 billion years ago - present
+The third planet from the Sun, the only known celestial body to harbor life.
+Characterized by its diverse biosphere, liquid water on its surface, tectonic plates, and a magnetic field.
+Composed primarily of iron, oxygen, silicon, magnesium, sulfur, nickel, calcium, and aluminum.
+Its atmosphere is about 78% nitrogen, 21% oxygen, and trace amounts of other gases.
+Experiences seasons due to its axial tilt.
+James Hutton, Considered the father of modern geology
+Charles Darwin, Developed the theory of evolution by natural selection.
+Rachel Carson, Marine biologist and conservationist who highlighted the impact of pesticides.
+
+Earth's Continents (Present Day)
+Millions of years ago - present (current configuration relatively recent in geological terms)
+Large, continuous masses of land on Earth's surface, currently divided into seven:
+Africa, Antarctica, Asia, Australia, Europe, North America, and South America.
+Their shapes and positions have changed over geological time due to plate tectonics.
+Each continent has unique geological features, climates, and ecosystems.
+Alfred Wegener, Proposed the theory of continental drift.
+Marie Tharp, Oceanographic cartographer who helped prove plate tectonics.
+
+Earth's Oceans (Present Day),
+Billions of years ago - present
+The interconnected body of saltwater covering over 70% of Earth's surface.
+Divided into five main basins: Pacific, Atlantic, Indian, Arctic, and Southern.
+Plays a crucial role in regulating climate, supporting biodiversity, and influencing weather patterns.
+Contains diverse marine ecosystems, from shallow coral reefs to deep-sea trenches.
+Jacques Cousteau, Oceanographer and filmmaker who popularized marine biology.
+Sylvia Earle, Marine biologist and oceanographer, a leading advocate for ocean conservation.
+
+Human History (Present Day Context)
+Roughly 300,000 years ago - present
+The history of Homo sapiens, from the Paleolithic era to the present day.
+Includes the development of agriculture, the rise and fall of civilizations,
+major technological advancements (e.g., the Industrial Revolution, the Information Age),
+significant social and political movements, and the formation of diverse cultures and societies across the globe.
+Marked by periods of conflict and cooperation, innovation and stagnation.
+Various (representing early hominids), Australopithecus, Homo habilis, Homo erectus, etc.
+Key figures from various historical periods, Leaders, thinkers, artists, scientists from different eras and cultures (e.g., Julius Caesar, Confucius, Leonardo da Vinci, Marie Curie, Nelson Mandela).
+
+Present Day Global Cultures
+Present (built upon centuries of societal evolution)
+The diverse array of human societies, practices, beliefs, values, traditions,
+and artistic expressions that exist across the world today.
+Characterized by a complex interplay of local customs and global influences (globalization).
+Includes a wide range of languages, religions, social structures, political systems,
+and economic models. Continuously evolving and interacting.",
+Various (representing cultural figures)
+Artists, musicians, writers, activists, religious leaders from different cultures and regions.
+
+Present Day Science and Technology
+Present (built upon centuries of scientific discovery)
+The accumulated body of knowledge about the natural world and the application of this knowledge for practical purposes.
+Characterized by the scientific method, peer review, and ongoing research across numerous fields
+(e.g., physics, chemistry, biology, medicine, computer science, engineering).
+Drives technological innovation, shaping modern society and our understanding of the universe.",
+Leading scientists and engineers in various fields,
+Researchers pushing the boundaries of knowledge in areas like artificial intelligence, biotechnology, space exploration, climate science, etc.
+`,
   },
 };
 
@@ -430,7 +417,7 @@ const DEFAULT_DOCUMENT = {
   /** User specified style for generating outlines and scenes  */
   style: "",
   /** User created story world setting for generating synopsis, outline and scenes */
-  setting: [],
+  setting: "",
   /** AI generated synopsis of the story for generating characters */
   synopsis: "",
   /**
@@ -456,6 +443,9 @@ function getStoryDocumentByTitle(title) {
     getValueFromLocalStorage(storyContentStorageKey(title)) ?? DEFAULT_DOCUMENT;
   if (!storyDocument.title) {
     storyDocument.title = titleStorageKey(title);
+  }
+  if (!storyDocument.setting) {
+    storyDocument.setting = StoryDefaults.setting.EARTH;
   }
   return storyDocument;
 }
