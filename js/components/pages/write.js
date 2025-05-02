@@ -1,8 +1,10 @@
+const CHARACTER_DELETE_TIMEOUT_MS = 5000;
 const WritePageIds = {
   ADD_CHARACTER_BTN_ID: "add-character-btn",
   CHARACTERS_CONTAINER_ID: "characters-container",
   GENRE_LIST_ID: "genre-datalist",
   GENRE_TEXT_INPUT_ID: "story-genre",
+  NEW_CHARACTER_INPUT_ID: "new-character",
   STORY_CHARACTERS_SECTION_ID: "story-characters-section",
   STORY_STYLE_SETTING_GENRE_BTN_ID: "story-style-setting-genre-btn",
   STORY_SETTING_INPUT_ID: "story-setting",
@@ -25,16 +27,16 @@ const WRITE_PAGE_CODE_TEMPLATE = () => `
   <div>
     <h2>${AppText.WRITE}</h2>
     <div style="display: flex; flex-direction: row; gap: 48px;">
-    <line-input
-      id="${WritePageIds.STORY_TITLE_INPUT_ID}"
-      placeholder="${AppText.ENTER_NEW_STORY}"
-      style="width: calc(100vw - 155px)" value="${getCurrentTitle()}">
-    </line-input>
-    <paper-button
-      id="${WritePageIds.STORY_TITLE_UPDATE_BTN_ID}"
-      title="${AppText.UPDATE_STORY_TITLE}">
-      ${AppText.SAVE}
-    </paper-button>
+      <line-input
+        id="${WritePageIds.STORY_TITLE_INPUT_ID}"
+        placeholder="${AppText.ENTER_NEW_STORY}"
+        style="width: calc(100vw - 155px)" value="${getCurrentTitle()}">
+      </line-input>
+      <paper-button
+        id="${WritePageIds.STORY_TITLE_UPDATE_BTN_ID}"
+        title="${AppText.UPDATE_STORY_TITLE}">
+        ${AppText.SAVE}
+      </paper-button>
     </div>
 
     <details open id=${WritePageIds.STORY_SUMMARY_SECTION_ID}>
@@ -96,15 +98,22 @@ const WRITE_PAGE_CODE_TEMPLATE = () => `
       <summary style="cursor: pointer; margin: 10px;">
         ${AppText.CHARACTERS}
       </summary>
-      <div style="display: flex; flex-direction: column;" id=${
-        WritePageIds.CHARACTERS_CONTAINER_ID
-      }>
+      <div
+        style="display: flex; flex-direction: column;"
+        id=${WritePageIds.CHARACTERS_CONTAINER_ID}>
       </div>
-      <paper-button
-        id="${WritePageIds.ADD_CHARACTER_BTN_ID}"
-        title="${AppText.ADD_CHARACTER}">
-        ${AppText.ADD_CHARACTER}
-      </paper-button>
+      <div style="display: flex; flex-direction: row; gap: 48px;">
+        <line-input
+          id="${WritePageIds.NEW_CHARACTER_INPUT_ID}"
+          placeholder="${AppText.NEW_CHARACTER_GUIDELINE}"
+          style="width: calc(100vw - 223px)">
+        </line-input>
+        <paper-button
+          id="${WritePageIds.ADD_CHARACTER_BTN_ID}"
+          title="${AppText.ADD_CHARACTER}">
+          ${AppText.ADD_CHARACTER}
+        </paper-button>
+      </div>
     </details>
   </div>
   <br /><br /><br />
@@ -139,6 +148,8 @@ customElements.define(
       this.styleSettingGenBtn.handler = this.generateStyleSetting;
 
       this.synopsisGenBtn.handler = this.generateSynopsis;
+
+      this.addCharacterBtn.handler = this.addGeneratedCharacter;
 
       this.storySummaryBrainDumpInput.addEventListener("input", () => {
         const currentTitle = getCurrentTitle();
@@ -183,6 +194,48 @@ customElements.define(
       this.storyStyleInput.value = storyDocument.style;
       this.storySynopsisInput.value = storyDocument.synopsis;
       this.storySettingInput.value = storyDocument.setting || "";
+
+      this.charactersContainer.innerHTML = "";
+      const getCharacterInputDescription = (input) => {
+        return input.value.trim();
+      };
+      const shouldDeleteCharacterInput = (input) => {
+        return (
+          getCharacterInputDescription(input).toLowerCase() ===
+          DELETE_CHARACTER_MARKER
+        );
+      };
+      Object.entries(storyDocument.characters)
+        .sort()
+        .forEach(([name, description]) => {
+          const characterInput =
+            /** @type {import('../../../types').TextInput} */ (
+              document.createElement(ComponentName.TEXT_INPUT)
+            );
+          characterInput.name = name;
+          characterInput.setAttribute("name", name);
+          characterInput.value = description;
+          characterInput.setAttribute("style", TEXT_INPUT_INLINE_STYLE);
+          characterInput.style.marginBottom = "16px";
+          this.charactersContainer.appendChild(characterInput);
+          characterInput.addEventListener("input", () => {
+            const currentTitle = getCurrentTitle();
+            const storyDocument = getStoryDocumentByTitle(currentTitle);
+            const characterDescription = characterInput.value.trim();
+            if (shouldDeleteCharacterInput(characterInput)) {
+              setTimeout(() => {
+                if (shouldDeleteCharacterInput(characterInput)) {
+                  characterInput.remove();
+                  delete storyDocument.characters[name];
+                  addStoryDocumentToLocalStorage(currentTitle, storyDocument);
+                }
+              }, CHARACTER_DELETE_TIMEOUT_MS);
+            } else {
+              storyDocument.characters[name] = characterDescription;
+              addStoryDocumentToLocalStorage(currentTitle, storyDocument);
+            }
+          });
+        });
     }
 
     /**
@@ -327,6 +380,71 @@ customElements.define(
       this.render();
     };
 
+    /**
+     * @param {MouseEvent} e click
+     */
+    addGeneratedCharacter = async (e) => {
+      const title = getCurrentTitle();
+      const storyDocument = getStoryDocumentByTitle(title);
+      if (!storyDocument.title) {
+        alert(AppText.STORY_TITLE_NOT_SET);
+        this.storyTitleInput.focus();
+        return;
+      }
+      if (!storyDocument.synopsis) {
+        alert(AppText.STORY_SYNOPSIS_NOT_SET);
+        this.storySynopsisInput.focus();
+        return;
+      }
+      const apiKey = getGeminiKeyFromLocalStorage();
+      if (!apiKey) {
+        alert(AppText.GEMINI_API_KEY_NOT_SET);
+        this.geminiApiKeyComponent.grabFocus();
+        return;
+      }
+      this.addCharacterBtn.disabled = true;
+      const characterPrompt = this.newCharacterInput.value.trim();
+      const characterResultPromise = fetchFromGemini(
+        apiKey,
+        [
+          `Generate a character for the story "${title}"`,
+          `This is the summary of the story: "${storyDocument.summary}"`,
+          `This is the genre of the story: "${storyDocument.genre}"`,
+          `This is the setting of the story: "${storyDocument.setting}"`,
+          `This is the synopsis of the story: "${storyDocument.synopsis}"`,
+          `These are the existing characters: ${JSON.stringify(
+            storyDocument.characters,
+            null,
+            2
+          )}`,
+          `Attempt to maintain a balance between the ages, cultures and genders of characters.`,
+          `The character should be tailored to the story based on the synopsis.`,
+          `The character should not be redundant with the existing characters.`,
+          characterPrompt &&
+            `The character should be inline with the given information: ${characterPrompt}`,
+          `The character should be in the format: ${StoryDefaults.CHARACTER_TEMPLATE}`,
+        ]
+          .filter(Boolean)
+          .join("\n\n"),
+        `{"character": {"name": "generated character primary name", "description": "generated character details matching template goes here"}}`
+      );
+      const result = await characterResultPromise;
+      console.log("character result:", result);
+      storyDocument.characters[result.character.name] =
+        result.character.description;
+      alert(AppText.SUCCESS_NEW_CHARACTER);
+      addStoryDocumentToLocalStorage(title, storyDocument);
+      this.addCharacterBtn.disabled = false;
+      this.render();
+      setTimeout(() => {
+        /** @type {import ('../../../types').TextInput} */ (
+          this.charactersContainer.querySelector(
+            `[name="${result.character.name}"]`
+          )
+        )?.focus();
+      }, 1000);
+    };
+
     get root() {
       if (!this.shadowRoot) {
         throw new Error("Shadow DOM not supported");
@@ -435,6 +553,36 @@ customElements.define(
         throw new Error("Story synopsis generation button not found");
       }
       return btnEl;
+    }
+
+    get newCharacterInput() {
+      const inputEl = /** @type {import("../../../types").LineInput} */ (
+        this.root.querySelector(`#${WritePageIds.NEW_CHARACTER_INPUT_ID}`)
+      );
+      if (!inputEl) {
+        throw new Error("New character input not found");
+      }
+      return inputEl;
+    }
+
+    get addCharacterBtn() {
+      const btnEl = /** @type {import("../../../types").PaperButton} */ (
+        this.root.querySelector(`#${WritePageIds.ADD_CHARACTER_BTN_ID}`)
+      );
+      if (!btnEl) {
+        throw new Error("Add character button not found");
+      }
+      return btnEl;
+    }
+
+    get charactersContainer() {
+      const containerEl = /** @type {HTMLDivElement} */ (
+        this.root.querySelector(`#${WritePageIds.CHARACTERS_CONTAINER_ID}`)
+      );
+      if (!containerEl) {
+        throw new Error("Characters container not found");
+      }
+      return containerEl;
     }
   }
 );

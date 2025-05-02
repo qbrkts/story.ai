@@ -37,12 +37,6 @@ customElements.define(
       super();
       this.attachShadow({ mode: "open" });
       this.root.innerHTML = TEXT_INPUT_CODE_TEMPLATE;
-      const style = document.createElement("style");
-      style.textContent = `${TEXT_INPUT_STYLE}
-.${TEXT_INPUT_TITLE_CLS}::before {
-${textInputTitleStyle(this)}
-}`;
-      this.root.appendChild(style);
     }
 
     get root() {
@@ -81,6 +75,14 @@ ${textInputTitleStyle(this)}
     render() {
       this.textAreaEl.name = this.id;
       copyAttributes(this, this.textAreaEl, ["id"]);
+
+      // set style after element has been added to document
+      const style = document.createElement("style");
+      style.textContent = `${TEXT_INPUT_STYLE}
+.${TEXT_INPUT_TITLE_CLS}::before {
+${textInputTitleStyle(this)}
+}`;
+      this.root.appendChild(style);
     }
   }
 );

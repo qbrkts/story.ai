@@ -46,6 +46,7 @@ const StorageKey = {
   STORY_CONTENTS: `${STORY_AI_NS}:story-contents`,
 };
 
+const DELETE_CHARACTER_MARKER = "delete";
 const AppText = {
   ADD_CHARACTER: "Add Character",
   API_KEY_SAVED: "API Key updated successfully!",
@@ -68,6 +69,7 @@ const AppText = {
   INFINITE_STORIES: "Enter the world of infinite tales",
   INVALID_API_KEY: "Please enter a valid API Key.",
   LOADING: "Loading...",
+  NEW_CHARACTER_GUIDELINE: "Optionally enter the name and any traits to guide character generation.",
   NO_API_KEY: "If you do not have an api key, visit here to generate one.",
   NO_STORIES_YET: "No stories yet... continue above",
   OWNER_NAME: "Quantum Brackets",
@@ -87,6 +89,7 @@ const AppText = {
   STORY_STYLE_NOT_SET:
     "Deciding on a style will help generate outlines, scenes and chapters for your story in a consistent way.",
   SUCCESS: "Success",
+  SUCCESS_NEW_CHARACTER: `Successfully generated new character. Add any extra traits to their description matching the same format. To remove a character, replace their description with '${DELETE_CHARACTER_MARKER}'.`,
   SUMMARY: "Summary",
   STYLE_OR_SETTING_ALREADY_PRESENT:
     "Delete the existing story style and settings if you want to generate new ones.",
@@ -233,7 +236,7 @@ function textInputTitleStyle(element) {
 border-radius: 2px;
 color: #303030;
 content: "${keyAsTitleCase(
-    element.title || element.id || element.getAttribute("name") || ""
+    element.title || element.id || element.name || ""
   )} ▾";
 display: block;
 font-size: 0.8em;
@@ -356,6 +359,20 @@ const StoryDefaults = {
     // "Wormholes",
     "Young Adult",
   ],
+  CHARACTER_TEMPLATE: `Names: [All Character Names]
+
+Physical Description: [Character's physical appearance, including height, weight, hair color, eye color, and any distinguishing features]
+
+Personality: [Character's personality traits, including strengths, weaknesses, and quirks]
+
+Background: [Character's backstory, including their upbringing, education, and significant life events]
+Role in the Story: [Character's role in the story, including their goals, motivations, and conflicts]
+
+Relationships: [Character's relationships with other characters, including family, friends, and enemies]
+
+Dialog and Conversational Style: [Character's speech patterns, including their tone, vocabulary, and any unique phrases they use]
+Other Relevant Traits and Details: [Any other relevant traits or details about the character, including their hobbies, interests, and fears]
+`,
   STYLE_TEMPLATE: `Narrative POV:
 
 Narrative Structure:
@@ -488,7 +505,7 @@ const DEFAULT_DOCUMENT = {
   synopsis: "",
   /**
    * AI generated characters for generating outline and scenes
-   * @typedef {{ "Name of the character": "physical description, personality, background, dialog and conversational style, including thier role in the story, relationships with other characters, and any other relevant traits and details" }}
+   * @typedef {{ "Name of the character": "physical description, personality, background, dialog and conversational style, including their role in the story, relationships with other characters, and any other relevant traits and details" }}
    */
   characters: {},
   /**
