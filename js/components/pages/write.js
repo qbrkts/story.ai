@@ -59,6 +59,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => `
           ${AppText.GENERATE_STYLE_AND_SETTING}
         </paper-button>
         <br />
+        <br />
         <line-input
           id="${WritePageIds.GENRE_TEXT_INPUT}"
           list="${WritePageIds.GENRE_LIST}"
@@ -89,6 +90,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => `
           ${AppText.GENERATE_SYNOPSIS}
         </paper-button>
         <br />
+        <br />
         <text-input
           id="${WritePageIds.STORY_SYNOPSIS}"
           style="${TEXT_INPUT_INLINE_STYLE}"
@@ -99,7 +101,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => `
     </details>
 
     <details id=${WritePageIds.STORY_CHARACTERS_SECTION}>
-      <summary style="cursor: pointer; margin: 10px;">
+      <summary style="cursor: pointer; margin: 20px;">
         ${AppText.CHARACTERS}
       </summary>
       <div
@@ -122,7 +124,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => `
     </details>
 
     <details id=${WritePageIds.STORY_OUTLINE_SECTION}>
-      <summary style="cursor: pointer; margin: 10px;">
+      <summary style="cursor: pointer; margin: 20px;">
         ${AppText.OUTLINE}
       </summary>
       <div style="display: flex; flex-direction: row; gap: 48px;">
@@ -178,6 +180,8 @@ customElements.define(
       this.synopsisGenBtn.handler = this.generateSynopsis;
 
       this.addCharacterBtn.handler = this.addGeneratedCharacter;
+
+      this.generateOutlineBtn.handler = this.generateOutline;
 
       this.storySummaryBrainDumpInput.addEventListener("input", () => {
         const currentTitle = getCurrentTitle();
@@ -493,6 +497,13 @@ customElements.define(
       }, 1000);
     };
 
+    /**
+     * @param {MouseEvent} e click
+     */
+    generateOutline = async (e) => {
+
+    }
+
     get root() {
       if (!this.shadowRoot) {
         throw new Error("Shadow DOM not supported");
@@ -661,6 +672,16 @@ customElements.define(
         throw new Error("Story outline section not found");
       }
       return sectionEl;
+    }
+
+    get generateOutlineBtn() {
+      const btnEl = /** @type {import("../../../types").PaperButton} */ (
+        this.root.querySelector(`#${WritePageIds.GENERATE_OUTLINE}`)
+      );
+      if (!btnEl) {
+        throw new Error("Generate outline button not found");
+      }
+      return btnEl;
     }
   }
 );

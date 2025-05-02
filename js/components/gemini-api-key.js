@@ -6,7 +6,7 @@ const GeminiApiKeyIds = {
 
 const isGeminiKeySet = () => !!getGeminiKeyFromLocalStorage();
 const GEMINI_API_KEY_CODE_TEMPLATE = `
-<details id="gemini-api-key-details" style="margin: 10px" ${
+<details id="gemini-api-key-details" style="margin: 20px" ${
   isGeminiKeySet() ? "" : "open"
 }>
   <summary style="cursor:pointer; margin-bottom:10px">

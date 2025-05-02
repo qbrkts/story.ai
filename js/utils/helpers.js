@@ -528,7 +528,7 @@ function getStoryDocumentByTitle(title) {
   const storyDocument =
     getValueFromLocalStorage(storyContentStorageKey(title)) ?? DEFAULT_DOCUMENT;
   if (storyDocument.title == null) {
-    storyDocument.title = titleStorageKey(title);
+    storyDocument.title = keyAsTitleCase(title);
   }
   if (storyDocument.setting == null) {
     storyDocument.setting = StoryDefaults.setting.EARTH;

@@ -14,7 +14,7 @@ const STORY_PAGE_CODE_TEMPLATE = `
     <line-input
       id="${StoriesPageIds.STORY_TITLE_INPUT}"
       placeholder="${AppText.ENTER_NEW_STORY}"
-      style="width: 400px">
+      style="width: 400px; max-width: calc(100vw - 80px);">
     </line-input>
     <br /><br />
     <paper-button
@@ -30,7 +30,10 @@ const STORY_PAGE_CODE_TEMPLATE = `
 
   <div id="${StoriesPageIds.STORIES_LIST_CONTAINER}">
     <h3>${AppText.PREVIOUSLY_ON}</h3>
-    <div id="${StoriesPageIds.EXISTING_STORIES}"></div>
+    <div
+      id="${StoriesPageIds.EXISTING_STORIES}"
+      style="display: flex; flex-direction: row; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center;">
+    </div>
   </div>
   <br /><br /><br />
   <qb-copyright></qb-copyright>
