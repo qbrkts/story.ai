@@ -88,6 +88,8 @@ const AppText = {
   NEW_CHARACTER_GUIDELINE:
     "Optionally enter the name and any traits to guide character generation.",
   NO_API_KEY: "If you do not have an api key, visit here to generate one.",
+  NO_STORY_CONTENT:
+    "This story has no content but you can add some on the write page.",
   NO_STORIES_YET: "No stories yet... continue above",
   NO_STORY_SELECTED: "No story selected",
   OUTLINE: "Outline",
