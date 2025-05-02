@@ -40,6 +40,7 @@ const ComponentName = Object.assign(
 );
 
 const UrlParams = {
+  CONTINUE: "continue",
   PAGE: "page",
   TITLE: "title",
 };
