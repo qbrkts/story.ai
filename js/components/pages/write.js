@@ -8,6 +8,7 @@ const WritePageIds = {
   GENRE_TEXT_INPUT: "story-genre",
   NEW_CHARACTER_INPUT: "new-character",
   STORY_CHARACTERS_SECTION: "story-characters-section",
+  STORY_OUTLINE_CONTAINER: "story-outline-container",
   STORY_OUTLINE_SECTION: "story-outline-section",
   STORY_STYLE_SETTING_GENRE_BTN: "story-style-setting-genre-btn",
   STORY_SETTING_INPUT: "story-setting",
@@ -43,7 +44,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => `
     </div>
 
     <details open id=${WritePageIds.STORY_SUMMARY_SECTION}>
-      <summary style="cursor: pointer; margin: 10px;">
+      <summary style="cursor: pointer; margin: 20px;">
         ${AppText.SUMMARY}
       </summary>
       <div style="display: flex; flex-direction: column;">
@@ -131,15 +132,17 @@ const WRITE_PAGE_CODE_TEMPLATE = () => `
         <line-input
           id="${WritePageIds.GENERATE_OUTLINE_INPUT}"
           placeholder="${AppText.GENERATE_OUTLINE_GUIDE}"
-          style="width: calc(100vw - 236px)">
+          style="width: calc(100vw - 238px)">
         </line-input>
         <paper-button
           id="${WritePageIds.GENERATE_OUTLINE}"
           title="${AppText.GENERATE_OUTLINE}">
           ${AppText.GENERATE_OUTLINE}
         </paper-button>
-       </div>
-       <br />
+      </div>
+      <br />
+      <div id=${WritePageIds.STORY_OUTLINE_CONTAINER}>
+      </div>
     </details>
   </div>
   <br /><br /><br />
@@ -161,9 +164,9 @@ customElements.define(
     }
 
     connectComponents() {
-      this.storySummarySection.onclick = this.openSectionOnClick;
-      this.storyCharactersSection.onclick = this.openSectionOnClick;
-      this.storyOutlineSection.onclick = this.openSectionOnClick;
+      this.storySummarySection.onclick = this.toggleSectionOpenOnClick;
+      this.storyCharactersSection.onclick = this.toggleSectionOpenOnClick;
+      this.storyOutlineSection.onclick = this.toggleSectionOpenOnClick;
 
       this.storyTitleUpdateBtn.handler = () => {
         const currentTitle = getCurrentTitle();
@@ -227,6 +230,11 @@ customElements.define(
       this.storySynopsisInput.value = storyDocument.synopsis;
       this.storySettingInput.value = storyDocument.setting || "";
 
+      this.renderCharacters(storyDocument);
+      this.renderOutline(storyDocument);
+    }
+
+    renderCharacters = (storyDocument) => {
       this.charactersContainer.innerHTML = "";
       const getCharacterInputDescription = (input) => {
         return input.value.trim();
@@ -268,7 +276,30 @@ customElements.define(
             }
           });
         });
-    }
+    };
+
+    renderOutline = (storyDocument) => {
+      this.outlineContainer.innerHTML = "";
+      storyDocument.outline.forEach((outline, i) => {
+        const outlineEl = /** @type {import ('../../../types').TextInput} */ (
+          document.createElement(ComponentName.TEXT_INPUT)
+        );
+        outlineEl.setAttribute("style", TEXT_INPUT_INLINE_STYLE);
+        outlineEl.name = `${AppText.CHAPTER} ${i + 1}`;
+        outlineEl.value = `${outline.title}\n\n${outline.description}`;
+        outlineEl.style.marginBottom = "16px";
+        outlineEl.addEventListener("input", () => {
+          const storyTitle = getCurrentTitle();
+          const storyDocument = getStoryDocumentByTitle(storyTitle);
+
+          const [chapterTitle, ...description] = outlineEl.value.split("\n");
+          storyDocument.outline[i].name = chapterTitle;
+          storyDocument.outline[i].description = description.join("\n").trim();
+          addStoryDocumentToLocalStorage(storyTitle, storyDocument);
+        });
+        this.outlineContainer.appendChild(outlineEl);
+      });
+    };
 
     closeAllSections = () => {
       this.root
@@ -276,18 +307,26 @@ customElements.define(
         .forEach((section) => section.removeAttribute("open"));
     };
 
-    openSectionOnClick = (e) => {
+    openSection = (section) => {
+      this.closeAllSections();
+      section.setAttribute("open", true);
+      section.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    };
+
+    toggleSectionOpenOnClick = (e) => {
       e.preventDefault();
       e.stopPropagation();
       if (e.target.tagName !== "SUMMARY") return;
       const target = e.target.closest("details");
       const wasOpen = target.hasAttribute("open");
-      this.closeAllSections();
-      if (!wasOpen) target.setAttribute("open", true);
-      target.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+      if (wasOpen) {
+        this.closeAllSections();
+      } else {
+        this.openSection(target);
+      }
     };
 
     /**
@@ -494,15 +533,70 @@ customElements.define(
             `[name="${result.character.name}"]`
           )
         )?.focus();
-      }, 1000);
+      }, 300);
     };
 
     /**
      * @param {MouseEvent} e click
      */
     generateOutline = async (e) => {
-
-    }
+      const title = getCurrentTitle();
+      const storyDocument = getStoryDocumentByTitle(title);
+      if (!storyDocument.title) {
+        alert(AppText.STORY_TITLE_NOT_SET);
+        this.storyTitleInput.focus();
+        return;
+      }
+      if (!storyDocument.synopsis) {
+        alert(AppText.STORY_SYNOPSIS_NOT_SET);
+        this.openSection(this.storySummarySection);
+        this.storySynopsisInput.focus();
+        return;
+      }
+      const hasCharacters = Object.keys(storyDocument.characters).length > 0;
+      if (!hasCharacters) {
+        alert(AppText.STORY_CHARACTERS_NOT_SET);
+        this.openSection(this.storyCharactersSection);
+        this.newCharacterInput.focus();
+        return;
+      }
+      const apiKey = getGeminiKeyFromLocalStorage();
+      if (!apiKey) {
+        alert(AppText.GEMINI_API_KEY_NOT_SET);
+        this.geminiApiKeyComponent.grabFocus();
+        return;
+      }
+      const outlinePrompt = this.generateOutlineInput.value.trim();
+      this.generateOutlineBtn.disabled = true;
+      const outlineResultPromise = fetchFromGemini(
+        apiKey,
+        [
+          `Generate an outline for the story "${title}"`,
+          `This is the summary of the story: "${storyDocument.summary}"`,
+          `This is the genre of the story: "${storyDocument.genre}"`,
+          `This is the setting of the story: "${storyDocument.setting}"`,
+          `This is the synopsis of the story: "${storyDocument.synopsis}"`,
+          `These are the existing characters: ${JSON.stringify(
+            storyDocument.characters,
+            null,
+            2
+          )}`,
+          `The outline should be tailored to the story based on the synopsis.`,
+          outlinePrompt &&
+            `The outline should adhere to the following instructions: ${outlinePrompt}`,
+        ]
+          .filter(Boolean)
+          .join("\n\n"),
+        `{"outline": [{"title": "chapter title excluding the chapter number", "description": "chapter description goes here"}]}`
+      );
+      const result = await outlineResultPromise;
+      console.log("outline result:", result);
+      storyDocument.outline = result.outline;
+      alert(AppText.SUCCESS_OUTLINE_GENERATED);
+      this.generateOutlineBtn.disabled = false;
+      addStoryDocumentToLocalStorage(title, storyDocument);
+      this.render();
+    };
 
     get root() {
       if (!this.shadowRoot) {
@@ -682,6 +776,26 @@ customElements.define(
         throw new Error("Generate outline button not found");
       }
       return btnEl;
+    }
+
+    get generateOutlineInput() {
+      const inputEl = /** @type {import("../../../types").LineInput} */ (
+        this.root.querySelector(`#${WritePageIds.GENERATE_OUTLINE_INPUT}`)
+      );
+      if (!inputEl) {
+        throw new Error("Generate outline input not found");
+      }
+      return inputEl;
+    }
+
+    get outlineContainer() {
+      const outlineContainerEl = /** @type {HTMLDivElement} */ (
+        this.root.querySelector(`#${WritePageIds.STORY_OUTLINE_CONTAINER}`)
+      );
+      if (!outlineContainerEl) {
+        throw new Error("Outline container not found");
+      }
+      return outlineContainerEl;
     }
   }
 );

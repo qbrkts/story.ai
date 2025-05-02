@@ -52,6 +52,7 @@ const AppText = {
   API_KEY_SAVED: "API Key updated successfully!",
   BRAIN_DUMP:
     "Dump your story ideas here. Anything goes and everything helps. If you want a more dramatic twist, add that idea here and regenerate the synopsis.",
+  CHAPTER: "Chapter",
   COPYRIGHT: "Copyright",
   CHARACTERS: "Characters",
   ENTER_GEMINI_API_KEY: "Enter your Gemini API Key",
@@ -63,7 +64,8 @@ const AppText = {
   GEMINI_API_KEY: "Gemini",
   GEMINI_API_KEY_NOT_SET: "Gemini API Key not set",
   GENERATE_OUTLINE: "Generate outline",
-  GENERATE_OUTLINE_GUIDE: "Include any specific directions for the outline you want to create. This will replace existing chapters and scenes.",
+  GENERATE_OUTLINE_GUIDE:
+    "Include any specific directions for the outline you want to create. Example, medium length story with 20 chapters and 3000 words per chapter etc. This will replace existing chapters and scenes.",
   GENERATE_STYLE_AND_SETTING: "Generate style and setting for story",
   GENERATE_SYNOPSIS: "Generate synopsis",
   GENERATE_SYNOPSIS_INSTRUCTIONS:
@@ -71,7 +73,8 @@ const AppText = {
   INFINITE_STORIES: "Enter the world of infinite tales",
   INVALID_API_KEY: "Please enter a valid API Key.",
   LOADING: "Loading...",
-  NEW_CHARACTER_GUIDELINE: "Optionally enter the name and any traits to guide character generation.",
+  NEW_CHARACTER_GUIDELINE:
+    "Optionally enter the name and any traits to guide character generation.",
   NO_API_KEY: "If you do not have an api key, visit here to generate one.",
   NO_STORIES_YET: "No stories yet... continue above",
   OUTLINE: "Outline",
@@ -83,6 +86,8 @@ const AppText = {
   STORY_AI_DESCRIPTION: "A tool to generate stories using AI",
   STORY_AI: "Story AI",
   STORY: "Story",
+  STORY_CHARACTERS_NOT_SET:
+    "You must have characters for your story before generating outlines or scenes.",
   STORY_SUMMARY_NOT_SET:
     "Please enter a summary before attempting to generate a story.",
   STORY_GENRE_NOT_SET:
@@ -93,6 +98,7 @@ const AppText = {
     "Deciding on a style will help generate outlines, scenes and chapters for your story in a consistent way.",
   SUCCESS: "Success",
   SUCCESS_NEW_CHARACTER: `Successfully generated new character. Add any extra traits to their description matching the same format. To remove a character, replace their description with '${DELETE_CHARACTER_MARKER}'.`,
+  SUCCESS_OUTLINE_GENERATED: `Successfully generated a new outline`,
   SUMMARY: "Summary",
   STYLE_OR_SETTING_ALREADY_PRESENT:
     "Delete the existing story style and settings if you want to generate new ones.",
@@ -508,18 +514,28 @@ const DEFAULT_DOCUMENT = {
   synopsis: "",
   /**
    * AI generated characters for generating outline and scenes
-   * @typedef {{ "Name of the character": "physical description, personality, background, dialog and conversational style, including their role in the story, relationships with other characters, and any other relevant traits and details" }}
+   * @type {Record<string, string>}
+   * @example { "Name of the character": "physical description, personality, background, dialog and conversational style, including their role in the story, relationships with other characters, and any other relevant traits and details" }
    */
   characters: {},
   /**
    * AI generated outline of the story
-   * @typedef {{
+   *
+   * @type {{
+   *    name: string;
+   *    description: string;
+   *    scenes: string;
+   *    content: string,
+   *    characters: string[],
+   * }[]}
+   *
+   * @example [{
    *    name: "Name of the chapter",
    *    description: "Summary description of the chapter for generating the scenes",
    *    scenes: "Scenes in the chapter for generating the full content",
    *    content: "Full content of the chapter",
-   *    characters: ["Name of the character"],
-   * }[]}
+   *    characters: ["Name of the character present in this chapter"],
+   * }]
    */
   outline: [],
 };
