@@ -2,7 +2,7 @@ const PageNavigationIds = {
   PAGE_LINKS: "page-links",
 }
 const PAGE_NAVIGATION_CODE_TEMPLATE = `
-<div id="${PageNavigationIds.PAGE_LINKS}" style="font-size: 0.7em; text-transform: capitalize"></div>
+<div id="${PageNavigationIds.PAGE_LINKS}" style="font-size: 0.7em; text-transform: capitalize; display: flex; flex-direction: row; gap: 20px; justify-content: center"></div>
 `;
 
 customElements.define(
@@ -25,7 +25,7 @@ customElements.define(
       this.render();
     }
 
-    createLink(page, includeDivider, container) {
+    createLink(page, container) {
       const link = document.createElement("a");
       link.textContent = page;
       link.style.textDecoration = "none";
@@ -40,9 +40,6 @@ customElements.define(
         link.style.fontWeight = "bold";
       }
       container.appendChild(link);
-      if (includeDivider) {
-        container.appendChild(document.createTextNode(" | "));
-      }
       return link;
     }
 
@@ -54,7 +51,11 @@ customElements.define(
       }
       for (let i = 0; i < PageNames.length; i++) {
         const page = PageNames[i].toLowerCase();
-        this.createLink(page, i < PageNames.length - 1, linksContainer);
+        if (page === Page.WRITE) {
+          // skip or disable write page if there is no story title
+          if (!getCurrentTitle()) continue;
+        }
+        this.createLink(page, linksContainer);
       }
       return containerEl;
     }
@@ -67,7 +68,7 @@ customElements.define(
       bottomNavigation.style.border = "solid 1px #ccc";
       bottomNavigation.style.borderRadius = "2px";
       bottomNavigation.style.bottom = "2px";
-      bottomNavigation.style.padding = "2px 8px";
+      bottomNavigation.style.padding = "4px 10px";
       bottomNavigation.style.position = "fixed";
       bottomNavigation.style.right = "2px";
       document.body.style.paddingBottom = "20px";
