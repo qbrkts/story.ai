@@ -1,4 +1,3 @@
-const PAGE_NAVIGATION_COMPONENT_NAME = "page-navigation";
 const PageNavigationIds = {
   PAGE_LINKS: "page-links",
 }
@@ -7,7 +6,7 @@ const PAGE_NAVIGATION_CODE_TEMPLATE = `
 `;
 
 customElements.define(
-  PAGE_NAVIGATION_COMPONENT_NAME,
+  ComponentName.PAGE_NAVIGATION,
   class extends HTMLElement {
     constructor() {
       super();

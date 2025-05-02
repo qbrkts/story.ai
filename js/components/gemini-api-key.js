@@ -28,10 +28,8 @@ const GEMINI_API_KEY_CODE_TEMPLATE = `
 </details>
 `;
 
-const GEMINI_API_KEY_COMPONENT_NAME = "gemini-api-key";
-
 customElements.define(
-  GEMINI_API_KEY_COMPONENT_NAME,
+  ComponentName.GEMINI_API_KEY,
   class extends HTMLElement {
     constructor() {
       super();

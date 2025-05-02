@@ -11,10 +11,8 @@ const COPYRIGHT_TEMPLATE = `
 </div>
 `;
 
-const COPYRIGHT_COMPONENT_NAME = "qb-copyright";
-
 customElements.define(
-  COPYRIGHT_COMPONENT_NAME,
+  ComponentName.COPYRIGHT,
   class extends HTMLElement {
     constructor() {
       super();

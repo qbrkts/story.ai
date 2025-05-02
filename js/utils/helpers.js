@@ -13,12 +13,25 @@ const Page = Object.assign(
   ...PageNames.map((page) => ({ [page]: page.toLowerCase() }))
 );
 /** @type {{
+  COPYRIGHT: 'qb-copyright';
+  GEMINI_API_KEY: 'gemini-api-key';
+  LINE_INPUT: 'line-input';
+  PAGE_NAVIGATION: 'page-navigation';
+  PAPER_BUTTON: 'paper-button';
+  TEXT_INPUT: 'text-input';
   HOME: 'home-page';
   STORIES: 'stories-page';
   WRITE: 'write-page';
 }} */
 const ComponentName = Object.assign(
-  {},
+  {
+    COPYRIGHT: "qb-copyright",
+    GEMINI_API_KEY: "gemini-api-key",
+    LINE_INPUT: "line-input",
+    PAGE_NAVIGATION: "page-navigation",
+    PAPER_BUTTON: "paper-button",
+    TEXT_INPUT: "text-input",
+  },
   ...Object.keys(Page).map((key) => ({ [key]: `${Page[key]}-page` }))
 );
 
@@ -65,6 +78,14 @@ const AppText = {
   STORY_AI_DESCRIPTION: "A tool to generate stories using AI",
   STORY_AI: "Story AI",
   STORY: "Story",
+  STORY_SUMMARY_NOT_SET:
+    "Please enter a summary before attempting to generate a story.",
+  STORY_GENRE_NOT_SET:
+    "You must have a genre before generating synopsis, outlines, scenes or chapters.",
+  STORY_SETTING_NOT_SET:
+    "You must have a setting for your story before generating synopsis, outlines or scenes",
+  STORY_STYLE_NOT_SET:
+    "Deciding on a style will help generate outlines, scenes and chapters for your story in a consistent way.",
   SUCCESS: "Success",
   SUMMARY: "Summary",
   STYLE_OR_SETTING_ALREADY_PRESENT:
@@ -459,7 +480,7 @@ const DEFAULT_DOCUMENT = {
   title: undefined,
   /** User specified genre for generating synopsis, outline, scenes and chapters */
   genre: "",
-  /** User specified style for generating outlines and scenes  */
+  /** User specified style for generating outlines, scenes and chapters */
   style: "",
   /** User created story world setting for generating synopsis, outline and scenes @type {string | undefined} */
   setting: undefined,

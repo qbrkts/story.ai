@@ -138,6 +138,8 @@ customElements.define(
 
       this.styleSettingGenBtn.handler = this.generateStyleSetting;
 
+      this.synopsisGenBtn.handler = this.generateSynopsis;
+
       this.storySummaryBrainDumpInput.addEventListener("input", () => {
         const currentTitle = getCurrentTitle();
         const storyDocument = getStoryDocumentByTitle(currentTitle);
@@ -188,12 +190,13 @@ customElements.define(
      * @param {MouseEvent} e click event
      */
     generateStyleSetting = async (e) => {
-      // prevent duplicate function calls
-      e.preventDefault();
-      e.stopPropagation();
-
       const currentTitle = getCurrentTitle();
       const storyDocument = getStoryDocumentByTitle(currentTitle);
+      if (!storyDocument.summary) {
+        alert(AppText.STORY_SUMMARY_NOT_SET);
+        this.storySummaryBrainDumpInput.focus();
+        return;
+      }
       const hasStyleOrSetting = storyDocument.style || storyDocument.setting;
       if (hasStyleOrSetting) {
         alert(AppText.STYLE_OR_SETTING_ALREADY_PRESENT);
@@ -261,7 +264,68 @@ customElements.define(
       console.log(storyDocument);
       addStoryDocumentToLocalStorage(currentTitle, storyDocument);
       this.render();
-    }
+    };
+
+    /**
+     * @param {MouseEvent} e click
+     */
+    generateSynopsis = async (e) => {
+      const title = getCurrentTitle();
+      const storyDocument = getStoryDocumentByTitle(title);
+      if (!storyDocument.title) {
+        alert(AppText.STORY_TITLE_NOT_SET);
+        this.storyTitleInput.focus();
+        return;
+      }
+      if (!storyDocument.summary) {
+        alert(AppText.STORY_SUMMARY_NOT_SET);
+        this.storySummaryBrainDumpInput.focus();
+        return;
+      }
+      if (!storyDocument.genre) {
+        alert(AppText.STORY_GENRE_NOT_SET);
+        this.storyGenreInput.focus();
+        return;
+      }
+      if (!storyDocument.setting) {
+        alert(AppText.STORY_SETTING_NOT_SET);
+        this.storySettingInput.focus();
+        return;
+      }
+      const apiKey = getGeminiKeyFromLocalStorage();
+      if (!apiKey) {
+        alert(AppText.GEMINI_API_KEY_NOT_SET);
+        this.geminiApiKeyComponent.grabFocus();
+        return;
+      }
+      this.synopsisGenBtn.disabled = true;
+      const synopsisResultPromise = fetchFromGemini(
+        apiKey,
+        [
+          `Generate a synopsis for the story "${title}"`,
+          `This is the summary of the story: "${storyDocument.summary}"`,
+          `This is the genre of the story: "${storyDocument.genre}"`,
+          `This is the setting of the story: "${storyDocument.setting}"`,
+          storyDocument.style &&
+            `This is the style of the writing: "${storyDocument.style}"`,
+        ]
+          .filter(Boolean)
+          .join("\n\n"),
+        `{"synopsis": "detailed synopsis of the story for generating characters and plot outline goes here."}`
+      );
+      if (!storyDocument.style) {
+        alert(AppText.STORY_STYLE_NOT_SET);
+        this.storyStyleInput.focus();
+        // continue as this is not blocking
+      }
+      const result = await synopsisResultPromise;
+      console.log("synopsis result:", result);
+      storyDocument.synopsis = result.synopsis;
+      alert(AppText.SUCCESS);
+      this.synopsisGenBtn.disabled = false;
+      addStoryDocumentToLocalStorage(title, storyDocument);
+      this.render();
+    };
 
     get root() {
       if (!this.shadowRoot) {
@@ -273,7 +337,7 @@ customElements.define(
     get geminiApiKeyComponent() {
       const geminiApiKeyComponent =
         /** @type {import("../../../types").GeminiApiKey} */ (
-          this.root.querySelector(GEMINI_API_KEY_COMPONENT_NAME)
+          this.root.querySelector(ComponentName.GEMINI_API_KEY)
         );
       if (!geminiApiKeyComponent) {
         throw new Error("Gemini API key component not found");
@@ -359,6 +423,16 @@ customElements.define(
       );
       if (!btnEl) {
         throw new Error("Story style setting generation button not found");
+      }
+      return btnEl;
+    }
+
+    get synopsisGenBtn() {
+      const btnEl = /** @type {import("../../../types").PaperButton} */ (
+        this.root.querySelector(`#${WritePageIds.STORY_SYNOPSIS_GEN_BTN_ID}`)
+      );
+      if (!btnEl) {
+        throw new Error("Story synopsis generation button not found");
       }
       return btnEl;
     }

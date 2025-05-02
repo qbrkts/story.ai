@@ -2,7 +2,6 @@ const PAPER_BUTTON_CODE_TEMPLATE = `
 <button id="paper-button" class="paper-button">
   <slot></slot>
 </button>`;
-const PAPER_BUTTON_COMPONENT_NAME = "paper-button";
 const PAPER_BUTTON_ID = "paper-button";
 const PAPER_BUTTON_STYLE = `
   .paper-button {
@@ -34,7 +33,7 @@ const PAPER_BUTTON_STYLE = `
 `;
 
 customElements.define(
-  PAPER_BUTTON_COMPONENT_NAME,
+  ComponentName.PAPER_BUTTON,
   class extends HTMLElement {
     constructor() {
       super();

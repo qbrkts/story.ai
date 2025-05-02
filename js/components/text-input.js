@@ -1,4 +1,3 @@
-const TEXT_INPUT_COMPONENT_NAME = "text-input";
 const TEXT_INPUT_ID = "text-input";
 const TEXT_INPUT_CLS = "text-input-cls";
 const TEXT_INPUT_TITLE_CLS = "text-input-title";
@@ -32,7 +31,7 @@ const TEXT_INPUT_CODE_TEMPLATE = `
 <textarea id="${TEXT_INPUT_ID}" class="${TEXT_INPUT_CLS}"></textarea>`;
 
 customElements.define(
-  TEXT_INPUT_COMPONENT_NAME,
+  ComponentName.TEXT_INPUT,
   class extends HTMLElement {
     constructor() {
       super();
