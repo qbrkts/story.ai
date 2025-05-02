@@ -16,6 +16,7 @@ const TEXT_INPUT_STYLE = `
   padding: 10px 20px;
   text-decoration: none;
   transition: background-color 0.3s, transform 0.3s;
+  overflow: hidden;
 }
 
 .${TEXT_INPUT_CLS}:hover {
@@ -24,6 +25,10 @@ const TEXT_INPUT_STYLE = `
 
 .${TEXT_INPUT_CLS}:active {
   transform: scale(0.95);
+}
+
+.${TEXT_INPUT_CLS}:focus {
+  overflow: auto;
 }
 `;
 const TEXT_INPUT_CODE_TEMPLATE = `
