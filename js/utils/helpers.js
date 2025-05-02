@@ -46,7 +46,9 @@ const AppText = {
     "Enter a sample of your writing to get a similar style or use descriptors e.g. First Person, Third Person, Omniscient etc.",
   ENTER_SETTING: "Enter setting e.g. Earth, Mars, Fantasy World",
   ENTER_NEW_STORY: "Enter new story title",
-  GEMINI_API_KEY: "Gemini API Key",
+  GEMINI_API_KEY: "Gemini",
+  GEMINI_API_KEY_NOT_SET: "Gemini API Key not set",
+  GENERATE_STYLE_AND_SETTING: "Generate style and setting for story",
   GENERATE_SYNOPSIS: "Generate synopsis",
   GENERATE_SYNOPSIS_INSTRUCTIONS:
     "Generated synopsis goes here. You can modify it to your liking or update your summary and regenerate the synopsis.",
@@ -63,7 +65,10 @@ const AppText = {
   STORY_AI_DESCRIPTION: "A tool to generate stories using AI",
   STORY_AI: "Story AI",
   STORY: "Story",
+  SUCCESS: "Success",
   SUMMARY: "Summary",
+  STYLE_OR_SETTING_ALREADY_PRESENT:
+    "Delete the existing story style and settings if you want to generate new ones.",
   UPDATE_GEMINI_API_KEY: "Update",
   UPDATE_STORY_TITLE: "Update story title",
   VISIT_STORIES: "Visit stories",
@@ -195,11 +200,29 @@ function titleStorageKey(title) {
   return title.toLowerCase().replace(/\s+/g, "-");
 }
 
-function storageKeyAsTitleCase(title) {
+function keyAsTitleCase(title) {
   // capitalize first letter of each word
   return title
     .replaceAll("-", " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function textInputTitleStyle(element) {
+  return `background-color: transparent;
+border-radius: 2px;
+color: #303030;
+content: "${keyAsTitleCase(
+    element.title || element.id || element.getAttribute("name") || ""
+  )} ▾";
+display: block;
+font-size: 0.8em;
+font-weight: bold;
+left: 0;
+padding: 0.2em 1em;
+position: absolute;
+text-align: start;
+top: -1.6em;
+`;
 }
 
 /** @returns {Set<string>} */
@@ -245,7 +268,7 @@ function getCurrentTitleKey() {
 
 function getCurrentTitle() {
   const titleKey = getCurrentTitleKey();
-  return storageKeyAsTitleCase(titleKey);
+  return keyAsTitleCase(titleKey);
 }
 
 const StoryDefaults = {
@@ -312,6 +335,28 @@ const StoryDefaults = {
     // "Wormholes",
     "Young Adult",
   ],
+  STYLE_TEMPLATE: `Narrative POV:
+
+Narrative Structure:
+
+Narrative Voice:
+
+Dialogue:
+
+Descriptive Style:
+
+Pacing and Rhythm:
+
+Sentence Structure:
+
+Tone and Mood:
+
+Themes and Motifs:
+
+Vocabulary and Word Choice:
+
+Cultural and Historical Context:
+`,
   setting: {
     EARTH: `Earth, A planet with diverse cultures and landscapes.
 
@@ -410,14 +455,14 @@ Researchers pushing the boundaries of knowledge in areas like artificial intelli
 const DEFAULT_DOCUMENT = {
   /** User written brain dump to guide the story generation */
   summary: "",
-  /** User generated title for the story */
-  title: "",
+  /** User generated title for the story @type {string | undefined} */
+  title: undefined,
   /** User specified genre for generating synopsis, outline, scenes and chapters */
   genre: "",
   /** User specified style for generating outlines and scenes  */
   style: "",
-  /** User created story world setting for generating synopsis, outline and scenes */
-  setting: "",
+  /** User created story world setting for generating synopsis, outline and scenes @type {string | undefined} */
+  setting: undefined,
   /** AI generated synopsis of the story for generating characters */
   synopsis: "",
   /**
@@ -441,12 +486,20 @@ const DEFAULT_DOCUMENT = {
 function getStoryDocumentByTitle(title) {
   const storyDocument =
     getValueFromLocalStorage(storyContentStorageKey(title)) ?? DEFAULT_DOCUMENT;
-  if (!storyDocument.title) {
+  if (storyDocument.title == null) {
     storyDocument.title = titleStorageKey(title);
   }
-  if (!storyDocument.setting) {
+  if (storyDocument.setting == null) {
     storyDocument.setting = StoryDefaults.setting.EARTH;
   }
+
+  // fix story document stored style value
+  if (typeof storyDocument.style === "object") {
+    storyDocument.style = Object.entries(storyDocument.style)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join("\n\n");
+  }
+
   return storyDocument;
 }
 

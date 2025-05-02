@@ -9,7 +9,7 @@ const PAPER_BUTTON_STYLE = `
     background-color: #f0f0f0;
     border: none;
     border-radius: 4px;
-    color: #333;
+    color: #303030;
     cursor: pointer;
     font-size: 1em;
     padding: 10px 20px;
@@ -27,8 +27,8 @@ const PAPER_BUTTON_STYLE = `
   }
 
   .paper-button:disabled {
-    background-color: #ccc;
-    color: #999;
+    background-color: #c0c0c0;
+    color: #909090;
     cursor: not-allowed;
   }
 `;
@@ -64,6 +64,12 @@ customElements.define(
     }
     get disabled() {
       return this.buttonEl.disabled;
+    }
+    set handler(value) {
+      this.buttonEl.onclick = value;
+    }
+    get handler() {
+      return this.buttonEl.onclick;
     }
     connectedCallback() {
       this.render();

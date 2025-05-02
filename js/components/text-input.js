@@ -1,29 +1,35 @@
 const TEXT_INPUT_COMPONENT_NAME = "text-input";
 const TEXT_INPUT_ID = "text-input";
+const TEXT_INPUT_CLS = "text-input-cls";
+const TEXT_INPUT_TITLE_CLS = "text-input-title";
 const TEXT_INPUT_STYLE = `
-  .${TEXT_INPUT_ID} {
-    background-color: #f0f0f0;
-    border: none;
-    border-radius: 4px;
-    color: #333;
-    cursor: pointer;
-    font-size: 1em;
-    padding: 10px 20px;
-    text-decoration: none;
-    transition: background-color 0.3s, transform 0.3s;
-  }
+:host {
+  position: relative;
+}
 
-  .${TEXT_INPUT_ID}:hover {
-    background-color: #e0e0e0;
-  }
+.${TEXT_INPUT_CLS} {
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 4px;
+  color: #303030;
+  cursor: pointer;
+  font-size: 1em;
+  padding: 10px 20px;
+  text-decoration: none;
+  transition: background-color 0.3s, transform 0.3s;
+}
 
-  .${TEXT_INPUT_ID}:active {
-    transform: scale(0.95);
-  }
+.${TEXT_INPUT_CLS}:hover {
+  background-color: #e0e0e0;
+}
+
+.${TEXT_INPUT_CLS}:active {
+  transform: scale(0.95);
+}
 `;
 const TEXT_INPUT_CODE_TEMPLATE = `
-<textarea id="${TEXT_INPUT_ID}" class="${TEXT_INPUT_ID}">
-</textarea>`;
+<div class="${TEXT_INPUT_TITLE_CLS}"></div>
+<textarea id="${TEXT_INPUT_ID}" class="${TEXT_INPUT_CLS}"></textarea>`;
 
 customElements.define(
   TEXT_INPUT_COMPONENT_NAME,
@@ -33,7 +39,10 @@ customElements.define(
       this.attachShadow({ mode: "open" });
       this.root.innerHTML = TEXT_INPUT_CODE_TEMPLATE;
       const style = document.createElement("style");
-      style.textContent = TEXT_INPUT_STYLE;
+      style.textContent = `${TEXT_INPUT_STYLE}
+.${TEXT_INPUT_TITLE_CLS}::before {
+${textInputTitleStyle(this)}
+}`;
       this.root.appendChild(style);
     }
 

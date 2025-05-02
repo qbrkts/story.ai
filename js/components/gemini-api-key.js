@@ -1,14 +1,18 @@
 const GeminiApiKeyIds = {
-  KEY_INPUT: "gemini-api-input",
+  DETAILS_CONTAINER: "gemini-api-key-details",
+  KEY_INPUT: "api-key",
   UPDATE_BTN: "update-gemini-api-key",
 };
 
 const isGeminiKeySet = () => !!getGeminiKeyFromLocalStorage();
 const GEMINI_API_KEY_CODE_TEMPLATE = `
-<details style="margin: 10px" ${isGeminiKeySet() ? "" : "open"}>
+<details id="gemini-api-key-details" style="margin: 10px" ${
+  isGeminiKeySet() ? "" : "open"
+}>
   <summary style="cursor:pointer; margin-bottom:10px">
     ${AppText.GEMINI_API_KEY}
   </summary>
+  <br />
   <line-input
     id="${GeminiApiKeyIds.KEY_INPUT}"
     placeholder="${AppText.ENTER_GEMINI_API_KEY}" style="width: 400px;">
@@ -46,6 +50,16 @@ customElements.define(
       return this.shadowRoot;
     }
 
+    get detailsContainer() {
+      const detailsEl = /** @type {HTMLDetailsElement} */ (
+        this.root.getElementById(GeminiApiKeyIds.DETAILS_CONTAINER)
+      );
+      if (!detailsEl) {
+        throw new Error("Details container not found");
+      }
+      return detailsEl;
+    }
+
     get apiKeyInput() {
       const inputEl = /** @type {HTMLInputElement} */ (
         this.root.getElementById(GeminiApiKeyIds.KEY_INPUT)
@@ -64,6 +78,11 @@ customElements.define(
         throw new Error("Update button not found");
       }
       return btnEl;
+    }
+
+    grabFocus() {
+      this.detailsContainer.open = true;
+      this.apiKeyInput.focus();
     }
 
     render() {

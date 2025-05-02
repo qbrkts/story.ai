@@ -93,14 +93,18 @@ customElements.define(
         this.existingStoriesContainer.innerHTML = `<p>${AppText.NO_STORIES_YET}</p>`;
       } else {
         existingStories.forEach((storyTitle) => {
-          const storyButton = document.createElement("paper-button");
-          storyButton.textContent = getStoryDocumentByTitle(storyTitle).title;
-          storyButton.addEventListener("click", () => {
+          const storyButton =
+            /** @type {import("../../../types").PaperButton} */ (
+              document.createElement("paper-button")
+            );
+          storyButton.textContent =
+            getStoryDocumentByTitle(storyTitle).title ?? "";
+          storyButton.handler = () => {
             setCurrentStoryTitle(storyTitle);
             gotoPage({
               page: Page.WRITE,
             });
-          });
+          };
           this.existingStoriesContainer.appendChild(storyButton);
         });
       }
@@ -126,7 +130,7 @@ customElements.define(
 
     render() {
       this.loadExistingStories();
-      this.startStoryButton.addEventListener("click", () => {
+      this.startStoryButton.handler = () => {
         const title = this.storyTitleInput.value;
         if (!title) {
           this.storyTitleInput.focus();
@@ -137,7 +141,7 @@ customElements.define(
             page: Page.WRITE,
           });
         }
-      });
+      };
       this.randomStoryButton.disabled = true;
     }
   }

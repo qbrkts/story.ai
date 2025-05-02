@@ -1,28 +1,34 @@
 const LINE_INPUT_COMPONENT_NAME = "line-input";
 const LINE_INPUT_ID = "line-input";
-const LINE_INPUT_CLS = "line-input";
+const LINE_INPUT_CLS = "line-input-cls";
+const LINE_INPUT_TITLE_CLS = "line-input-title";
 const LINE_INPUT_STYLE = `
-  .${LINE_INPUT_CLS} {
-    background-color: #f0f0f0;
-    border: none;
-    border-radius: 4px;
-    color: #333;
-    cursor: pointer;
-    font-size: 1em;
-    padding: 10px 20px;
-    text-decoration: none;
-    transition: background-color 0.3s, transform 0.3s;
-  }
+:host {
+  position: relative;
+}
 
-  .${LINE_INPUT_CLS}:hover {
-    background-color: #e0e0e0;
-  }
+.${LINE_INPUT_CLS} {
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 4px;
+  color: #303030;
+  cursor: pointer;
+  font-size: 1em;
+  padding: 10px 20px;
+  text-decoration: none;
+  transition: background-color 0.3s, transform 0.3s;
+}
 
-  .${LINE_INPUT_CLS}:active {
-    transform: scale(0.95);
-  }
+.${LINE_INPUT_CLS}:hover {
+background-color: #e0e0e0;
+}
+
+.${LINE_INPUT_CLS}:active {
+  transform: scale(0.95);
+}
 `;
 const LINE_INPUT_CODE_TEMPLATE = `
+<div class="${LINE_INPUT_TITLE_CLS}"></div>
 <input id="${LINE_INPUT_ID}" class="${LINE_INPUT_CLS}" type="text"></input>`;
 
 customElements.define(
@@ -33,7 +39,8 @@ customElements.define(
       this.attachShadow({ mode: "open" });
       this.root.innerHTML = LINE_INPUT_CODE_TEMPLATE;
       const style = document.createElement("style");
-      style.textContent = LINE_INPUT_STYLE;
+      style.textContent = `${LINE_INPUT_STYLE}
+.${LINE_INPUT_TITLE_CLS}::before {${textInputTitleStyle(this)}}`;
       this.root.appendChild(style);
     }
 
