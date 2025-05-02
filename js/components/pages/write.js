@@ -23,10 +23,20 @@ const WritePageIds = {
 };
 const TEXT_INPUT_INLINE_STYLE =
   "max-width: calc(100vw - 70px); min-width: calc(100vw - 70px); min-height: 180px; font-family: sans-serif;";
-const WRITE_PAGE_CODE_TEMPLATE = () => `
+const WRITE_PAGE_CODE_TEMPLATE = () => {
+  const title = getCurrentTitle();
+
+  if (!title) {
+    alert(AppText.NO_STORY_SELECTED);
+    gotoPage({ page: Page.STORIES });
+  }
+
+  return `
   <page-navigation></page-navigation>
 
   <gemini-api-key></gemini-api-key>
+
+  <share-story></share-story>
 
   <div>
     <h2>${AppText.WRITE}</h2>
@@ -148,6 +158,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => `
   <br /><br /><br />
   <qb-copyright></qb-copyright>
 `;
+};
 
 customElements.define(
   ComponentName.WRITE,

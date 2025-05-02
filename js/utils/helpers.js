@@ -2,9 +2,10 @@
 const STORY_AI_NS = "https://qbrkts.com/story-ai";
 
 const DEFAULT_PAGE = "HOME";
-const PageNames = [DEFAULT_PAGE, "STORIES", "WRITE"];
+const PageNames = [DEFAULT_PAGE, "STORIES", "WRITE", "READ"];
 /** @type {{
   HOME: 'home';
+  READ: 'read';
   STORIES: 'stories';
   WRITE: 'write';
 }} */
@@ -18,8 +19,10 @@ const Page = Object.assign(
   LINE_INPUT: 'line-input';
   PAGE_NAVIGATION: 'page-navigation';
   PAPER_BUTTON: 'paper-button';
+  SHARE_STORY: 'share-story';
   TEXT_INPUT: 'text-input';
   HOME: 'home-page';
+  READ: 'read-page';
   STORIES: 'stories-page';
   WRITE: 'write-page';
 }} */
@@ -30,6 +33,7 @@ const ComponentName = Object.assign(
     LINE_INPUT: "line-input",
     PAGE_NAVIGATION: "page-navigation",
     PAPER_BUTTON: "paper-button",
+    SHARE_STORY: "share-story",
     TEXT_INPUT: "text-input",
   },
   ...Object.keys(Page).map((key) => ({ [key]: `${Page[key]}-page` }))
@@ -46,6 +50,12 @@ const StorageKey = {
   STORY_CONTENTS: `${STORY_AI_NS}:story-contents`,
 };
 
+const Level = {
+  TOP: 100,
+  NORMAL: "auto",
+  BOTTOM: -1,
+};
+
 const DELETE_CHARACTER_MARKER = "delete";
 const AppText = {
   ADD_CHARACTER: "Add Character",
@@ -54,6 +64,7 @@ const AppText = {
     "Dump your story ideas here. Anything goes and everything helps. If you want a more dramatic twist, add that idea here and regenerate the synopsis.",
   CHAPTER: "Chapter",
   COPYRIGHT: "Copyright",
+  COPY_SHARE_LINK_SUCCESS: "Successfully copied share link to clipboard",
   CHARACTERS: "Characters",
   ENTER_GEMINI_API_KEY: "Enter your Gemini API Key",
   ENTER_GENRE: "Enter genre e.g. Sci-Fi Fantasy, Thriller Romance",
@@ -77,11 +88,13 @@ const AppText = {
     "Optionally enter the name and any traits to guide character generation.",
   NO_API_KEY: "If you do not have an api key, visit here to generate one.",
   NO_STORIES_YET: "No stories yet... continue above",
+  NO_STORY_SELECTED: "No story selected",
   OUTLINE: "Outline",
   OWNER_NAME: "Quantum Brackets",
   PREVIOUSLY_ON: "Previously on...",
   RANDOM: "Random",
   SAVE: "Save",
+  SHARE_STORY: "Copy share story link",
   START: "Start",
   STORY_AI_DESCRIPTION: "A tool to generate stories using AI",
   STORY_AI: "Story AI",
@@ -300,8 +313,13 @@ function getCurrentTitleKey() {
 }
 
 function getCurrentTitle() {
-  const titleKey = getCurrentTitleKey();
-  return keyAsTitleCase(titleKey);
+  try {
+    const titleKey = getCurrentTitleKey();
+    return keyAsTitleCase(titleKey);
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
 }
 
 const StoryDefaults = {
@@ -577,4 +595,110 @@ function renameStoryTitle(title, newTitle) {
   const storyDocument = getStoryDocumentByTitle(title);
   addStoryDocumentToLocalStorage(newTitle, storyDocument);
   removeStoryDocumentFromLocalStorage(title);
+}
+
+function encodeStoryDocument(jsonObject) {
+  try {
+    if (typeof jsonObject !== "object" || jsonObject === null) {
+      throw new Error("Input must be a non-null object.");
+    }
+    const jsonString = JSON.stringify(jsonObject);
+    // Use pako.deflate for compression, returns Uint8Array
+    const compressedData = pako.deflate(jsonString, { level: 9 }); // level 9 for max compression
+
+    // Convert Uint8Array to binary string for btoa
+    let binaryString = "";
+    const len = compressedData.length;
+    for (let i = 0; i < len; i++) {
+      binaryString += String.fromCharCode(compressedData[i]);
+    }
+
+    // Base64 encode
+    const base64String = btoa(binaryString);
+
+    // Make URL-safe: replace '+' with '-', '/' with '_', remove padding '='
+    const urlSafeBase64String = base64String
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+
+    return urlSafeBase64String;
+  } catch (error) {
+    console.error("Error encoding JSON to URL-safe string:", error);
+    // Re-throw or return a specific error indicator as needed
+    throw new Error(`Encoding failed: ${error.message}`);
+  }
+}
+
+function decodeStoryDocument(urlSafeString) {
+  try {
+    if (typeof urlSafeString !== "string" || urlSafeString.length === 0) {
+      throw new Error("Input must be a non-empty string.");
+    }
+    // Convert Base64URL back to standard Base64
+    let base64String = urlSafeString.replace(/-/g, "+").replace(/_/g, "/");
+
+    // Add padding if necessary
+    while (base64String.length % 4) {
+      base64String += "=";
+    }
+
+    // Decode Base64 to binary string
+    const binaryString = atob(base64String);
+
+    // Convert binary string to Uint8Array
+    const len = binaryString.length;
+    const compressedData = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      compressedData[i] = binaryString.charCodeAt(i);
+    }
+
+    // Decompress using pako.inflate, get result as string
+    const jsonString = pako.inflate(compressedData, { to: "string" });
+
+    // Parse JSON
+    const jsonObject = JSON.parse(jsonString);
+    return jsonObject;
+  } catch (error) {
+    console.error("Error decoding URL-safe string to JSON:", error);
+    // Re-throw or return a specific error indicator as needed
+    throw new Error(`Decoding failed: ${error.message}`);
+  }
+}
+
+function fallbackCopyTextToClipboard(text) {
+  var textArea = document.createElement("textarea");
+  textArea.value = text;
+
+  // Avoid scrolling to bottom
+  textArea.style.top = "0";
+  textArea.style.left = "0";
+  textArea.style.position = "fixed";
+
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+
+  try {
+    const successful = document.execCommand("copy");
+    if (successful) {
+      alert(AppText.COPY_SHARE_LINK_SUCCESS);
+    } else {
+      throw Error("document.execCommmand('copy') failed");
+    }
+  } catch (err) {
+    console.error("Fallback: Could not copy text", err);
+  }
+
+  document.body.removeChild(textArea);
+}
+
+async function copyTextToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    alert(AppText.COPY_SHARE_LINK_SUCCESS);
+  } catch (err) {
+    console.error("Async: Could not copy text: ", err);
+    fallbackCopyTextToClipboard(text);
+  }
 }

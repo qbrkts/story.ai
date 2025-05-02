@@ -1,6 +1,6 @@
 const PageNavigationIds = {
   PAGE_LINKS: "page-links",
-}
+};
 const PAGE_NAVIGATION_CODE_TEMPLATE = `
 <div id="${PageNavigationIds.PAGE_LINKS}" style="font-size: 0.7em; text-transform: capitalize; display: flex; flex-direction: row; gap: 20px; justify-content: center"></div>
 `;
@@ -45,13 +45,17 @@ customElements.define(
 
     createLinks(containerEl) {
       containerEl.innerHTML = PAGE_NAVIGATION_CODE_TEMPLATE;
-      const linksContainer = containerEl.querySelector(`#${PageNavigationIds.PAGE_LINKS}`);
+      const linksContainer = containerEl.querySelector(
+        `#${PageNavigationIds.PAGE_LINKS}`
+      );
       if (!linksContainer) {
         throw new Error("Links container not found");
       }
+      /** @type {string[]} */
+      const pagesRequiringContent = [Page.WRITE, Page.READ];
       for (let i = 0; i < PageNames.length; i++) {
         const page = PageNames[i].toLowerCase();
-        if (page === Page.WRITE) {
+        if (pagesRequiringContent.includes(page)) {
           // skip or disable write page if there is no story title
           if (!getCurrentTitle()) continue;
         }
