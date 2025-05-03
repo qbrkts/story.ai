@@ -12,6 +12,8 @@ const READ_PAGE_CODE_TEMPLATE = () => {
 
   <h2>${title}</h2>
 
+  <p id=${ReadPageIds.PROGRESS_BAR}></p>
+
   <paper-button id=${ReadPageIds.REGENERATE_STORY_CONTENT_BTN}>${AppText.REGENERATE_STORY_CONTENT}</paper-button>
 
   <pre id=${ReadPageIds.STORY_CONTENT} style="font-family: sans-serif; white-space: break-spaces; padding: 10px;">
@@ -53,6 +55,14 @@ customElements.define(
     }
 
     render() {
+      const progressIndicator = this.root.getElementById(ReadPageIds.PROGRESS_BAR);
+      if (!progressIndicator) {
+        throw new Error("Progress bar not found");
+      }
+      progressIndicator.innerHTML = `${Math.round(
+        window.__chaptersGenerationProgress * 100
+      )} percent complete`;
+
       const title = getCurrentTitle();
       const storyDocument = getStoryDocumentByTitle(title);
       const storyContent = storyDocument.outline

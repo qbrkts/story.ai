@@ -1,5 +1,5 @@
 // --- helper constants
-const STORY_AI_NS = "https://qbrkts.com/story-ai";
+const STORY_AI_NS = "https://qbrkts.com/story.ai";
 
 const DEFAULT_PAGE = "HOME";
 const PageNames = [DEFAULT_PAGE, "STORIES", "WRITE", "READ"];
@@ -627,19 +627,28 @@ async function generateStoryContents() {
     )}`,
     `The generated story MUST match this style: ${storyDocument.style}`,
     `The generated content MUST be limited to the context of its chapter.`,
+    `The generated content MUST ensure characters are not introduced before they are relevant.`,
+    `The generated content MUST be set up that the story flows between the scenes and chapters in a natural way.`,
   ];
+  const chapterGenerationStepSize = 1 / ((storyDocument.outline.length ?? 0) * 2);
+  window.__chaptersGenerationProgress = 0;
+  let chapGenerationDelay = 0;
   const chapterGenerationPromises = storyDocument.outline.map(
     async (chapter, i, outline) => {
       const chapNum = i + 1;
       const chapCount = outline.length;
       if (chapter.content) {
+        console.log("chap already had content", chapNum);
         window.__chaptersGenerated += 1;
+        window.__chaptersGenerationProgress += chapterGenerationStepSize * 2;
         return;
       }
-      const generationDelaySeconds = i * 5;
+      const generationDelaySeconds = chapGenerationDelay * 5;
+      chapGenerationDelay += 1;
       if (!chapter.scenes) {
         // generate chapter scenes
         await delay(generationDelaySeconds); // wait seconds between scene generation requests
+        console.log("chap scenes generating", chapNum);
         const sceneResult = await fetchFromGemini(
           apiKey,
           [
@@ -654,8 +663,10 @@ async function generateStoryContents() {
         chapter.scenes = sceneResult.scenes;
         addStoryDocumentToLocalStorage(storyTitle, storyDocument);
       }
+      window.__chaptersGenerationProgress += chapterGenerationStepSize;
       // generate chapter content
       await delay(generationDelaySeconds + chapCount); // wait seconds between chapter generation requests
+      console.log("chap content generating", chapNum);
       const chapterResult = await fetchFromGemini(
         apiKey,
         [
@@ -664,6 +675,7 @@ async function generateStoryContents() {
           `This the title of chapter ${chapNum}: ${chapter.title}`,
           `These are the scenes for chapter ${chapNum}: ${chapter.scenes}`,
           `The chapter should be about ${chapCount * 200} words in length.`,
+          `The chapter should be well formatted with appropriate line breaks`,
         ].join("\n\n"),
         `{content: "chapter ${chapNum} content in plain text"}`
       );
@@ -672,6 +684,7 @@ async function generateStoryContents() {
       addStoryDocumentToLocalStorage(storyTitle, storyDocument);
       // add chapter content to story
       window.__chaptersGenerated += 1;
+      window.__chaptersGenerationProgress += chapterGenerationStepSize;
     }
   );
   await Promise.all(chapterGenerationPromises);
@@ -709,6 +722,7 @@ function fallbackCopyTextToClipboard(text) {
 
 async function copyTextToClipboard(text) {
   try {
+    console.log("Copy", { text });
     await navigator.clipboard.writeText(text);
     alert(AppText.COPY_SHARE_LINK_SUCCESS);
   } catch (err) {

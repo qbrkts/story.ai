@@ -43,12 +43,14 @@ customElements.define(
       style.textContent = PAPER_BUTTON_STYLE;
       this.root.appendChild(style);
     }
+
     get root() {
       if (!this.shadowRoot) {
         throw new Error("Shadow DOM not supported");
       }
       return this.shadowRoot;
     }
+
     get buttonEl() {
       const button = /** @type {HTMLButtonElement} */ (
         this.root.getElementById(PAPER_BUTTON_ID)
@@ -58,18 +60,28 @@ customElements.define(
       }
       return button;
     }
+
     set disabled(value) {
       this.buttonEl.disabled = !!value;
     }
     get disabled() {
-      return this.buttonEl.disabled;
+      return this.buttonEl.disabled == true;
     }
+
+    get value() {
+      return this.buttonEl.value;
+    }
+    set value(value) {
+      this.buttonEl.value = value;
+    }
+
     set handler(value) {
       this.buttonEl.onclick = value;
     }
     get handler() {
       return this.buttonEl.onclick;
     }
+
     connectedCallback() {
       this.render();
     }

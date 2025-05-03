@@ -57,6 +57,7 @@ declare global {
     __cacheShareLinks: Record<string, string>;
     __chapterCount: number;
     __chaptersGenerated: number;
+    __chaptersGenerationProgress: number;
     pako: typeof pako;
   }
   namespace JSX {
