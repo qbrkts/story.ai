@@ -98,7 +98,7 @@ const AppText = {
   OWNER_NAME: "Quantum Brackets",
   PREVIOUSLY_ON: "Previously on...",
   RANDOM: "Random",
-  REGENERATE_STORY_CONTENT: "Recreate",
+  REGENERATE_STORY_CONTENT: "Refresh",
   SAVE: "Save",
   SHARE_STORY: "Copy link to share story",
   START: "Start",
@@ -606,13 +606,10 @@ function renameStoryTitle(title, newTitle) {
 async function generateStoryContents() {
   const storyTitle = getCurrentTitle();
   const storyDocument = getStoryDocumentByTitle(storyTitle);
-  const apiKey = getGeminiKeyFromLocalStorage();
-  if (!apiKey) {
-    throw new Error(AppText.GEMINI_API_KEY_NOT_SET);
-  }
 
   window.__chapterCount = storyDocument.outline.length;
   window.__chaptersGenerated = 0;
+  window.__chaptersGenerationProgress = 0;
 
   const promptParts = [
     // `This is the summary of the story: "${storyDocument.summary}"`,
@@ -630,9 +627,16 @@ async function generateStoryContents() {
     `The generated content MUST ensure characters are not introduced before they are relevant.`,
     `The generated content MUST be set up that the story flows between the scenes and chapters in a natural way.`,
   ];
-  const chapterGenerationStepSize = 1 / ((storyDocument.outline.length ?? 0) * 2);
+  const chapterGenerationStepSize =
+    1 / ((storyDocument.outline.length ?? 0) * 2);
   window.__chaptersGenerationProgress = 0;
   let chapGenerationDelay = 0;
+
+  const apiKey = getGeminiKeyFromLocalStorage();
+  if (!apiKey) {
+    throw new Error(AppText.GEMINI_API_KEY_NOT_SET);
+  }
+
   const chapterGenerationPromises = storyDocument.outline.map(
     async (chapter, i, outline) => {
       const chapNum = i + 1;
@@ -656,6 +660,7 @@ async function generateStoryContents() {
             ...promptParts,
             `This the title of chapter ${chapNum}: ${chapter.title}`,
             `This the description for chapter ${chapNum}: ${chapter.description}`,
+            `The chapter should be about ${chapCount * 200} words in length.`,
           ].join("\n\n"),
           `{scenes: "All scenes for chapter ${chapNum} in plain text"}`
         );

@@ -35,6 +35,10 @@ customElements.define(
 
     connectedCallback() {
       this.regenerateStoryBtn.handler = async () => {
+        if (!getGeminiKeyFromLocalStorage()) {
+          alert(AppText.GEMINI_API_KEY_NOT_SET);
+          gotoPage({ page: Page.WRITE });
+        }
         this.regenerateStoryBtn.disabled = true;
         const title = getCurrentTitle();
         const storyDocument = getStoryDocumentByTitle(title);
@@ -55,7 +59,9 @@ customElements.define(
     }
 
     render() {
-      const progressIndicator = this.root.getElementById(ReadPageIds.PROGRESS_BAR);
+      const progressIndicator = this.root.getElementById(
+        ReadPageIds.PROGRESS_BAR
+      );
       if (!progressIndicator) {
         throw new Error("Progress bar not found");
       }
@@ -66,9 +72,13 @@ customElements.define(
       const title = getCurrentTitle();
       const storyDocument = getStoryDocumentByTitle(title);
       const storyContent = storyDocument.outline
-        .map((o) => {
+        .map((o, i) => {
           return (
-            o.content && [`<h4>${o.title}</h4>`, `<p>${o.content}</p>`].join("")
+            o.content &&
+            [
+              `<h4>${AppText.CHAPTER} ${i + 1}: ${o.title}</h4>`,
+              `<p>${o.content}</p>`,
+            ].join("")
           );
         })
         .filter(Boolean)
