@@ -6,9 +6,13 @@ const SHARE_STORY_CODE_TEMPLATE = `
 <paper-button
   id="${ShareStoryIds.COPY_LINK_BTN_ID}"
   title="${AppText.SHARE_STORY}"
-  style="padding: 10px; position: fixed; top: 0; left: 0; z-index: ${Level.TOP}; border-radius: 0 0 10px 0;">
-  📖
-</paper-button>
+  style="
+    border-radius: 4px;
+    box-shadow: 0px 0px 10px #30303090;
+    position: fixed;
+    bottom: 4px; left: 4px;
+    z-index: ${Level.TOP};
+  ">${AppText.SHARE_STORY}</paper-button>
 `;
 
 customElements.define(
@@ -48,13 +52,34 @@ customElements.define(
       return buttonEl;
     }
 
-    copyShareLink = () => {
+    copyShareLink = async () => {
       const title = getCurrentTitle();
       const storyDocument = getStoryDocumentByTitle(title);
-      // convert story document to url base64 hash
-      const storyData = encodeStoryDocument(storyDocument);
-      console.log({ storyData });
-      const storyUrl = `${STORY_AI_NS}/?page=${Page.READ}&continue=${storyData}`;
+      const storyContents = JSON.stringify(storyDocument, null, 2);
+      if (!window.__cacheShareLinks) {
+        window.__cacheShareLinks = {};
+      }
+      if (!window.__cacheShareLinks[storyContents]) {
+        const name = prompt(AppText.ENTER_NAME)?.trim(); // Use optional chaining and trim
+        if (!name) {
+          console.warn("Author name not provided. Share cancelled.");
+          alert("Author name is required to share."); // Inform user
+          return;
+        }
+        const email = prompt(AppText.ENTER_EMAIL)?.trim(); // Use optional chaining and trim
+        if (!email) {
+          console.warn("Author email not provided. Share cancelled.");
+          alert("Author email is required to share."); // Inform user
+          return;
+        }
+        const storyRef = await storeTextInRepo({
+          author: { name, email },
+          content: storyContents,
+        });
+        window.__cacheShareLinks[storyContents] = storyRef;
+      }
+      const continueRef = window.__cacheShareLinks[storyContents];
+      const storyUrl = `${STORY_AI_NS}/?continue=${continueRef}`;
       copyTextToClipboard(storyUrl);
     };
   }

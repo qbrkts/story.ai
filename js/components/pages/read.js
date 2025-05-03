@@ -1,4 +1,6 @@
-const ReadPageIds = {};
+const ReadPageIds = {
+  STORY_CONTENT: "story-content",
+};
 const READ_PAGE_CODE_TEMPLATE = () => {
   const title = getCurrentTitle();
   const storyDocument = getStoryDocumentByTitle(title);
@@ -8,11 +10,6 @@ const READ_PAGE_CODE_TEMPLATE = () => {
     .join("<br/><br/>")
     .trim();
 
-  if (!storyContent) {
-    alert(AppText.NO_STORY_CONTENT);
-    gotoPage({ page: Page.WRITE });
-  }
-
   return `
   <page-navigation></page-navigation>
 
@@ -20,7 +17,7 @@ const READ_PAGE_CODE_TEMPLATE = () => {
 
   <h2>${title}</h2>
 
-  <div>
+  <div id=${ReadPageIds.STORY_CONTENT}>
     ${storyContent}
   </div>
   <br /><br /><br />
@@ -41,13 +38,26 @@ customElements.define(
       this.render();
     }
 
-    render() {}
+    render() {
+      if (!this.storyContent) {
+        alert(AppText.NO_STORY_CONTENT);
+        gotoPage({ page: Page.WRITE });
+      }
+    }
 
     get root() {
       if (!this.shadowRoot) {
         throw new Error("Shadow DOM not supported");
       }
       return this.shadowRoot;
+    }
+
+    get storyContent() {
+      return (
+        this.root
+          .getElementById(ReadPageIds.STORY_CONTENT)
+          ?.textContent?.trim() ?? ""
+      );
     }
   }
 );

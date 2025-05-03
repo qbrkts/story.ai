@@ -18,15 +18,24 @@ appContainer.innerHTML = "";
 appContainer.appendChild(pageComponent);
 
 // Continue story from shared URL
-const url = new URL(window.location.href);
-if (url.searchParams.has(UrlParams.CONTINUE)) {
-  const encodedStoryDocument = url.searchParams.get(UrlParams.CONTINUE);
-  const decodedStoryDocument = decodeStoryDocument(encodedStoryDocument);
-  console.log(decodedStoryDocument);
-  const storyTitle = decodedStoryDocument.title;
-  setCurrentStoryTitle(decodedStoryDocument.title);
-  addStoryDocumentToLocalStorage(storyTitle, decodedStoryDocument);
+async function continueStoryFromRef() {
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has(UrlParams.CONTINUE)) return;
+  const storyRef = url.searchParams.get(UrlParams.CONTINUE);
+  const storyContent = await loadTextFromRepo({
+    ref: storyRef,
+  });
+  const storyDocument = JSON.parse(storyContent);
+  console.log(storyDocument);
+  const storyTitle = storyDocument.title;
+  setCurrentStoryTitle(storyDocument.title);
+  addStoryDocumentToLocalStorage(storyTitle, storyDocument);
   url.searchParams.delete(UrlParams.CONTINUE);
   url.searchParams.set(UrlParams.TITLE, titleStorageKey(storyTitle));
+  if (!url.searchParams.has(UrlParams.PAGE)) {
+    url.searchParams.set(UrlParams.PAGE, Page.READ);
+  }
   window.location.href = url.toString();
 }
+
+continueStoryFromRef();

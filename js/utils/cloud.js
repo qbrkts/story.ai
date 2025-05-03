@@ -1,274 +1,196 @@
-// Import necessary functions if using modules
-// import firebase from 'firebase/compat/app';
-// import 'firebase/compat/auth';
-// import 'firebase/compat/firestore';
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "YOUR_FIREBASE_API_KEY", // From Firebase console project settings
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID",
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-const googleProvider = new firebase.auth.GoogleAuthProvider();
-
-let currentUser = null;
-
-// --- Authentication Functions ---
+const GITHUB_STORE_TOKEN = atob(
+  "Z2l0aHViX3BhdF8xMUFBVEpOUFkwMmlpN2tZQUNOS1dQX05pR1p6ZUNzUGp6Z1ZHcU16YTZydk12aHZkVExnbm1zanZxY1Bkd3pjWkJGUzNPT0hPVW5zNmJXdll2"
+);
+const GITHUB_SHARE_BRANCH = "share";
+const GITHUB_SHARE_OWNER = "qbrkts";
+const GITHUB_SHARE_REPO = "story.ai";
+const GITHUB_SHARE_PATH = "document.json";
+const GITHUB_COMMIT_MSG = "Upload story document";
 
 /**
- * Initiates Google Sign-In popup.
+ * Stores arbitrary text into a file within a GitHub repository branch.
+ * Creates the file if it doesn't exist, updates it otherwise.
  */
-async function signInWithGoogle() {
-  try {
-    const result = await auth.signInWithPopup(googleProvider);
-    console.log("Signed in successfully!", result.user);
-    // User is signed in. currentUser will be set by onAuthStateChanged
-  } catch (error) {
-    console.error("Google Sign-In Error:", error);
-    alert(`Sign-in failed: ${error.message}`);
-  }
-}
-
-/**
- * Signs the current user out.
- */
-async function signOut() {
-  try {
-    await auth.signOut();
-    console.log("Signed out successfully!");
-    // User is signed out. currentUser will be set to null by onAuthStateChanged
-  } catch (error) {
-    console.error("Sign Out Error:", error);
-  }
-}
-
-/**
- * Listens for authentication state changes and updates UI/currentUser.
- * @param {(user: firebase.User | null) => void} callback Function to call when auth state changes.
- */
-function onAuthStateChanged(callback) {
-  auth.onAuthStateChanged((user) => {
-    currentUser = user; // Keep track of the current user
-    if (user) {
-      console.log("User is signed in:", user.uid, user.displayName);
-    } else {
-      console.log("User is signed out.");
-    }
-    if (callback) {
-      callback(user); // Notify other parts of the app
-    }
-  });
-}
-
-/**
- * Gets the current authenticated user's ID.
- * @returns {string | null} User ID or null if not authenticated.
- */
-function getCurrentUserId() {
-  return currentUser ? currentUser.uid : null;
-}
-
-// --- Firestore Helper Functions (Example) ---
-
-/**
- * Saves a story document to Firestore under the current user's collection.
- * @param {string} title - The story title (will be used as document ID after sanitizing).
- * @param {object} storyDocument - The story data object (like DEFAULT_DOCUMENT).
- * @returns {Promise<void>}
- */
-async function saveStoryToFirestore(title, storyDocument) {
-  const userId = getCurrentUserId();
-  if (!userId) {
-    alert("You must be signed in to save stories.");
-    throw new Error("User not authenticated");
-  }
-  if (!title || !storyDocument) {
-    throw new Error("Invalid title or story document provided.");
-  }
-
-  const storyId = titleStorageKey(title); // Use your existing helper
-  const storyRef = db
-    .collection("users")
-    .doc(userId)
-    .collection("stories")
-    .doc(storyId);
-
-  try {
-    // Use set with merge: true to update or create, without overwriting unspecified fields
-    await storyRef.set(
-      {
-        ...storyDocument,
-        title: title,
-        lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
-      },
-      { merge: true }
+async function storeTextInRepo({
+  owner = GITHUB_SHARE_OWNER,
+  repo = GITHUB_SHARE_REPO,
+  branch = GITHUB_SHARE_BRANCH,
+  filePath = GITHUB_SHARE_PATH,
+  commitMessage = GITHUB_COMMIT_MSG,
+  token = GITHUB_STORE_TOKEN,
+  content,
+  author, // Defaults to committer if not provided by GitHub API
+}) {
+  if (
+    !author ||
+    !owner ||
+    !repo ||
+    !branch ||
+    !filePath ||
+    content === undefined ||
+    !commitMessage ||
+    !token
+  ) {
+    throw new Error(
+      "Missing required parameters: owner, repo, branch, filePath, content, commitMessage, token.",
+      ...arguments
     );
-    console.log(
-      `Story "${title}" saved successfully to Firestore for user ${userId}.`
-    );
-  } catch (error) {
-    console.error(`Error saving story "${title}" to Firestore:`, error);
-    throw error; // Re-throw to allow caller to handle
-  }
-}
-
-/**
- * Retrieves a specific story document from Firestore for the current user.
- * @param {string} title - The story title.
- * @returns {Promise<object | null>} The story document or null if not found.
- */
-async function getStoryFromFirestore(title) {
-  const userId = getCurrentUserId();
-  if (!userId) {
-    console.warn("Cannot get story: User not authenticated.");
-    return null;
   }
 
-  const storyId = titleStorageKey(title);
-  const storyRef = db
-    .collection("users")
-    .doc(userId)
-    .collection("stories")
-    .doc(storyId);
+  const apiUrlBase = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+  const headers = {
+    Authorization: `token ${token}`,
+    Accept: "application/vnd.github.v3+json",
+    "Content-Type": "application/json",
+  };
 
+  let fileSha = undefined;
+
+  // 1. Try to get the current file SHA (needed for updates)
   try {
-    const docSnap = await storyRef.get();
-    if (docSnap.exists) {
-      console.log(`Story "${title}" retrieved successfully from Firestore.`);
-      // Combine with defaults if needed, similar to your local storage logic
-      const firestoreData = docSnap.data();
-      // Ensure essential fields exist, potentially merging with DEFAULT_DOCUMENT structure
-      // This depends on how strictly you want to enforce the schema on read
-      return { ...DEFAULT_DOCUMENT, ...firestoreData };
+    const getResponse = await fetch(`${apiUrlBase}?ref=${branch}`, { headers });
+    if (getResponse.ok) {
+      const fileData = await getResponse.json();
+      fileSha = fileData.sha;
+      console.log(
+        `File '${filePath}' exists on branch '${branch}'. SHA: ${fileSha}`
+      );
+    } else if (getResponse.status !== 404) {
+      // Handle errors other than "Not Found"
+      const errorData = await getResponse
+        .json()
+        .catch(() => ({ message: getResponse.statusText }));
+      throw new Error(
+        `GitHub API Error (GET): ${getResponse.status} - ${
+          errorData.message || "Unknown error"
+        }`
+      );
     } else {
       console.log(
-        `Story "${title}" not found in Firestore for user ${userId}.`
+        `File '${filePath}' does not exist on branch '${branch}'. Will create it.`
       );
-      return null;
     }
   } catch (error) {
-    console.error(`Error getting story "${title}" from Firestore:`, error);
-    throw error;
-  }
-}
-
-/**
- * Retrieves a list of story titles (or minimal data) from Firestore for the current user.
- * @returns {Promise<string[]>} A list of story titles.
- */
-async function listStoryTitlesFromFirestore() {
-  const userId = getCurrentUserId();
-  if (!userId) {
-    console.warn("Cannot list stories: User not authenticated.");
-    return [];
-  }
-
-  const storiesRef = db.collection("users").doc(userId).collection("stories");
-  try {
-    const snapshot = await storiesRef.orderBy("lastUpdated", "desc").get(); // Or order by title
-    const titles = snapshot.docs.map(
-      (doc) => doc.data().title || keyAsTitleCase(doc.id)
-    ); // Get title field, fallback to ID
-    console.log(`Found ${titles.length} stories for user ${userId}.`);
-    return titles.filter(Boolean); // Filter out any potential null/empty titles
-  } catch (error) {
-    console.error("Error listing stories from Firestore:", error);
-    throw error;
-  }
-}
-
-/**
- * Deletes a story document from Firestore for the current user.
- * @param {string} title - The story title.
- * @returns {Promise<void>}
- */
-async function deleteStoryFromFirestore(title) {
-  const userId = getCurrentUserId();
-  if (!userId) {
-    alert("You must be signed in to delete stories.");
-    throw new Error("User not authenticated");
-  }
-
-  const storyId = titleStorageKey(title);
-  const storyRef = db
-    .collection("users")
-    .doc(userId)
-    .collection("stories")
-    .doc(storyId);
-
-  try {
-    await storyRef.delete();
-    console.log(
-      `Story "${title}" deleted successfully from Firestore for user ${userId}.`
+    if (error.message.includes("GitHub API Error (GET)")) throw error; // Re-throw API errors
+    // Network errors during GET are problematic, but we can still try PUT
+    console.warn(
+      `Could not check for existing file (may be network issue): ${error.message}. Attempting create/update anyway.`
     );
-  } catch (error) {
-    console.error(`Error deleting story "${title}" from Firestore:`, error);
-    throw error;
   }
-}
 
-// --- Export or make functions globally available ---
-// (Depending on your project structure)
-window.firebaseAuth = {
-  signInWithGoogle,
-  signOut,
-  onAuthStateChanged,
-  getCurrentUserId,
-};
+  // 2. Create or update the file (MUST BE PUBLIC)
+  const body = {
+    message: [commitMessage, "by", author.name].join(" "),
+    content: encodeStringToBase64(content),
+    branch,
+    author, // Use committer info if author is not specified
+    ...(fileSha && { sha: fileSha }), // Include SHA only if updating an existing file
+  };
 
-window.firestoreApi = {
-  saveStoryToFirestore,
-  getStoryFromFirestore,
-  listStoryTitlesFromFirestore,
-  deleteStoryFromFirestore,
-};
-
-// Example: Trigger UI update on auth state change
-onAuthStateChanged((user) => {
-  const loginButton = document.getElementById("google-login-button"); // Assume you have these buttons
-  const logoutButton = document.getElementById("google-logout-button");
-  const userInfo = document.getElementById("user-info");
-
-  if (user) {
-    // User is signed in - Show logout, hide login, show user info
-    if (loginButton) loginButton.style.display = "none";
-    if (logoutButton) logoutButton.style.display = "block";
-    if (userInfo) userInfo.textContent = `Welcome, ${user.displayName}!`;
-    // Potentially load user's stories here
-    loadUserStories(); // You'd need to implement this function
-  } else {
-    // User is signed out - Show login, hide logout, clear user info
-    if (loginButton) loginButton.style.display = "block";
-    if (logoutButton) logoutButton.style.display = "none";
-    if (userInfo) userInfo.textContent = "Please sign in.";
-    // Clear any loaded story data
-    clearStoryData(); // You'd need to implement this
-  }
-});
-
-async function loadUserStories() {
-  console.log("Loading user stories...");
   try {
-    const titles = await listStoryTitlesFromFirestore();
-    // Update your UI (e.g., the stories list page)
-    console.log("User stories:", titles);
-    // Example: updateStoriesListUI(titles);
+    const putResponse = await fetch(apiUrlBase, {
+      method: "PUT",
+      headers: headers,
+      body: JSON.stringify(body),
+    });
+
+    if (!putResponse.ok) {
+      const errorData = await putResponse
+        .json()
+        .catch(() => ({ message: putResponse.statusText }));
+      // Common error: SHA mismatch if the file was updated concurrently
+      if (putResponse.status === 409) {
+        throw new Error(
+          `GitHub API Error (PUT): ${putResponse.status} - Conflict. The file might have been updated since the last check. Please try again. (${errorData.message})`
+        );
+      }
+      throw new Error(
+        `GitHub API Error (PUT): ${putResponse.status} - ${
+          errorData.message || "Unknown error"
+        }`
+      );
+    }
+
+    const responseData = await putResponse.json();
+    console.log(
+      `File '${filePath}' ${
+        fileSha ? "updated" : "created"
+      } successfully on branch '${branch}'.`
+    );
+    return responseData.commit.sha; // Return the commit SHA
   } catch (error) {
-    console.error("Failed to load user stories:", error);
+    console.error("Failed to store text in repository:", error);
+    throw error; // Re-throw the error for further handling
   }
 }
 
-function clearStoryData() {
-  console.log("Clearing story data...");
-  // Clear UI elements related to stories
-  // Example: updateStoriesListUI([]);
+/**
+ * Loads text content from a specific file in a GitHub repository at a given ref (commit SHA or branch name).
+ */
+async function loadTextFromRepo({
+  owner = GITHUB_SHARE_OWNER,
+  repo = GITHUB_SHARE_REPO,
+  filePath = GITHUB_SHARE_PATH,
+  ref,
+}) {
+  if (!owner || !repo || !filePath || !ref) {
+    throw new Error("Missing required parameters: owner, repo, filePath, ref.");
+  }
+
+  // Use the raw content URL for simplicity (avoids base64 decoding)
+  const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${ref}/${filePath}`;
+  const headers = {
+    Accept: "text/plain", // Request plain text
+  };
+
+  try {
+    const response = await fetch(rawUrl, { headers });
+
+    if (!response.ok) {
+      // Provide more specific error messages
+      if (response.status === 404) {
+        // Could be repo, ref, or file not found. GitHub raw doesn't distinguish easily.
+        throw new Error(
+          `Could not load file: Not Found (404). Check owner, repo, ref ('${ref}'), and filePath ('${filePath}'). Also ensure token has access if repo is private.`
+        );
+      }
+      // Handle other potential errors (e.g., 401 Unauthorized if token is bad/missing for private repo)
+      const errorText = await response.text().catch(() => response.statusText);
+      throw new Error(
+        `GitHub Raw Content Error: ${response.status} - ${errorText}`
+      );
+    }
+
+    const textContent = await response.text();
+    console.log(`Text loaded successfully from '${filePath}' at ref '${ref}'.`);
+    return textContent;
+  } catch (error) {
+    console.error("Failed to load text from repository:", error);
+    throw error; // Re-throw the error
+  }
+}
+
+function encodeStringToBase64(str) {
+  if (typeof TextEncoder === "undefined") {
+    // Fallback or error for older browsers (very rare nowadays)
+    console.error("TextEncoder API not supported in this browser.");
+    // You might try a polyfill or a library here if needed,
+    // but for simplicity, we'll throw an error.
+    throw new Error(
+      "TextEncoder is required for proper Unicode to Base64 encoding."
+    );
+  }
+
+  // 1. Encode the string into UTF-8 bytes (Uint8Array)
+  const utf8Bytes = new TextEncoder().encode(str);
+
+  // 2. Convert the bytes into a binary string (each byte becomes a character)
+  //    This intermediate step is necessary because btoa works on strings.
+  let binaryString = "";
+  for (let i = 0; i < utf8Bytes.length; i++) {
+    binaryString += String.fromCharCode(utf8Bytes[i]);
+  }
+
+  // 3. Base64 encode the binary string
+  return btoa(binaryString);
 }

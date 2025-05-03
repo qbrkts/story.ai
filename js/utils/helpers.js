@@ -72,6 +72,8 @@ const AppText = {
   ENTER_STYLE:
     "Enter a sample of your writing to get a similar style or use descriptors e.g. First Person, Third Person, Omniscient etc.",
   ENTER_SETTING: "Enter setting e.g. Earth, Mars, Fantasy World",
+  ENTER_EMAIL: "Enter your email address",
+  ENTER_NAME: "Enter your name",
   ENTER_NEW_STORY: "Enter new story title",
   GEMINI_API_KEY: "Gemini",
   GEMINI_API_KEY_NOT_SET: "Gemini API Key not set",
@@ -97,7 +99,7 @@ const AppText = {
   PREVIOUSLY_ON: "Previously on...",
   RANDOM: "Random",
   SAVE: "Save",
-  SHARE_STORY: "Copy share story link",
+  SHARE_STORY: "Copy link to share story",
   START: "Start",
   STORY_AI_DESCRIPTION: "A tool to generate stories using AI",
   STORY_AI: "Story AI",
@@ -600,75 +602,6 @@ function renameStoryTitle(title, newTitle) {
   removeStoryDocumentFromLocalStorage(title);
 }
 
-function encodeStoryDocument(jsonObject) {
-  try {
-    if (typeof jsonObject !== "object" || jsonObject === null) {
-      throw new Error("Input must be a non-null object.");
-    }
-    const jsonString = JSON.stringify(jsonObject);
-    // Use pako.deflate for compression, returns Uint8Array
-    const compressedData = pako.deflate(jsonString, { level: 9 }); // level 9 for max compression
-
-    // Convert Uint8Array to binary string for btoa
-    let binaryString = "";
-    const len = compressedData.length;
-    for (let i = 0; i < len; i++) {
-      binaryString += String.fromCharCode(compressedData[i]);
-    }
-
-    // Base64 encode
-    const base64String = btoa(binaryString);
-
-    // Make URL-safe: replace '+' with '-', '/' with '_', remove padding '='
-    const urlSafeBase64String = base64String
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=+$/, "");
-
-    return urlSafeBase64String;
-  } catch (error) {
-    console.error("Error encoding JSON to URL-safe string:", error);
-    // Re-throw or return a specific error indicator as needed
-    throw new Error(`Encoding failed: ${error.message}`);
-  }
-}
-
-function decodeStoryDocument(urlSafeString) {
-  try {
-    if (typeof urlSafeString !== "string" || urlSafeString.length === 0) {
-      throw new Error("Input must be a non-empty string.");
-    }
-    // Convert Base64URL back to standard Base64
-    let base64String = urlSafeString.replace(/-/g, "+").replace(/_/g, "/");
-
-    // Add padding if necessary
-    while (base64String.length % 4) {
-      base64String += "=";
-    }
-
-    // Decode Base64 to binary string
-    const binaryString = atob(base64String);
-
-    // Convert binary string to Uint8Array
-    const len = binaryString.length;
-    const compressedData = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      compressedData[i] = binaryString.charCodeAt(i);
-    }
-
-    // Decompress using pako.inflate, get result as string
-    const jsonString = pako.inflate(compressedData, { to: "string" });
-
-    // Parse JSON
-    const jsonObject = JSON.parse(jsonString);
-    return jsonObject;
-  } catch (error) {
-    console.error("Error decoding URL-safe string to JSON:", error);
-    // Re-throw or return a specific error indicator as needed
-    throw new Error(`Decoding failed: ${error.message}`);
-  }
-}
-
 function fallbackCopyTextToClipboard(text) {
   var textArea = document.createElement("textarea");
   textArea.value = text;
@@ -677,6 +610,8 @@ function fallbackCopyTextToClipboard(text) {
   textArea.style.top = "0";
   textArea.style.left = "0";
   textArea.style.position = "fixed";
+  textArea.style.opacity = "0";
+  textArea.style.visibility = "hidden";
 
   document.body.appendChild(textArea);
   textArea.focus();
