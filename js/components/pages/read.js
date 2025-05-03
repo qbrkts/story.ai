@@ -1,14 +1,9 @@
 const ReadPageIds = {
   STORY_CONTENT: "story-content",
+  REGENERATE_STORY_CONTENT_BTN: "regenerate-story-content-btn",
 };
 const READ_PAGE_CODE_TEMPLATE = () => {
   const title = getCurrentTitle();
-  const storyDocument = getStoryDocumentByTitle(title);
-
-  const storyContent = storyDocument.outline
-    .map((c) => c.content)
-    .join("<br/><br/>")
-    .trim();
 
   return `
   <page-navigation></page-navigation>
@@ -17,9 +12,11 @@ const READ_PAGE_CODE_TEMPLATE = () => {
 
   <h2>${title}</h2>
 
-  <div id=${ReadPageIds.STORY_CONTENT}>
-    ${storyContent}
-  </div>
+  <paper-button id=${ReadPageIds.REGENERATE_STORY_CONTENT_BTN}>${AppText.REGENERATE_STORY_CONTENT}</paper-button>
+
+  <pre id=${ReadPageIds.STORY_CONTENT} style="font-family: sans-serif; white-space: break-spaces; padding: 10px;">
+    ${AppText.NO_STORY_CONTENT}
+  </pre>
   <br /><br /><br />
   <qb-copyright></qb-copyright>
 `;
@@ -35,13 +32,42 @@ customElements.define(
     }
 
     connectedCallback() {
-      this.render();
+      this.regenerateStoryBtn.handler = async () => {
+        this.regenerateStoryBtn.disabled = true;
+        const title = getCurrentTitle();
+        const storyDocument = getStoryDocumentByTitle(title);
+        storyDocument.outline.forEach((outline) => {
+          outline.content = "";
+          outline.scenes = "";
+        });
+        addStoryDocumentToLocalStorage(title, storyDocument);
+        await this.generateStory();
+        this.regenerateStoryBtn.disabled = false;
+      };
+      this.generateStory();
+    }
+
+    async generateStory() {
+      setInterval(() => this.render(), 1000); // refresh every 1 second
+      await generateStoryContents();
     }
 
     render() {
-      if (!this.storyContent) {
-        alert(AppText.NO_STORY_CONTENT);
-        gotoPage({ page: Page.WRITE });
+      const title = getCurrentTitle();
+      const storyDocument = getStoryDocumentByTitle(title);
+      const storyContent = storyDocument.outline
+        .map((o) => {
+          return (
+            o.content && [`<h4>${o.title}</h4>`, `<p>${o.content}</p>`].join("")
+          );
+        })
+        .filter(Boolean)
+        .join("<br/><br/>")
+        .trim();
+      const storyElem = document.createElement("span");
+      storyElem.innerHTML = storyContent;
+      if (storyElem.textContent?.trim()) {
+        this.storyContentEl.innerHTML = storyContent;
       }
     }
 
@@ -52,12 +78,29 @@ customElements.define(
       return this.shadowRoot;
     }
 
-    get storyContent() {
-      return (
-        this.root
-          .getElementById(ReadPageIds.STORY_CONTENT)
-          ?.textContent?.trim() ?? ""
+    get regenerateStoryBtn() {
+      const regenerateBtn =
+        /** @type {import('../../../types').PaperButton} */ (
+          this.root.getElementById(ReadPageIds.REGENERATE_STORY_CONTENT_BTN)
+        );
+      if (!regenerateBtn) {
+        throw new Error("Regenerate story button not found");
+      }
+      return regenerateBtn;
+    }
+
+    get storyContentEl() {
+      const containerEl = /** @type {HTMLDivElement} */ (
+        this.root.getElementById(ReadPageIds.STORY_CONTENT)
       );
+      if (!containerEl) {
+        throw new Error("Story content container not found");
+      }
+      return containerEl;
+    }
+
+    get storyContent() {
+      return this.storyContentEl.textContent?.trim() ?? "";
     }
   }
 );

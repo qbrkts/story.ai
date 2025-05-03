@@ -55,6 +55,8 @@ declare global {
   };
   interface Window {
     __cacheShareLinks: Record<string, string>;
+    __chapterCount: number;
+    __chaptersGenerated: number;
     pako: typeof pako;
   }
   namespace JSX {

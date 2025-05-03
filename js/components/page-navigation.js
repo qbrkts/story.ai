@@ -53,11 +53,12 @@ customElements.define(
       }
       /** @type {string[]} */
       const pagesRequiringContent = [Page.WRITE, Page.READ];
+      const title = getCurrentTitle();
       for (let i = 0; i < PageNames.length; i++) {
         const page = PageNames[i].toLowerCase();
         if (pagesRequiringContent.includes(page)) {
           // skip or disable write page if there is no story title
-          if (!getCurrentTitle()) continue;
+          if (!title) continue;
         }
         this.createLink(page, linksContainer);
       }

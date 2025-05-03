@@ -304,8 +304,11 @@ customElements.define(
           const storyDocument = getStoryDocumentByTitle(storyTitle);
 
           const [chapterTitle, ...description] = outlineEl.value.split("\n");
-          storyDocument.outline[i].name = chapterTitle;
+          storyDocument.outline[i].title = chapterTitle;
           storyDocument.outline[i].description = description.join("\n").trim();
+          // clear generated story content if outline changes
+          storyDocument.outline[i].scenes = "";
+          storyDocument.outline[i].content = "";
           addStoryDocumentToLocalStorage(storyTitle, storyDocument);
         });
         this.outlineContainer.appendChild(outlineEl);
@@ -532,9 +535,17 @@ customElements.define(
       );
       const result = await characterResultPromise;
       console.log("character result:", result);
-      storyDocument.characters[result.character.name] =
-        result.character.description;
-      alert(AppText.SUCCESS_NEW_CHARACTER);
+      const characterName =
+        result.character.name ||
+        result.character.Name ||
+        result.character.names ||
+        result.character.Names;
+      storyDocument.characters[characterName] =
+        result.character.description ||
+        Object.entries(result.character)
+          .map((v) => v.join(": "))
+          .join("\n\n");
+      alert(AppText.SUCCESS_NEW_CHARACTER + "\n\n" + characterName);
       addStoryDocumentToLocalStorage(title, storyDocument);
       this.addCharacterBtn.disabled = false;
       this.render();
@@ -607,6 +618,8 @@ customElements.define(
       this.generateOutlineBtn.disabled = false;
       addStoryDocumentToLocalStorage(title, storyDocument);
       this.render();
+      // Start generation of story contents from saved outline
+      generateStoryContents();
     };
 
     get root() {

@@ -91,13 +91,14 @@ const AppText = {
     "Optionally enter the name and any traits to guide character generation.",
   NO_API_KEY: "If you do not have an api key, visit here to generate one.",
   NO_STORY_CONTENT:
-    "This story has no content but you can add some on the write page.",
+    "This story has no content. Attempting to generate some from the outline. If you want to make any changes, return to the chapters outline page and make changes.",
   NO_STORIES_YET: "No stories yet... continue above",
   NO_STORY_SELECTED: "No story selected",
   OUTLINE: "Outline",
   OWNER_NAME: "Quantum Brackets",
   PREVIOUSLY_ON: "Previously on...",
   RANDOM: "Random",
+  REGENERATE_STORY_CONTENT: "Recreate",
   SAVE: "Save",
   SHARE_STORY: "Copy link to share story",
   START: "Start",
@@ -545,7 +546,7 @@ const DEFAULT_DOCUMENT = {
    * AI generated outline of the story
    *
    * @type {{
-   *    name: string;
+   *    title: string;
    *    description: string;
    *    scenes: string;
    *    content: string,
@@ -600,6 +601,81 @@ function renameStoryTitle(title, newTitle) {
   const storyDocument = getStoryDocumentByTitle(title);
   addStoryDocumentToLocalStorage(newTitle, storyDocument);
   removeStoryDocumentFromLocalStorage(title);
+}
+
+async function generateStoryContents() {
+  const storyTitle = getCurrentTitle();
+  const storyDocument = getStoryDocumentByTitle(storyTitle);
+  const apiKey = getGeminiKeyFromLocalStorage();
+  if (!apiKey) {
+    throw new Error(AppText.GEMINI_API_KEY_NOT_SET);
+  }
+
+  window.__chapterCount = storyDocument.outline.length;
+  window.__chaptersGenerated = 0;
+
+  const promptParts = [
+    // `This is the summary of the story: "${storyDocument.summary}"`,
+    `This is the genre of the story: "${storyDocument.genre}"`,
+    // `This is the setting of the story: "${storyDocument.setting}"`,
+    // `This is the synopsis of the story: "${storyDocument.synopsis}"`,
+    // `This is the outline of the story: ${outline.join("\n")}`,
+    `These are the existing characters: ${JSON.stringify(
+      storyDocument.characters,
+      null,
+      2
+    )}`,
+    `The generated story MUST match this style: ${storyDocument.style}`,
+    `The generated content MUST be limited to the context of its chapter.`,
+  ];
+  const chapterGenerationPromises = storyDocument.outline.map(
+    async (chapter, i, outline) => {
+      const chapNum = i + 1;
+      const chapCount = outline.length;
+      if (chapter.content) {
+        window.__chaptersGenerated += 1;
+        return;
+      }
+      const generationDelaySeconds = i * 5;
+      if (!chapter.scenes) {
+        // generate chapter scenes
+        await delay(generationDelaySeconds); // wait seconds between scene generation requests
+        const sceneResult = await fetchFromGemini(
+          apiKey,
+          [
+            `Generate the scenes for chapter ${chapNum} ONLY of the story "${storyTitle}"`,
+            ...promptParts,
+            `This the title of chapter ${chapNum}: ${chapter.title}`,
+            `This the description for chapter ${chapNum}: ${chapter.description}`,
+          ].join("\n\n"),
+          `{scenes: "All scenes for chapter ${chapNum} in plain text"}`
+        );
+        console.log(sceneResult);
+        chapter.scenes = sceneResult.scenes;
+        addStoryDocumentToLocalStorage(storyTitle, storyDocument);
+      }
+      // generate chapter content
+      await delay(generationDelaySeconds + chapCount); // wait seconds between chapter generation requests
+      const chapterResult = await fetchFromGemini(
+        apiKey,
+        [
+          `Generate the content for chapter ${chapNum} ONLY of the story "${storyTitle}"`,
+          ...promptParts,
+          `This the title of chapter ${chapNum}: ${chapter.title}`,
+          `These are the scenes for chapter ${chapNum}: ${chapter.scenes}`,
+          `The chapter should be about ${chapCount * 200} words in length.`,
+        ].join("\n\n"),
+        `{content: "chapter ${chapNum} content in plain text"}`
+      );
+      console.log(chapterResult);
+      storyDocument.outline[i].content = chapterResult.content;
+      addStoryDocumentToLocalStorage(storyTitle, storyDocument);
+      // add chapter content to story
+      window.__chaptersGenerated += 1;
+    }
+  );
+  await Promise.all(chapterGenerationPromises);
+  addStoryDocumentToLocalStorage(storyTitle, storyDocument);
 }
 
 function fallbackCopyTextToClipboard(text) {
