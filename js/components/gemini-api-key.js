@@ -15,7 +15,7 @@ const GEMINI_API_KEY_CODE_TEMPLATE = `
   <br />
   <line-input
     id="${GeminiApiKeyIds.KEY_INPUT}"
-    placeholder="${AppText.ENTER_GEMINI_API_KEY}" style="width: 400px;">
+    placeholder="${AppText.ENTER_GEMINI_API_KEY}" style="width: 400px; max-width: calc(100vw - 200px);">
   </line-input>
   <paper-button id="${GeminiApiKeyIds.UPDATE_BTN}">
     ${AppText.UPDATE_GEMINI_API_KEY}
