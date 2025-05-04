@@ -109,7 +109,8 @@ async function fetchFromGemini(
   apiKey,
   prompt,
   responseSchema = `{"result": ""}`,
-  temperature = GeminiConfig.Temperature.BALANCED
+  temperature = GeminiConfig.Temperature.BALANCED,
+  useRandomizedTemp = true // Add flag to control randomization
 ) {
   const modelName = "gemini-2.0-flash"; // Or another suitable Gemini model
   const username = "The Doctor"; // TODO: load user name from account context
@@ -143,7 +144,8 @@ async function fetchFromGemini(
             },
           ],
           generationConfig: {
-            temperature: temperature * (1 + Math.random()),
+            // Conditionally apply randomization
+            temperature: useRandomizedTemp ? temperature * (1 + Math.random()) : temperature,
             response_mime_type: "application/json",
           },
         }),

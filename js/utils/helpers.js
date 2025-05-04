@@ -617,15 +617,15 @@ async function generateStoryContents() {
     // `This is the setting of the story: "${storyDocument.setting}"`,
     // `This is the synopsis of the story: "${storyDocument.synopsis}"`,
     // `This is the outline of the story: ${outline.join("\n")}`,
-    `These are the existing characters: ${JSON.stringify(
+    `These are the main characters involved in the story: ${JSON.stringify(
       storyDocument.characters,
       null,
       2
     )}`,
-    `The generated story MUST match this style: ${storyDocument.style}`,
-    `The generated content MUST be limited to the context of its chapter.`,
-    `The generated content MUST ensure characters are not introduced before they are relevant.`,
-    `The generated content MUST be set up that the story flows between the scenes and chapters in a natural way.`,
+    `CRITICAL: The generated story MUST strictly adhere to this writing style style: ${storyDocument.style}`,
+    `CRITICAL: The primary goal is to generate content ONLY for the specified chapter, strictly following its description and scenes.`,
+    `CRITICAL: Maintain narrative consistency with the overall story progression implied by the chapter outlines.`,
+    `CRITICAL: The generated content MUST be set up that the story flows between the scenes and chapters in a natural way.`,
   ];
   const chapterGenerationStepSize =
     1 / ((storyDocument.outline.length ?? 0) * 2);
@@ -637,62 +637,83 @@ async function generateStoryContents() {
     throw new Error(AppText.GEMINI_API_KEY_NOT_SET);
   }
 
-  const chapterGenerationPromises = storyDocument.outline.map(
-    async (chapter, i, outline) => {
-      const chapNum = i + 1;
-      const chapCount = outline.length;
-      if (chapter.content) {
-        console.log("chap already had content", chapNum);
-        window.__chaptersGenerated += 1;
-        window.__chaptersGenerationProgress += chapterGenerationStepSize * 2;
-        return;
-      }
-      const generationDelaySeconds = chapGenerationDelay * 5;
-      chapGenerationDelay += 1;
-      if (!chapter.scenes) {
-        // generate chapter scenes
-        await delay(generationDelaySeconds); // wait seconds between scene generation requests
-        console.log("chap scenes generating", chapNum);
-        const sceneResult = await fetchFromGemini(
-          apiKey,
-          [
-            `Generate the scenes for chapter ${chapNum} ONLY of the story "${storyTitle}"`,
-            ...promptParts,
-            `This the title of chapter ${chapNum}: ${chapter.title}`,
-            `This the description for chapter ${chapNum}: ${chapter.description}`,
-            `The chapter should be about ${chapCount * 200} words in length.`,
-          ].join("\n\n"),
-          `{scenes: "All scenes for chapter ${chapNum} in plain text"}`
-        );
-        console.log(sceneResult);
-        chapter.scenes = sceneResult.scenes;
-        addStoryDocumentToLocalStorage(storyTitle, storyDocument);
-      }
-      window.__chaptersGenerationProgress += chapterGenerationStepSize;
-      // generate chapter content
-      await delay(generationDelaySeconds + chapCount); // wait seconds between chapter generation requests
-      console.log("chap content generating", chapNum);
-      const chapterResult = await fetchFromGemini(
+  const outline = storyDocument.outline;
+  const chapCount = outline.length;
+  const chapWordCount = chapCount * 200;
+  for (let i = 0; i < chapCount; i++) {
+    const chapter = outline[i];
+    const chapNum = i + 1;
+    if (chapter.content) {
+      console.log("chap already had content", chapNum);
+      window.__chaptersGenerated += 1;
+      window.__chaptersGenerationProgress += chapterGenerationStepSize * 2;
+      continue;
+    }
+    const generationDelaySeconds = chapGenerationDelay * 5;
+
+    // --- Determine Previous Chapter Context (for prompt, even in parallel) ---
+    const prevChapterContext =
+      i > 0
+        ? `\n\nContext from Previous Chapter (${
+            outline[i - 1].title
+          }):\nDescription: ${outline[i - 1].description}\nScenes: ${
+            outline[i - 1].scenes || "N/A"
+          }`
+        : "\n\nThis is the first chapter.";
+
+    if (!chapter.scenes) {
+      // generate chapter scenes
+      await delay(generationDelaySeconds); // wait seconds between scene generation requests
+      console.log("chap scenes generating", chapNum);
+      const sceneResult = await fetchFromGemini(
         apiKey,
         [
-          `Generate the content for chapter ${chapNum} ONLY of the story "${storyTitle}"`,
+          `Generate the scenes for chapter ${chapNum} ONLY of the story "${storyTitle}"`,
+          `Chapter ${chapNum} Title: ${chapter.title}`,
+          `Chapter ${chapNum} Description: ${chapter.description}`,
+          prevChapterContext,
           ...promptParts,
-          `This the title of chapter ${chapNum}: ${chapter.title}`,
-          `These are the scenes for chapter ${chapNum}: ${chapter.scenes}`,
-          `The chapter should be about ${chapCount * 200} words in length.`,
-          `The chapter should be well formatted with appropriate line breaks`,
+          `CRITICAL: Base the scenes strictly on the chapter description provided above.`,
+          `CRITICAL: Aim for a chapter length of approximately ${chapWordCount} words.`,
         ].join("\n\n"),
-        `{content: "chapter ${chapNum} content in plain text"}`
+        `{scenes: "Bulleted or numbered list of scenes for chapter ${chapNum} based *only* on its description."}`,
+        GeminiConfig.Temperature.BALANCED,
+        false
       );
-      console.log(chapterResult);
-      storyDocument.outline[i].content = chapterResult.content;
+      console.log(sceneResult);
+      chapter.scenes = sceneResult.scenes;
       addStoryDocumentToLocalStorage(storyTitle, storyDocument);
-      // add chapter content to story
-      window.__chaptersGenerated += 1;
-      window.__chaptersGenerationProgress += chapterGenerationStepSize;
     }
-  );
-  await Promise.all(chapterGenerationPromises);
+    window.__chaptersGenerationProgress += chapterGenerationStepSize;
+    // generate chapter content
+    await delay(generationDelaySeconds); // wait seconds between chapter generation requests
+    console.log("chap content generating", chapNum);
+    const chapterResult = await fetchFromGemini(
+      apiKey,
+      [
+        `Generate the content for chapter ${chapNum} ONLY of the story "${storyTitle}"`,
+        `Chapter ${chapNum} Title: ${chapter.title}`,
+        `Chapter ${chapNum} Description: ${chapter.description}`,
+        `Chapter ${chapNum} Scenes: ${chapter.scenes}`,
+        prevChapterContext,
+        ...promptParts,
+        `CRITICAL: Write the narrative by strictly following the scenes provided above, in order.`,
+        `CRITICAL: Ensure the tone, style, and character voices are consistent with the overall style provided.`,
+        `CRITICAL: Aim for a chapter length of approximately ${chapWordCount} words.`,
+        `CRITICAL: Prioritize fulfilling the scenes and narrative flow.`,
+        `CRITICAL: The chapter should be well formatted with appropriate paragraphs line breaks.`,
+      ].join("\n\n"),
+      `{content: "Full narrative content for chapter ${chapNum} in plain text, adhering strictly to the provided scenes and style."}`,
+      GeminiConfig.Temperature.BALANCED,
+      false
+    );
+    console.log(chapterResult);
+    storyDocument.outline[i].content = chapterResult.content;
+    addStoryDocumentToLocalStorage(storyTitle, storyDocument);
+    // add chapter content to story
+    window.__chaptersGenerated += 1;
+    window.__chaptersGenerationProgress += chapterGenerationStepSize;
+  }
   addStoryDocumentToLocalStorage(storyTitle, storyDocument);
 }
 
