@@ -38,32 +38,39 @@ customElements.define(
 
     connectedCallback() {
       this.regenerateStoryBtn.handler = async () => {
-        if (!getGeminiKeyFromLocalStorage()) {
-          alert(AppText.GEMINI_API_KEY_NOT_SET);
-          gotoPage({ page: Page.WRITE });
-        }
         const title = getCurrentTitle();
         const storyDocument = getStoryDocumentByTitle(title);
-        storyDocument.outline.forEach((outline) => {
-          outline.content = "";
-          outline.scenes = "";
-        });
-        addStoryDocumentToLocalStorage(title, storyDocument);
+        // only clear contents if there is an api key set
+        if (getGeminiKeyFromLocalStorage()) {
+          storyDocument.outline.forEach((outline) => {
+            outline.content = "";
+            outline.scenes = "";
+          });
+          addStoryDocumentToLocalStorage(title, storyDocument);
+        }
         await this.generateStory();
       };
       this.generateStory();
     }
 
     async generateStory() {
+      if (!getGeminiKeyFromLocalStorage()) {
+        alert(AppText.GEMINI_API_KEY_NOT_SET);
+        return gotoPage({ page: Page.WRITE });
+      }
       this.regenerateStoryBtn.disabled = true;
       this.regenerateStoryBtn.innerText = AppText.LOADING;
-      setInterval(() => this.render(), 1000); // refresh every 1 second
+      const intervalId = setInterval(() => {
+        this.render();
+        if (window.__chaptersGenerationProgress >= 1) {
+          clearInterval(intervalId);
+        }
+      }, 1000); // refresh every 1 second
       try {
         await generateStoryContents();
       } catch (error) {
         console.error(error);
         alert("Error occurred attempting to generate story");
-        location.reload();
       }
       this.regenerateStoryBtn.innerText = AppText.REGENERATE_STORY_CONTENT;
       this.regenerateStoryBtn.disabled = false;
@@ -80,7 +87,7 @@ customElements.define(
             o.content &&
             [
               `<h4>${AppText.CHAPTER} ${i + 1}: ${o.title}</h4>`,
-              `<p>${o.content}</p>`,
+              `<chapter-content>${o.content}</chapter-content>`,
             ].join("")
           );
         })

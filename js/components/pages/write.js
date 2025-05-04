@@ -39,7 +39,9 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
 
   <div>
     <h2>${AppText.WRITE}</h2>
-    <div style="display: flex; flex-direction: row; gap: ${DimensionsPx.LARGE};">
+    <div style="display: flex; flex-direction: row; gap: ${
+      DimensionsPx.LARGE
+    };">
       <line-input
         id="${WritePageIds.STORY_TITLE_INPUT}"
         placeholder="${AppText.ENTER_NEW_STORY}"
@@ -118,7 +120,9 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
         style="display: flex; flex-direction: column;"
         id=${WritePageIds.CHARACTERS_CONTAINER}>
       </div>
-      <div style="display: flex; flex-direction: row; gap: ${DimensionsPx.LARGE};">
+      <div style="display: flex; flex-direction: row; gap: ${
+        DimensionsPx.LARGE
+      };">
         <line-input
           id="${WritePageIds.NEW_CHARACTER_INPUT}"
           placeholder="${AppText.NEW_CHARACTER_GUIDELINE}"
@@ -137,7 +141,9 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
       <summary style="cursor: pointer; margin: ${DimensionsPx.MLARGE};">
         ${AppText.OUTLINE}
       </summary>
-      <div style="display: flex; flex-direction: row; gap: ${DimensionsPx.LARGE};">
+      <div style="display: flex; flex-direction: row; gap: ${
+        DimensionsPx.LARGE
+      };">
         <line-input
           id="${WritePageIds.GENERATE_OUTLINE_INPUT}"
           placeholder="${AppText.GENERATE_OUTLINE_GUIDE}"
@@ -262,9 +268,8 @@ customElements.define(
             /** @type {import('../../../types').TextInput} */ (
               document.createElement(ComponentName.TEXT_INPUT)
             );
-          characterInput.name = name;
-          characterInput.setAttribute("name", name);
           characterInput.value = description;
+          characterInput.setAttribute("name", name);
           characterInput.setAttribute("style", TEXT_INPUT_INLINE_STYLE);
           characterInput.style.marginBottom = "16px";
           this.charactersContainer.appendChild(characterInput);
@@ -294,9 +299,9 @@ customElements.define(
         const outlineEl = /** @type {import ('../../../types').TextInput} */ (
           document.createElement(ComponentName.TEXT_INPUT)
         );
-        outlineEl.setAttribute("style", TEXT_INPUT_INLINE_STYLE);
-        outlineEl.name = `${AppText.CHAPTER} ${i + 1}`;
         outlineEl.value = `${outline.title}\n\n${outline.description}`;
+        outlineEl.setAttribute("name", `${AppText.CHAPTER} ${i + 1}`);
+        outlineEl.setAttribute("style", TEXT_INPUT_INLINE_STYLE);
         outlineEl.style.marginBottom = "16px";
         outlineEl.addEventListener("input", () => {
           const storyTitle = getCurrentTitle();

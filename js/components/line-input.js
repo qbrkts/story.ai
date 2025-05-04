@@ -73,7 +73,7 @@ customElements.define(
     }
 
     render() {
-      this.inputEl.name = this.id;
+      if (this.id && !this.inputEl.name) this.inputEl.name = this.id;
       copyAttributes(this, this.inputEl, ["id"]);
       // add any children of the parent to the shadow dom
       Array.from(this.childNodes).forEach((child) => {

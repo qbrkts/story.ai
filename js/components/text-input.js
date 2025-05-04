@@ -78,7 +78,7 @@ customElements.define(
     }
 
     render() {
-      this.textAreaEl.name = this.id;
+      if (this.id && !this.textAreaEl.name) this.textAreaEl.name = this.id;
       copyAttributes(this, this.textAreaEl, ["id"]);
 
       // set style after element has been added to document

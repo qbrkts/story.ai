@@ -33,6 +33,7 @@ const Page = Object.assign(
   ...PageNames.map((page) => ({ [page]: page.toLowerCase() }))
 );
 /** @type {{
+  CHAPTER_CONTENT: 'chapter-content';
   COPYRIGHT: 'qb-copyright';
   GEMINI_API_KEY: 'gemini-api-key';
   LINE_INPUT: 'line-input';
@@ -48,6 +49,7 @@ const Page = Object.assign(
 }} */
 const ComponentName = Object.assign(
   {
+    CHAPTER_CONTENT: "chapter-content",
     COPYRIGHT: "qb-copyright",
     GEMINI_API_KEY: "gemini-api-key",
     LINE_INPUT: "line-input",
