@@ -37,10 +37,6 @@ customElements.define(
       super();
       this.attachShadow({ mode: "open" });
       this.root.innerHTML = LINE_INPUT_CODE_TEMPLATE;
-      const style = document.createElement("style");
-      style.textContent = `${LINE_INPUT_STYLE}
-.${LINE_INPUT_TITLE_CLS}::before {${textInputTitleStyle(this)}}`;
-      this.root.appendChild(style);
     }
 
     get root() {
@@ -83,6 +79,12 @@ customElements.define(
       Array.from(this.childNodes).forEach((child) => {
         this.root.appendChild(child);
       });
+      // set style after element has been added to document
+      const style = document.createElement("style");
+      style.textContent = `${LINE_INPUT_STYLE}
+.${LINE_INPUT_TITLE_CLS}::before {
+${textInputTitleStyle(this.inputEl)}}`;
+      this.root.appendChild(style);
     }
   }
 );

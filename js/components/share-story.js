@@ -11,6 +11,7 @@ const SHARE_STORY_CODE_TEMPLATE = `
     border: solid ${DimensionsPx.XXSMALL} ${Colors.TEXT}30;
     position: fixed;
     bottom: ${DimensionsPx.SMALL}; left: ${DimensionsPx.SMALL};
+    font-weight: bold;
     z-index: ${Level.TOP};
   "></paper-button>
 `;
@@ -44,7 +45,6 @@ customElements.define(
       } else {
         this.copyLinkButton.innerHTML = AppText.SHARE_STORY;
       }
-      console.log(this.copyLinkButton.value);
     };
 
     get root() {

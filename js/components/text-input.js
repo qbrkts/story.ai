@@ -85,7 +85,7 @@ customElements.define(
       const style = document.createElement("style");
       style.textContent = `${TEXT_INPUT_STYLE}
 .${TEXT_INPUT_TITLE_CLS}::before {
-${textInputTitleStyle(this)}
+${textInputTitleStyle(this.textAreaEl)}
 }`;
       this.root.appendChild(style);
     }

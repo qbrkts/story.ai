@@ -227,12 +227,12 @@ function textInputTitleStyle(element) {
 border-radius: ${DimensionsPx.XSMALL};
 color: ${Colors.TEXT};
 content: "${keyAsTitleCase(
-    element.title || element.id || element.name || ""
+    element.title || element.name || element.id || ""
   )} ▾";
 display: block;
 font-size: 0.8em;
 font-weight: bold;
-left: 0;
+left: ${element.offsetLeft}px;
 padding: 0.2em 1em;
 position: absolute;
 text-align: start;
