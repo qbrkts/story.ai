@@ -81,27 +81,6 @@ function recursiveMergeConcat(obj1, obj2) {
   return mergedResult;
 }
 
-async function queryGeminiWithProgress(
-  apiKey,
-  prompt,
-  responseSchema = `{"result": ""}`,
-  temperature = GeminiConfig.Temperature.BALANCED,
-  setProgressPercentage = (/** @type {number} */ ratio) => {
-    showProgressingDialog(ratio);
-    console.log({ ratio });
-    if (ratio >= 1) {
-      setTimeout(hideProgressDialog, 100);
-    }
-  }
-) {
-  setProgressPercentage(0);
-  try {
-    return await fetchFromGemini(apiKey, prompt, responseSchema, temperature);
-  } finally {
-    setProgressPercentage(1);
-  }
-}
-
 /**
  * https://ai.google.dev/gemini-api/docs/structured-output
  */

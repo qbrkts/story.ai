@@ -3,7 +3,10 @@ const ProgressIndicatorIds = {
 };
 const PROGRESS_INDICATOR_TEMPLATE = (
   progressRatio = 0,
-  css = { height: "4px", width: "96px" }
+  css = {
+    height: DimensionsPx.SMALL,
+    width: `calc(${DimensionsPx.XLARGE} - ${DimensionsPx.SMALL})`,
+  }
 ) => {
   const progressPercent = progressRatio * 100;
   return `

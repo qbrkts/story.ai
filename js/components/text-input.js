@@ -2,18 +2,18 @@ const TEXT_INPUT_ID = "text-input";
 const TEXT_INPUT_CLS = "text-input-cls";
 const TEXT_INPUT_TITLE_CLS = "text-input-title";
 const TEXT_INPUT_STYLE = `
-:host {
+:host, .${TEXT_INPUT_TITLE_CLS} {
   position: relative;
 }
 
 .${TEXT_INPUT_CLS} {
   background-color: ${Colors.BACKGROUND_DEFAULT};
   border: none;
-  border-radius: 4px;
+  border-radius: ${DimensionsPx.SMALL};
   color: ${Colors.TEXT};
   cursor: pointer;
   font-size: 1em;
-  padding: 10px 20px;
+  padding: ${DimensionsPx.MEDIUM} ${DimensionsPx.MLARGE};
   text-decoration: none;
   transition: background-color 0.3s, transform 0.3s;
   overflow: hidden;

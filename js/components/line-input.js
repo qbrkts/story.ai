@@ -2,18 +2,18 @@ const LINE_INPUT_ID = "line-input";
 const LINE_INPUT_CLS = "line-input-cls";
 const LINE_INPUT_TITLE_CLS = "line-input-title";
 const LINE_INPUT_STYLE = `
-:host {
+:host, .${LINE_INPUT_TITLE_CLS} {
   position: relative;
 }
 
 .${LINE_INPUT_CLS} {
   background-color: ${Colors.BACKGROUND_DEFAULT};
   border: none;
-  border-radius: 4px;
+  border-radius: ${DimensionsPx.SMALL};
   color: ${Colors.TEXT};
   cursor: pointer;
   font-size: 1em;
-  padding: 10px 20px;
+  padding: ${DimensionsPx.MEDIUM} ${DimensionsPx.MLARGE};
   text-decoration: none;
   transition: background-color 0.3s, transform 0.3s;
 }

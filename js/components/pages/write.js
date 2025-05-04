@@ -21,8 +21,7 @@ const WritePageIds = {
   STYLE_TEXT_INPUT: "story-style",
   SUMMARY_TEXT_INPUT: "brain-dump",
 };
-const TEXT_INPUT_INLINE_STYLE =
-  "max-width: calc(100vw - 70px); min-width: calc(100vw - 70px); min-height: 180px; font-family: sans-serif;";
+const TEXT_INPUT_INLINE_STYLE = `max-width: calc(100vw - 70px); min-width: calc(100vw - 70px); min-height: ${DimensionsPx.XLARGE}; font-family: sans-serif;`;
 const WRITE_PAGE_CODE_TEMPLATE = () => {
   const title = getCurrentTitle();
 
@@ -40,7 +39,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
 
   <div>
     <h2>${AppText.WRITE}</h2>
-    <div style="display: flex; flex-direction: row; gap: 48px;">
+    <div style="display: flex; flex-direction: row; gap: ${DimensionsPx.LARGE};">
       <line-input
         id="${WritePageIds.STORY_TITLE_INPUT}"
         placeholder="${AppText.ENTER_NEW_STORY}"
@@ -54,7 +53,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
     </div>
 
     <details open id=${WritePageIds.STORY_SUMMARY_SECTION}>
-      <summary style="cursor: pointer; margin: 20px;">
+      <summary style="cursor: pointer; margin: ${DimensionsPx.MLARGE};">
         ${AppText.SUMMARY}
       </summary>
       <div style="display: flex; flex-direction: column;">
@@ -112,14 +111,14 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
     </details>
 
     <details id=${WritePageIds.STORY_CHARACTERS_SECTION}>
-      <summary style="cursor: pointer; margin: 20px;">
+      <summary style="cursor: pointer; margin: ${DimensionsPx.MLARGE};">
         ${AppText.CHARACTERS}
       </summary>
       <div
         style="display: flex; flex-direction: column;"
         id=${WritePageIds.CHARACTERS_CONTAINER}>
       </div>
-      <div style="display: flex; flex-direction: row; gap: 48px;">
+      <div style="display: flex; flex-direction: row; gap: ${DimensionsPx.LARGE};">
         <line-input
           id="${WritePageIds.NEW_CHARACTER_INPUT}"
           placeholder="${AppText.NEW_CHARACTER_GUIDELINE}"
@@ -135,10 +134,10 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
     </details>
 
     <details id=${WritePageIds.STORY_OUTLINE_SECTION}>
-      <summary style="cursor: pointer; margin: 20px;">
+      <summary style="cursor: pointer; margin: ${DimensionsPx.MLARGE};">
         ${AppText.OUTLINE}
       </summary>
-      <div style="display: flex; flex-direction: row; gap: 48px;">
+      <div style="display: flex; flex-direction: row; gap: ${DimensionsPx.LARGE};">
         <line-input
           id="${WritePageIds.GENERATE_OUTLINE_INPUT}"
           placeholder="${AppText.GENERATE_OUTLINE_GUIDE}"

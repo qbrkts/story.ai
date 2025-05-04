@@ -7,11 +7,11 @@ const PAPER_BUTTON_STYLE = `
   .paper-button {
     background-color: ${Colors.BACKGROUND_DEFAULT};
     border: none;
-    border-radius: 4px;
+    border-radius: ${DimensionsPx.SMALL};
     color: ${Colors.TEXT};
     cursor: pointer;
     font-size: 1em;
-    padding: 10px 20px;
+    padding: ${DimensionsPx.MEDIUM} ${DimensionsPx.MLARGE};
     text-align: center;
     text-decoration: none;
     transition: background-color 0.3s, transform 0.3s;

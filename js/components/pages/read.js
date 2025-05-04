@@ -19,7 +19,7 @@ const READ_PAGE_CODE_TEMPLATE = () => {
 
   <progress-indicator id=${ReadPageIds.PROGRESS_INDICATOR}></progress-indicator>
 
-  <pre id=${ReadPageIds.STORY_CONTENT} style="font-family: sans-serif; white-space: break-spaces; padding: 10px;">
+  <pre id=${ReadPageIds.STORY_CONTENT} style="font-family: sans-serif; white-space: break-spaces; padding: ${DimensionsPx.MEDIUM};">
     ${AppText.NO_STORY_CONTENT}
   </pre>
   <br /><br /><br />

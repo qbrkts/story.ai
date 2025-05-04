@@ -7,10 +7,10 @@ const SHARE_STORY_CODE_TEMPLATE = `
   id="${ShareStoryIds.COPY_LINK_BTN_ID}"
   title="${AppText.SHARE_STORY}"
   style="
-    border-radius: 4px;
-    box-shadow: 0px 0px 10px ${Colors.TEXT}90;
+    border-radius: ${DimensionsPx.SMALL};
+    border: solid ${DimensionsPx.XXSMALL} ${Colors.TEXT}30;
     position: fixed;
-    bottom: 4px; left: 4px;
+    bottom: ${DimensionsPx.SMALL}; left: ${DimensionsPx.SMALL};
     z-index: ${Level.TOP};
   "></paper-button>
 `;

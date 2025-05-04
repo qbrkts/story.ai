@@ -2,7 +2,21 @@ const PageNavigationIds = {
   PAGE_LINKS: "page-links",
 };
 const PAGE_NAVIGATION_CODE_TEMPLATE = `
-<div id="${PageNavigationIds.PAGE_LINKS}" style="font-size: 0.7em; text-transform: capitalize; display: flex; flex-direction: row; gap: 20px; justify-content: center"></div>
+<div
+  id="${PageNavigationIds.PAGE_LINKS}"
+  style="font-size: 0.7em; text-transform: capitalize; display: flex; flex-direction: row; justify-content: center">
+</div>
+<style>
+#${PageNavigationIds.PAGE_LINKS} a {
+  background-color: transparent;
+  border: none;
+  border-radius: ${DimensionsPx.SMALL};
+}
+#${PageNavigationIds.PAGE_LINKS} a.active {
+  background-color: ${Colors.BACKGROUND_HOVER};
+  font-weight: bold;
+}
+</style>
 `;
 
 customElements.define(
@@ -27,18 +41,17 @@ customElements.define(
 
     createLink(page, container) {
       const link = document.createElement("a");
+      link.title = page;
       link.textContent = page;
       link.style.textDecoration = "none";
       link.style.cursor = "pointer";
+      link.style.padding = `${DimensionsPx.SMALL} ${DimensionsPx.MEDIUM}`;
       link.addEventListener("click", () => {
         gotoPage({ page });
       });
       const url = new URL(window.location.href);
       const isCurrentPage = page.includes(url.searchParams.get(UrlParams.PAGE));
-      if (isCurrentPage) {
-        link.textContent = `[ ${link.textContent} ]`;
-        link.style.fontWeight = "bold";
-      }
+      if (isCurrentPage) link.classList.add("active");
       container.appendChild(link);
       return link;
     }
@@ -69,14 +82,13 @@ customElements.define(
       const bottomNavigation = document.createElement("div");
       bottomNavigation.style.display = "none";
       document.body.appendChild(bottomNavigation);
-      bottomNavigation.style.backgroundColor = "white";
-      bottomNavigation.style.border = `solid 1px ${Colors.BACKGROUND_DISABLED}`;
-      bottomNavigation.style.borderRadius = "2px";
-      bottomNavigation.style.bottom = "2px";
-      bottomNavigation.style.padding = "4px 10px";
+      bottomNavigation.style.backgroundColor = Colors.BACKGROUND_DEFAULT;
+      bottomNavigation.style.border = `solid ${DimensionsPx.XXSMALL} ${Colors.BACKGROUND_DISABLED}90`;
+      bottomNavigation.style.borderRadius = DimensionsPx.XSMALL;
+      bottomNavigation.style.bottom = DimensionsPx.XSMALL;
       bottomNavigation.style.position = "fixed";
-      bottomNavigation.style.right = "2px";
-      document.body.style.paddingBottom = "20px";
+      bottomNavigation.style.right = `${DimensionsPx.XSMALL}`;
+      document.body.style.paddingBottom = DimensionsPx.MLARGE;
       this.createLinks(bottomNavigation);
       bottomNavigation.style.display = "unset";
     }

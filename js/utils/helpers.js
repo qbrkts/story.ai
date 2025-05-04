@@ -9,6 +9,17 @@ const Colors = {
   TEXT_DISABLED: "#909090",
 };
 
+const DimensionsPx = {
+  XXSMALL: "1px",
+  XSMALL: "2px",
+  SMALL: "4px",
+  MEDIUM: "10px",
+  MLARGE: "20px",
+  LARGE: "48px",
+  XLARGE: "100px",
+  XXLARGE: "400px",
+};
+
 const DEFAULT_PAGE = "HOME";
 const PageNames = [DEFAULT_PAGE, "STORIES", "WRITE", "READ"];
 /** @type {{
@@ -139,64 +150,6 @@ const AppText = {
 };
 
 // --- helper functions
-function getProgressDialog() {
-  const PROGRESS_DIALOG_ID = "progress-dialog";
-  const progressDialog =
-    document.getElementById(PROGRESS_DIALOG_ID) ||
-    document.createElement("dialog");
-  if (!progressDialog.id) {
-    progressDialog.style.backgroundColor = "white";
-    progressDialog.style.border = "none";
-    progressDialog.style.height = "100vh";
-    progressDialog.style.left = "0";
-    progressDialog.style.margin = "0";
-    progressDialog.style.padding = "0";
-    progressDialog.style.position = "fixed";
-    progressDialog.style.textAlign = "center";
-    progressDialog.style.top = "0";
-    progressDialog.style.width = "100vw";
-    progressDialog.innerHTML = `<div style="display:block; border: maroon 2px solid; margin: 40px auto; width: 50%; height: 20px; border-radius: 4px; background: white; overflow: hidden;">
-<div id="progress-bar" style="color: white; font-weight: bold; background: maroon; display:flex; height: 100%; width: 0.01%; transition: width 0.3s ease-in-out; font-size: 0.5em; align-items: center; justify-content: start;">&nbsp;&nbsp;&nbsp;&nbsp;0%</div></div>`;
-    progressDialog.id = PROGRESS_DIALOG_ID;
-    document.body.appendChild(progressDialog);
-  }
-  return progressDialog;
-}
-
-let _progressRatio = 0;
-function showProgressDialog(ratio) {
-  _progressRatio = Math.max(0, Math.min(ratio, 1));
-  const progressDialog = getProgressDialog();
-  const progressBar = document.getElementById("progress-bar");
-  if (!progressBar) {
-    throw new Error("Progress bar not found");
-  }
-  const progressPercent = Math.round(ratio * 100);
-  progressBar.innerHTML = `&nbsp;&nbsp;&nbsp;&nbsp;${progressPercent}%`;
-  progressBar.style.width = `${progressPercent}%`;
-  progressDialog.setAttribute("open", "true");
-}
-
-let _progressIntervalId = undefined;
-const stopProgressingDialog = () =>
-  _progressIntervalId && clearInterval(_progressIntervalId);
-function showProgressingDialog(startRatio, intervalStep = 0.0001) {
-  const updateProgress = () => {
-    showProgressDialog(_progressRatio);
-    _progressRatio += intervalStep;
-  };
-  stopProgressingDialog();
-  _progressIntervalId = setInterval(updateProgress, 10);
-  _progressRatio = startRatio;
-  updateProgress();
-}
-
-function hideProgressDialog() {
-  stopProgressingDialog();
-  showProgressDialog(1);
-  setTimeout(() => getProgressDialog().removeAttribute("open"), 1000);
-}
-
 function NotFound(id) {
   return new Error(id + " not found");
 }
@@ -271,7 +224,7 @@ function keyAsTitleCase(title) {
 
 function textInputTitleStyle(element) {
   return `background-color: transparent;
-border-radius: 2px;
+border-radius: ${DimensionsPx.XSMALL};
 color: ${Colors.TEXT};
 content: "${keyAsTitleCase(
     element.title || element.id || element.name || ""
