@@ -1,6 +1,14 @@
 // --- helper constants
 const STORY_AI_NS = "https://qbrkts.com/story.ai";
 
+const Colors = {
+  BACKGROUND_DISABLED: "#c0c0c0",
+  BACKGROUND_HOVER: "#e0e0e0",
+  BACKGROUND_DEFAULT: "#f0f0f0",
+  TEXT: "#303030",
+  TEXT_DISABLED: "#909090",
+};
+
 const DEFAULT_PAGE = "HOME";
 const PageNames = [DEFAULT_PAGE, "STORIES", "WRITE", "READ"];
 /** @type {{
@@ -19,6 +27,7 @@ const Page = Object.assign(
   LINE_INPUT: 'line-input';
   PAGE_NAVIGATION: 'page-navigation';
   PAPER_BUTTON: 'paper-button';
+  PROGRESS_INDICATOR: 'progress-indicator';
   SHARE_STORY: 'share-story';
   TEXT_INPUT: 'text-input';
   HOME: 'home-page';
@@ -33,6 +42,7 @@ const ComponentName = Object.assign(
     LINE_INPUT: "line-input",
     PAGE_NAVIGATION: "page-navigation",
     PAPER_BUTTON: "paper-button",
+    PROGRESS_INDICATOR: "progress-indicator",
     SHARE_STORY: "share-story",
     TEXT_INPUT: "text-input",
   },
@@ -262,7 +272,7 @@ function keyAsTitleCase(title) {
 function textInputTitleStyle(element) {
   return `background-color: transparent;
 border-radius: 2px;
-color: #303030;
+color: ${Colors.TEXT};
 content: "${keyAsTitleCase(
     element.title || element.id || element.name || ""
   )} ▾";
@@ -702,6 +712,7 @@ async function generateStoryContents() {
         `CRITICAL: Aim for a chapter length of approximately ${chapWordCount} words.`,
         `CRITICAL: Prioritize fulfilling the scenes and narrative flow.`,
         `CRITICAL: The chapter should be well formatted with appropriate paragraphs line breaks.`,
+        `CRITICAL: Do not include the chapter title in the contents.`,
       ].join("\n\n"),
       `{content: "Full narrative content for chapter ${chapNum} in plain text, adhering strictly to the provided scenes and style."}`,
       GeminiConfig.Temperature.BALANCED,

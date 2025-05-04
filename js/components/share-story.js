@@ -8,7 +8,7 @@ const SHARE_STORY_CODE_TEMPLATE = `
   title="${AppText.SHARE_STORY}"
   style="
     border-radius: 4px;
-    box-shadow: 0px 0px 10px #30303090;
+    box-shadow: 0px 0px 10px ${Colors.TEXT}90;
     position: fixed;
     bottom: 4px; left: 4px;
     z-index: ${Level.TOP};
@@ -39,7 +39,6 @@ customElements.define(
     }
 
     updateShareButtonLink = () => {
-      console.log("resize", window.innerWidth);
       if (window.innerWidth < 640) {
         this.copyLinkButton.innerHTML = "📖";
       } else {

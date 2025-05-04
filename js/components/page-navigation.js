@@ -70,7 +70,7 @@ customElements.define(
       bottomNavigation.style.display = "none";
       document.body.appendChild(bottomNavigation);
       bottomNavigation.style.backgroundColor = "white";
-      bottomNavigation.style.border = "solid 1px #ccc";
+      bottomNavigation.style.border = `solid 1px ${Colors.BACKGROUND_DISABLED}`;
       bottomNavigation.style.borderRadius = "2px";
       bottomNavigation.style.bottom = "2px";
       bottomNavigation.style.padding = "4px 10px";

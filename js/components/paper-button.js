@@ -5,10 +5,10 @@ const PAPER_BUTTON_CODE_TEMPLATE = `
 const PAPER_BUTTON_ID = "paper-button";
 const PAPER_BUTTON_STYLE = `
   .paper-button {
-    background-color: #f0f0f0;
+    background-color: ${Colors.BACKGROUND_DEFAULT};
     border: none;
     border-radius: 4px;
-    color: #303030;
+    color: ${Colors.TEXT};
     cursor: pointer;
     font-size: 1em;
     padding: 10px 20px;
@@ -18,7 +18,7 @@ const PAPER_BUTTON_STYLE = `
   }
 
   .paper-button:hover {
-    background-color: #e0e0e0;
+    background-color: ${Colors.BACKGROUND_HOVER};
   }
 
   .paper-button:active {
@@ -26,8 +26,8 @@ const PAPER_BUTTON_STYLE = `
   }
 
   .paper-button:disabled {
-    background-color: #c0c0c0;
-    color: #909090;
+    background-color: ${Colors.BACKGROUND_DISABLED};
+    color: ${Colors.TEXT_DISABLED};
     cursor: not-allowed;
   }
 `;

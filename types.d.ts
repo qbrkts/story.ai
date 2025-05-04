@@ -1,44 +1,16 @@
 export class GeminiApiKey extends HTMLInputElement {
-  constructor();
-  connectedCallback(): void;
-  disconnectedCallback(): void;
-  attributeChangedCallback(
-    name: string,
-    oldValue: string,
-    newValue: string
-  ): void;
-  static get observedAttributes(): string[];
   grabFocus(): void;
 }
 
-export class LineInput extends HTMLInputElement {
-  constructor();
-  connectedCallback(): void;
-  disconnectedCallback(): void;
+export class ProgressIndicator extends HTMLElement {
+  value: number;
 }
 
-export class TextInput extends HTMLTextAreaElement {
-  constructor();
-  connectedCallback(): void;
-  disconnectedCallback(): void;
-  attributeChangedCallback(
-    name: string,
-    oldValue: string,
-    newValue: string
-  ): void;
-  static get observedAttributes(): string[];
-}
+export class LineInput extends HTMLInputElement {}
+
+export class TextInput extends HTMLTextAreaElement {}
 
 export class PaperButton extends HTMLButtonElement {
-  constructor();
-  connectedCallback(): void;
-  disconnectedCallback(): void;
-  attributeChangedCallback(
-    name: string,
-    oldValue: string,
-    newValue: string
-  ): void;
-  static get observedAttributes(): string[];
   handler(e: MouseEvent): unknown;
 }
 
@@ -62,10 +34,10 @@ declare global {
   }
   namespace JSX {
     interface IntrinsicElements {
-      "gemini-api-key": GeminiApiKey;
-      "line-input": LineInput;
-      "paper-button": PaperButton;
-      "text-input": TextInput;
+      // "gemini-api-key": GeminiApiKey;
+      // "line-input": LineInput;
+      // "paper-button": PaperButton;
+      // "text-input": TextInput;
     }
   }
 }

@@ -7,10 +7,10 @@ const LINE_INPUT_STYLE = `
 }
 
 .${LINE_INPUT_CLS} {
-  background-color: #f0f0f0;
+  background-color: ${Colors.BACKGROUND_DEFAULT};
   border: none;
   border-radius: 4px;
-  color: #303030;
+  color: ${Colors.TEXT};
   cursor: pointer;
   font-size: 1em;
   padding: 10px 20px;
@@ -19,7 +19,7 @@ const LINE_INPUT_STYLE = `
 }
 
 .${LINE_INPUT_CLS}:hover {
-background-color: #e0e0e0;
+  background-color: ${Colors.BACKGROUND_HOVER};
 }
 
 .${LINE_INPUT_CLS}:active {

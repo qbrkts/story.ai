@@ -1,5 +1,6 @@
 const ReadPageIds = {
   STORY_CONTENT: "story-content",
+  PROGRESS_INDICATOR: "progress-indicator",
   REGENERATE_STORY_CONTENT_BTN: "regenerate-story-content-btn",
 };
 const READ_PAGE_CODE_TEMPLATE = () => {
@@ -12,9 +13,11 @@ const READ_PAGE_CODE_TEMPLATE = () => {
 
   <h2>${title}</h2>
 
-  <p id=${ReadPageIds.PROGRESS_BAR}></p>
-
   <paper-button id=${ReadPageIds.REGENERATE_STORY_CONTENT_BTN}>${AppText.REGENERATE_STORY_CONTENT}</paper-button>
+
+  <br/>
+
+  <progress-indicator id=${ReadPageIds.PROGRESS_INDICATOR}></progress-indicator>
 
   <pre id=${ReadPageIds.STORY_CONTENT} style="font-family: sans-serif; white-space: break-spaces; padding: 10px;">
     ${AppText.NO_STORY_CONTENT}
@@ -39,7 +42,6 @@ customElements.define(
           alert(AppText.GEMINI_API_KEY_NOT_SET);
           gotoPage({ page: Page.WRITE });
         }
-        this.regenerateStoryBtn.disabled = true;
         const title = getCurrentTitle();
         const storyDocument = getStoryDocumentByTitle(title);
         storyDocument.outline.forEach((outline) => {
@@ -48,26 +50,27 @@ customElements.define(
         });
         addStoryDocumentToLocalStorage(title, storyDocument);
         await this.generateStory();
-        this.regenerateStoryBtn.disabled = false;
       };
       this.generateStory();
     }
 
     async generateStory() {
+      this.regenerateStoryBtn.disabled = true;
+      this.regenerateStoryBtn.innerText = AppText.LOADING;
       setInterval(() => this.render(), 1000); // refresh every 1 second
-      await generateStoryContents();
+      try {
+        await generateStoryContents();
+      } catch (error) {
+        console.error(error);
+        alert("Error occurred attempting to generate story");
+        location.reload();
+      }
+      this.regenerateStoryBtn.innerText = AppText.REGENERATE_STORY_CONTENT;
+      this.regenerateStoryBtn.disabled = false;
     }
 
     render() {
-      const progressIndicator = this.root.getElementById(
-        ReadPageIds.PROGRESS_BAR
-      );
-      if (!progressIndicator) {
-        throw new Error("Progress bar not found");
-      }
-      progressIndicator.innerHTML = `${Math.round(
-        window.__chaptersGenerationProgress * 100
-      )} percent complete`;
+      this.progressIndicator.value = window.__chaptersGenerationProgress;
 
       const title = getCurrentTitle();
       const storyDocument = getStoryDocumentByTitle(title);
@@ -96,6 +99,17 @@ customElements.define(
         throw new Error("Shadow DOM not supported");
       }
       return this.shadowRoot;
+    }
+
+    get progressIndicator() {
+      const progressIndicator =
+        /** @type {import('../../../types').ProgressIndicator} */ (
+          this.root.getElementById(ReadPageIds.PROGRESS_INDICATOR)
+        );
+      if (!progressIndicator) {
+        throw new Error("Progress indicator not found");
+      }
+      return progressIndicator;
     }
 
     get regenerateStoryBtn() {
