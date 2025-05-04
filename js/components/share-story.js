@@ -12,7 +12,7 @@ const SHARE_STORY_CODE_TEMPLATE = `
     position: fixed;
     bottom: 4px; left: 4px;
     z-index: ${Level.TOP};
-  ">${AppText.SHARE_STORY}</paper-button>
+  "></paper-button>
 `;
 
 customElements.define(
@@ -31,9 +31,22 @@ customElements.define(
 
     connectHandlers() {
       this.copyLinkButton.handler = this.copyShareLink;
+      window.addEventListener("resize", this.updateShareButtonLink);
     }
 
-    render() {}
+    render() {
+      this.updateShareButtonLink();
+    }
+
+    updateShareButtonLink = () => {
+      console.log("resize", window.innerWidth);
+      if (window.innerWidth < 640) {
+        this.copyLinkButton.innerHTML = "📖";
+      } else {
+        this.copyLinkButton.innerHTML = AppText.SHARE_STORY;
+      }
+      console.log(this.copyLinkButton.value);
+    };
 
     get root() {
       if (!this.shadowRoot) {
