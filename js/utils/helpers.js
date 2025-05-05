@@ -580,6 +580,7 @@ function removeStoryDocumentFromLocalStorage(title) {
 
 function renameStoryTitle(title, newTitle) {
   const storyDocument = getStoryDocumentByTitle(title);
+  storyDocument.title = keyAsTitleCase(newTitle);
   addStoryDocumentToLocalStorage(newTitle, storyDocument);
   removeStoryDocumentFromLocalStorage(title);
 }
