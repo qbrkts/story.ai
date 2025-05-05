@@ -2,8 +2,8 @@ const CHARACTER_DELETE_TIMEOUT_MS = 5000;
 const WritePageIds = {
   ADD_CHARACTER_BTN: "add-character-btn",
   CHARACTERS_CONTAINER: "characters-container",
-  GENERATE_OUTLINE: "generate-outline-btn",
-  GENERATE_OUTLINE_INPUT: "create-outline-guide",
+  GENERATE_CHAPTER_BTN: "generate-chapter-btn",
+  GENERATE_CHAPTER_INPUT: "create-chapter-guide",
   GENRE_LIST: "genre-datalist",
   GENRE_TEXT_INPUT: "story-genre",
   NEW_CHARACTER_INPUT: "new-character",
@@ -141,25 +141,26 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
       <summary style="cursor: pointer; margin: ${DimensionsPx.MLARGE};">
         ${AppText.OUTLINE}
       </summary>
-      <div style="display: flex; flex-direction: row; gap: ${
-        DimensionsPx.LARGE
-      };">
-        <line-input
-          id="${WritePageIds.GENERATE_OUTLINE_INPUT}"
-          placeholder="${AppText.GENERATE_OUTLINE_GUIDE}"
-          style="width: calc(100vw - 260px)">
-        </line-input>
-        <paper-button
-          id="${WritePageIds.GENERATE_OUTLINE}"
-          title="${AppText.GENERATE_OUTLINE}">
-          ${AppText.GENERATE_OUTLINE}
-        </paper-button>
+      <div
+          id=${WritePageIds.STORY_OUTLINE_CONTAINER}
+          style="display: flex; flex-direction: column;">
       </div>
       <br />
       <br />
       <div
-        id=${WritePageIds.STORY_OUTLINE_CONTAINER}
-        style="display: flex; flex-direction: column;">
+        style="display: flex;
+        flex-direction: row;
+        gap: ${DimensionsPx.LARGE};">
+        <line-input
+          id="${WritePageIds.GENERATE_CHAPTER_INPUT}"
+          placeholder="${AppText.GENERATE_CHAPTER_GUIDE}"
+          style="width: calc(100vw - 263px)">
+        </line-input>
+        <paper-button
+          id="${WritePageIds.GENERATE_CHAPTER_BTN}"
+          title="${AppText.GENERATE_CHAPTER}">
+          ${AppText.GENERATE_CHAPTER}
+        </paper-button>
       </div>
     </details>
   </div>
@@ -203,7 +204,7 @@ customElements.define(
 
       this.addCharacterBtn.handler = this.addGeneratedCharacter;
 
-      this.generateOutlineBtn.handler = this.generateOutline;
+      this.generateChapterBtn.handler = this.generateOutline;
 
       this.generateOutlineInput.addEventListener("input", () => {
         const currentTitle = getCurrentTitle();
@@ -618,12 +619,13 @@ customElements.define(
         this.geminiApiKeyComponent.grabFocus();
         return;
       }
-      const outlinePrompt = this.generateOutlineInput.value.trim();
-      this.generateOutlineBtn.disabled = true;
-      const outlineResultPromise = fetchFromGemini(
+      const chapterPrompt = this.generateOutlineInput.value.trim();
+      this.generateChapterBtn.disabled = true;
+      const chapNum = storyDocument.outline.length + 1;
+      const chapterResultPromise = fetchFromGemini(
         apiKey,
         [
-          `Generate an outline for the story "${title}"`,
+          `Generate chapter ${chapNum} for the story "${title}"`,
           `This is the summary of the story: "${storyDocument.summary}"`,
           `This is the genre of the story: "${storyDocument.genre}"`,
           `This is the setting of the story: "${storyDocument.setting}"`,
@@ -631,19 +633,30 @@ customElements.define(
           `These are the existing characters: ${getCharactersForQuery(
             storyDocument
           )}`,
-          `The outline should be tailored to the story based on the synopsis.`,
-          outlinePrompt &&
-            `The outline should adhere to the following instructions: ${outlinePrompt}`,
+          `These are the existing chapters:\n${storyDocument.outline
+            .map((c) => c.description)
+            .filter(Boolean)
+            .map((c, i) => `Chapter ${i + 1}: ${c}`)
+            .join("\n\n")}`,
+          `The chapter should be tailored to the story based on the synopsis.`,
+          chapterPrompt &&
+            `The chapter should adhere to the following instructions: ${chapterPrompt}`,
         ]
           .filter(Boolean)
           .join("\n\n"),
-        `{"outline": [{"title": "chapter title excluding the chapter number", "description": "chapter description goes here"}]}`
+        `{"chapter": {"title": "chapter title excluding the chapter number", "description": "chapter description goes here"}}`
       );
-      const result = await outlineResultPromise;
-      console.log("outline result:", result);
-      storyDocument.outline = result.outline;
-      alert(AppText.SUCCESS_OUTLINE_GENERATED);
-      this.generateOutlineBtn.disabled = false;
+      const result = await chapterResultPromise;
+      console.log("chapter result:", result);
+      storyDocument.outline.push({
+        title: result.chapter.title,
+        description: result.chapter.description,
+        scenes: "",
+        content: "",
+        characters: [],
+      });
+      alert(AppText.SUCCESS_NEW_CHAPTER);
+      this.generateChapterBtn.disabled = false;
       addStoryDocumentToLocalStorage(title, storyDocument);
       this.render();
       // Start generation of story contents from saved outline
@@ -820,9 +833,9 @@ customElements.define(
       return sectionEl;
     }
 
-    get generateOutlineBtn() {
+    get generateChapterBtn() {
       const btnEl = /** @type {import("../../../types").PaperButton} */ (
-        this.root.querySelector(`#${WritePageIds.GENERATE_OUTLINE}`)
+        this.root.querySelector(`#${WritePageIds.GENERATE_CHAPTER_BTN}`)
       );
       if (!btnEl) {
         throw new Error("Generate outline button not found");
@@ -832,7 +845,7 @@ customElements.define(
 
     get generateOutlineInput() {
       const inputEl = /** @type {import("../../../types").LineInput} */ (
-        this.root.querySelector(`#${WritePageIds.GENERATE_OUTLINE_INPUT}`)
+        this.root.querySelector(`#${WritePageIds.GENERATE_CHAPTER_INPUT}`)
       );
       if (!inputEl) {
         throw new Error("Generate outline input not found");

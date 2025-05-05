@@ -117,8 +117,7 @@ const AppText = {
   GEMINI_API_KEY: "Gemini",
   GEMINI_API_KEY_NOT_SET: "Gemini API Key not set",
   GENERATE_CHAPTER: "Generate chapter",
-  GENERATE_OUTLINE: "Generate outline",
-  GENERATE_OUTLINE_GUIDE:
+  GENERATE_CHAPTER_GUIDE:
     "Include any specific directions for the outline you want to create. Example, medium length story with 20 chapters and 3000 words per chapter etc. This will replace existing chapters and scenes.",
   GENERATE_STYLE_AND_SETTING: "Generate style and setting",
   GENERATE_SYNOPSIS: "Generate synopsis",
@@ -156,7 +155,7 @@ const AppText = {
     "Deciding on a style will help generate outlines, scenes and chapters for your story in a consistent way.",
   SUCCESS: "Success",
   SUCCESS_NEW_CHARACTER: `Successfully generated new character. Add any extra traits to their description matching the same format. To remove a character, replace their description with '${DELETE_CHARACTER_MARKER}'.`,
-  SUCCESS_OUTLINE_GENERATED: `Successfully generated a new outline`,
+  SUCCESS_NEW_CHAPTER: `Successfully generated a new chapter`,
   SUMMARY: "Summary",
   STYLE_OR_SETTING_ALREADY_PRESENT:
     "Delete the existing story style and settings if you want to generate new ones.",
@@ -657,7 +656,6 @@ async function generateStoryContents() {
           prevChapterContext,
           ...promptParts,
           `CRITICAL: Base the scenes strictly on the chapter description provided above.`,
-          `CRITICAL: Aim for a chapter length of approximately ${chapWordCount} words.`,
         ].join("\n\n"),
         `{scenes: "Bulleted or numbered list of scenes for chapter ${chapNum} based *only* on its description."}`,
         GeminiConfig.Temperature.BALANCED,
