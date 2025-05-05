@@ -21,7 +21,7 @@ const WritePageIds = {
   STYLE_TEXT_INPUT: "story-style",
   SUMMARY_TEXT_INPUT: "brain-dump",
 };
-const TEXT_INPUT_INLINE_STYLE = `max-width: calc(100vw - 70px); min-width: calc(100vw - 70px); min-height: ${DimensionsPx.XLARGE}; font-family: sans-serif;`;
+const TEXT_INPUT_INLINE_STYLE = `max-width: calc(100vw - 70px); min-width: calc(100vw - 70px); min-height: ${DimensionsPx.XLARGE}; font-family: ${Font.DEFAULT_FAMILY};`;
 const WRITE_PAGE_CODE_TEMPLATE = () => {
   const title = getCurrentTitle();
 

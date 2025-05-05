@@ -15,22 +15,11 @@ export class PaperButton extends HTMLButtonElement {
 }
 
 declare global {
-  const pako: {
-    deflate: (
-      data: string,
-      options?: { level: number }
-    ) => Uint8Array<ArrayBuffer>;
-    inflate: (
-      data: Uint8Array<ArrayBuffer>,
-      options?: { to: "string" }
-    ) => string;
-  };
   interface Window {
     __cacheShareLinks: Record<string, string>;
     __chapterCount: number;
     __chaptersGenerated: number;
     __chaptersGenerationProgress: number;
-    pako: typeof pako;
   }
   namespace JSX {
     interface IntrinsicElements {

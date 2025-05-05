@@ -1,6 +1,10 @@
 // --- helper constants
 const STORY_AI_NS = "https://qbrkts.com/story.ai";
 
+const Font = {
+  DEFAULT_FAMILY: "Pangolin, sans-serif",
+};
+
 const Colors = {
   BACKGROUND_DISABLED: "#c0c0c0",
   BACKGROUND_HOVER: "#e0e0e0",

@@ -1,3 +1,4 @@
+// load app
 const APP_ID = "app";
 
 const currentPage = getCurrentPage();
@@ -16,6 +17,36 @@ if (!pageComponent) {
 }
 appContainer.innerHTML = "";
 appContainer.appendChild(pageComponent);
+
+// load styles
+const style = document.createElement("style");
+style.innerHTML = `
+html,
+body {
+  scroll-behavior: smooth;
+}
+
+html,
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: ${Font.DEFAULT_FAMILY};
+  text-align: center;
+}
+
+a {
+  text-decoration: none;
+}
+
+details > summary {
+  cursor: pointer;
+}
+`;
+document.head.appendChild(style);
 
 // Continue story from shared URL
 async function continueStoryFromRef() {

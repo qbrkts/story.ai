@@ -82,12 +82,14 @@ customElements.define(
       copyAttributes(this, this.textAreaEl, ["id"]);
 
       // set style after element has been added to document
-      const style = document.createElement("style");
-      style.textContent = `${TEXT_INPUT_STYLE}
+      setTimeout(() => {
+        const style = document.createElement("style");
+        style.textContent = `${TEXT_INPUT_STYLE}
 .${TEXT_INPUT_TITLE_CLS}::before {
 ${textInputTitleStyle(this.textAreaEl)}
 }`;
-      this.root.appendChild(style);
+        this.root.appendChild(style);
+      }, 300);
     }
   }
 );

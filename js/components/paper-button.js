@@ -5,6 +5,7 @@ const PAPER_BUTTON_CODE_TEMPLATE = `
 const PAPER_BUTTON_ID = "paper-button";
 const PAPER_BUTTON_STYLE = `
   .paper-button {
+    font-family: ${Font.DEFAULT_FAMILY};
     background-color: ${Colors.BACKGROUND_DEFAULT};
     border: none;
     border-radius: ${DimensionsPx.SMALL};

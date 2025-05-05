@@ -80,11 +80,13 @@ customElements.define(
         this.root.appendChild(child);
       });
       // set style after element has been added to document
-      const style = document.createElement("style");
-      style.textContent = `${LINE_INPUT_STYLE}
+      setTimeout(() => {
+        const style = document.createElement("style");
+        style.textContent = `${LINE_INPUT_STYLE}
 .${LINE_INPUT_TITLE_CLS}::before {
 ${textInputTitleStyle(this.inputEl)}}`;
-      this.root.appendChild(style);
+        this.root.appendChild(style);
+      }, 300);
     }
   }
 );
