@@ -1,7 +1,7 @@
 const ReadPageIds = {
   STORY_CONTENT: "story-content",
   PROGRESS_INDICATOR: "progress-indicator",
-  REGENERATE_STORY_CONTENT_BTN: "regenerate-story-content-btn",
+  GENERATE_STORY_CONTENT_BTN: "generate-story-content-btn",
 };
 const READ_PAGE_CODE_TEMPLATE = () => {
   const title = getCurrentTitle();
@@ -13,7 +13,7 @@ const READ_PAGE_CODE_TEMPLATE = () => {
 
   <h2>${title}</h2>
 
-  <paper-button id=${ReadPageIds.REGENERATE_STORY_CONTENT_BTN}>${AppText.REGENERATE_STORY_CONTENT}</paper-button>
+  <paper-button id=${ReadPageIds.GENERATE_STORY_CONTENT_BTN}>${AppText.GENERATE_CHAPTER}</paper-button>
 
   <br/>
 
@@ -37,20 +37,11 @@ customElements.define(
     }
 
     connectedCallback() {
-      this.regenerateStoryBtn.handler = async () => {
-        const title = getCurrentTitle();
-        const storyDocument = getStoryDocumentByTitle(title);
-        // only clear contents if there is an api key set
-        if (getGeminiKeyFromLocalStorage()) {
-          storyDocument.outline.forEach((outline) => {
-            outline.content = "";
-            outline.scenes = "";
-          });
-          addStoryDocumentToLocalStorage(title, storyDocument);
-        }
+      this.generateStoryBtn.handler = async () => {
         await this.generateStory();
       };
-      this.generateStory();
+      this.render();
+      this.generateStoryBtn.disabled = window.__chaptersGenerationProgress >= 1;
     }
 
     async generateStory() {
@@ -58,8 +49,7 @@ customElements.define(
         alert(AppText.GEMINI_API_KEY_NOT_SET);
         return gotoPage({ page: Page.WRITE });
       }
-      this.regenerateStoryBtn.disabled = true;
-      this.regenerateStoryBtn.innerText = AppText.LOADING;
+      this.generateStoryBtn.disabled = true;
       const intervalId = setInterval(() => {
         this.render();
         if (window.__chaptersGenerationProgress >= 1) {
@@ -72,15 +62,25 @@ customElements.define(
         console.error(error);
         alert("Error occurred attempting to generate story");
       }
-      this.regenerateStoryBtn.innerText = AppText.REGENERATE_STORY_CONTENT;
-      this.regenerateStoryBtn.disabled = false;
+      this.generateStoryBtn.disabled = window.__chaptersGenerationProgress >= 1;
     }
 
     render() {
-      this.progressIndicator.value = window.__chaptersGenerationProgress;
-
       const title = getCurrentTitle();
       const storyDocument = getStoryDocumentByTitle(title);
+
+      const lastChapterGenerated = storyDocument.outline.findIndex(
+        (o) => !o.content
+      );
+      const chapterCount = storyDocument.outline.length;
+      const chapterIdxToGenerate =
+        lastChapterGenerated < 0 ? chapterCount : lastChapterGenerated;
+      this.generateStoryBtn.innerText = `${AppText.GENERATE_CHAPTER} ${
+        chapterIdxToGenerate < chapterCount ? chapterIdxToGenerate + 1 : ""
+      }`;
+      window.__chaptersGenerationProgress = chapterIdxToGenerate / chapterCount;
+      this.progressIndicator.value = window.__chaptersGenerationProgress;
+
       const storyContent = storyDocument.outline
         .map((o, i) => {
           return (
@@ -119,13 +119,13 @@ customElements.define(
       return progressIndicator;
     }
 
-    get regenerateStoryBtn() {
+    get generateStoryBtn() {
       const regenerateBtn =
         /** @type {import('../../../types').PaperButton} */ (
-          this.root.getElementById(ReadPageIds.REGENERATE_STORY_CONTENT_BTN)
+          this.root.getElementById(ReadPageIds.GENERATE_STORY_CONTENT_BTN)
         );
       if (!regenerateBtn) {
-        throw new Error("Regenerate story button not found");
+        throw new Error("Generate story button not found");
       }
       return regenerateBtn;
     }

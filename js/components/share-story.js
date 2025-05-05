@@ -8,7 +8,8 @@ const SHARE_STORY_CODE_TEMPLATE = `
   title="${AppText.SHARE_STORY}"
   style="
     border-radius: ${DimensionsPx.SMALL};
-    border: solid ${DimensionsPx.XXSMALL} ${Colors.TEXT}30;
+    border: none;
+    box-shadow: 0px 0px ${DimensionsPx.SMALL} ${DimensionsPx.XXSMALL} ${Colors.BUTTON_TEXT}30;
     position: fixed;
     bottom: ${DimensionsPx.SMALL}; left: ${DimensionsPx.SMALL};
     font-weight: bold;

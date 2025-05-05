@@ -115,6 +115,7 @@ const AppText = {
   ENTER_NEW_STORY: "Enter new story title",
   GEMINI_API_KEY: "Gemini",
   GEMINI_API_KEY_NOT_SET: "Gemini API Key not set",
+  GENERATE_CHAPTER: "Generate chapter",
   GENERATE_OUTLINE: "Generate outline",
   GENERATE_OUTLINE_GUIDE:
     "Include any specific directions for the outline you want to create. Example, medium length story with 20 chapters and 3000 words per chapter etc. This will replace existing chapters and scenes.",
@@ -136,7 +137,6 @@ const AppText = {
   OWNER_NAME: "Quantum Brackets",
   PREVIOUSLY_ON: "Previously on...",
   RANDOM: "Random",
-  REGENERATE_STORY_CONTENT: "Refresh",
   SAVE: "Save",
   SHARE_STORY: "Copy link to share story",
   START: "Start",
@@ -601,7 +601,9 @@ async function generateStoryContents() {
     // `This is the setting of the story: "${storyDocument.setting}"`,
     // `This is the synopsis of the story: "${storyDocument.synopsis}"`,
     // `This is the outline of the story: ${outline.join("\n")}`,
-    `These are the main characters involved in the story: ${getCharactersForQuery(storyDocument)}`,
+    `These are the main characters involved in the story: ${getCharactersForQuery(
+      storyDocument
+    )}`,
     `CRITICAL: The generated story MUST strictly adhere to this writing style style: ${storyDocument.style}`,
     `CRITICAL: The primary goal is to generate content ONLY for the specified chapter, strictly following its description and scenes.`,
     `CRITICAL: Maintain narrative consistency with the overall story progression implied by the chapter outlines.`,
@@ -609,7 +611,6 @@ async function generateStoryContents() {
   ];
   const chapterGenerationStepSize =
     1 / ((storyDocument.outline.length ?? 0) * 2);
-  window.__chaptersGenerationProgress = 0;
   let chapGenerationDelay = 0;
 
   const apiKey = getGeminiKeyFromLocalStorage();
@@ -618,15 +619,15 @@ async function generateStoryContents() {
   }
 
   const outline = storyDocument.outline;
-  const chapCount = outline.length;
-  const chapWordCount = chapCount * 200;
-  for (let i = 0; i < chapCount; i++) {
+  const chapWordCount = window.__chapterCount * 200;
+  for (let i = 0; i < window.__chapterCount; i++) {
     const chapter = outline[i];
     const chapNum = i + 1;
     if (chapter.content) {
       console.log("chap already had content", chapNum);
       window.__chaptersGenerated += 1;
-      window.__chaptersGenerationProgress += chapterGenerationStepSize * 2;
+      window.__chaptersGenerationProgress =
+        window.__chaptersGenerated / window.__chapterCount;
       continue;
     }
     const generationDelaySeconds = chapGenerationDelay * 5;
@@ -693,7 +694,8 @@ async function generateStoryContents() {
     addStoryDocumentToLocalStorage(storyTitle, storyDocument);
     // add chapter content to story
     window.__chaptersGenerated += 1;
-    window.__chaptersGenerationProgress += chapterGenerationStepSize;
+    window.__chaptersGenerationProgress =
+      window.__chaptersGenerated / window.__chapterCount;
   }
   addStoryDocumentToLocalStorage(storyTitle, storyDocument);
 }

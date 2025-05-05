@@ -10,7 +10,7 @@ const PAGE_NAVIGATION_CODE_TEMPLATE = `
 #${PageNavigationIds.PAGE_LINKS} a {
   background-color: transparent;
   border: none;
-  border-radius: ${DimensionsPx.SMALL};
+  border-radius: ${DimensionsPx.XSMALL};
 }
 #${PageNavigationIds.PAGE_LINKS} a.active {
   background-color: ${Colors.PAPER_TEXT}30;
@@ -84,7 +84,7 @@ customElements.define(
       document.body.appendChild(bottomNavigation);
       bottomNavigation.style.backgroundColor = Colors.PAPER_BACKGROUND;
       bottomNavigation.style.border = `solid ${DimensionsPx.XXSMALL} ${Colors.PAPER_TEXT}30`;
-      bottomNavigation.style.borderRadius = DimensionsPx.XSMALL;
+      bottomNavigation.style.borderRadius = DimensionsPx.SMALL;
       bottomNavigation.style.bottom = DimensionsPx.XSMALL;
       bottomNavigation.style.position = "fixed";
       bottomNavigation.style.right = `${DimensionsPx.XSMALL}`;

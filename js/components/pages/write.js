@@ -156,7 +156,10 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
         </paper-button>
       </div>
       <br />
-      <div id=${WritePageIds.STORY_OUTLINE_CONTAINER}>
+      <br />
+      <div
+        id=${WritePageIds.STORY_OUTLINE_CONTAINER}
+        style="display: flex; flex-direction: column;">
       </div>
     </details>
   </div>
@@ -521,7 +524,9 @@ customElements.define(
           `This is the genre of the story: "${storyDocument.genre}"`,
           `This is the setting of the story: "${storyDocument.setting}"`,
           `This is the synopsis of the story: "${storyDocument.synopsis}"`,
-          `These are the existing characters: ${getCharactersForQuery(storyDocument)}`,
+          `These are the existing characters: ${getCharactersForQuery(
+            storyDocument
+          )}`,
           `Attempt to maintain a balance between the ages, cultures and genders of characters.`,
           `The character should be tailored to the story based on the synopsis.`,
           `The character should not be redundant with the existing characters.`,
@@ -598,7 +603,9 @@ customElements.define(
           `This is the genre of the story: "${storyDocument.genre}"`,
           `This is the setting of the story: "${storyDocument.setting}"`,
           `This is the synopsis of the story: "${storyDocument.synopsis}"`,
-          `These are the existing characters: ${getCharactersForQuery(storyDocument)}`,
+          `These are the existing characters: ${getCharactersForQuery(
+            storyDocument
+          )}`,
           `The outline should be tailored to the story based on the synopsis.`,
           outlinePrompt &&
             `The outline should adhere to the following instructions: ${outlinePrompt}`,

@@ -2,17 +2,13 @@ const ProgressIndicatorIds = {
   CONTAINER: "progress-container",
 };
 const PROGRESS_INDICATOR_TEMPLATE = (
-  progressRatio = 0,
   css = {
     height: DimensionsPx.SMALL,
     width: `calc(${DimensionsPx.XLARGE} - ${DimensionsPx.SMALL})`,
   }
 ) => {
-  const progressPercent = progressRatio * 100;
   return `
-<div id="${ProgressIndicatorIds.CONTAINER}" title="${Math.round(
-    progressPercent
-  )} percent complete">
+<div id="${ProgressIndicatorIds.CONTAINER}" title="0 percent complete">
 </div>
 <style>
 :host {
@@ -20,12 +16,12 @@ const PROGRESS_INDICATOR_TEMPLATE = (
   justify-content: center;
 }
 #${ProgressIndicatorIds.CONTAINER} {
-  opacity: ${Math.floor(progressRatio) ? 0 : 1};
-  margin-top: ${Math.round(progressRatio + 1) * 4}px;
+  opacity: 0;
+  margin-top: 0px;
   height: ${css.height};
   overflow: visible;
   position: relative;
-  transition: opacity margin 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
   width: ${css.width};
 }
 #${ProgressIndicatorIds.CONTAINER}::before,
@@ -36,13 +32,14 @@ const PROGRESS_INDICATOR_TEMPLATE = (
   top: 0;
   left: 0;
   height: ${css.height};
+  transition: width 0.3s ease-in-out;
 }
 #${ProgressIndicatorIds.CONTAINER}::before {
   width: 100%;
   background-color: ${Colors.BUTTON_TEXT};
 }
 #${ProgressIndicatorIds.CONTAINER}::after {
-  width: ${progressPercent}%;
+  width: 0%;
   background-color: ${Colors.BUTTON_BACKGROUND};
 }
 </style>
@@ -55,6 +52,8 @@ customElements.define(
     constructor() {
       super();
       this.attachShadow({ mode: "open" });
+      this.root.innerHTML = PROGRESS_INDICATOR_TEMPLATE();
+      this.__value = 0;
     }
 
     connectedCallback() {
@@ -62,7 +61,27 @@ customElements.define(
     }
 
     render() {
-      this.root.innerHTML = PROGRESS_INDICATOR_TEMPLATE(this.value);
+      const progressPercent = Math.round(this.value * 100);
+      const styleRules = /** @type {CSSStyleRule[]}*/ (
+        Array.from(
+          this.root.styleSheets[0]?.cssRules || this.root.styleSheets[0]?.rules
+        )
+      );
+      if (styleRules) {
+        const rule = styleRules.find(
+          (r) => r.selectorText === `#${ProgressIndicatorIds.CONTAINER}::after`
+        );
+        if (rule) {
+          rule.style.width = `${progressPercent}%`;
+        }
+      }
+      this.progressContainer.style.opacity = (
+        Math.floor(this.value) ? 0 : 1
+      ).toString();
+      this.progressContainer.style.marginTop = `${
+        Math.round(this.value + 1) * 4
+      }px`;
+      this.progressContainer.title = Math.round(progressPercent) + "% complete";
     }
 
     get root() {
@@ -79,6 +98,16 @@ customElements.define(
     set value(/** @type {Number} */ v) {
       this.__value = v;
       this.render();
+    }
+
+    get progressContainer() {
+      const containerEl = this.root.getElementById(
+        ProgressIndicatorIds.CONTAINER
+      );
+      if (!containerEl) {
+        throw new Error("Progress container not found");
+      }
+      return containerEl;
     }
   }
 );

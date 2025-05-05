@@ -16,10 +16,10 @@ customElements.define(
     constructor() {
       super();
       this.attachShadow({ mode: "open" });
+      this.root.innerHTML = CHAPTER_CONTENT_CODE_TEMPLATE;
     }
 
     connectedCallback() {
-      this.root.innerHTML = CHAPTER_CONTENT_CODE_TEMPLATE;
     }
 
     get root() {

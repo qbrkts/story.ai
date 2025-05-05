@@ -8,6 +8,7 @@ const TEXT_INPUT_STYLE = `
 
 .${TEXT_INPUT_CLS} {
   background-color: ${Colors.PAPER_BACKGROUND};
+  box-shadow: 0px 0px 0px ${DimensionsPx.XXSMALL} ${Colors.PAPER_TEXT}30;
   border: none;
   border-radius: ${DimensionsPx.SMALL};
   color: ${Colors.PAPER_TEXT};
