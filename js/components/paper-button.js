@@ -6,20 +6,21 @@ const PAPER_BUTTON_ID = "paper-button";
 const PAPER_BUTTON_STYLE = `
   .paper-button {
     font-family: ${Font.DEFAULT_FAMILY};
-    background-color: ${Colors.BACKGROUND_DEFAULT};
+    background-color: ${Colors.BUTTON_BACKGROUND};
     border: none;
     border-radius: ${DimensionsPx.SMALL};
-    color: ${Colors.TEXT};
+    color: ${Colors.BUTTON_TEXT};
     cursor: pointer;
     font-size: 1em;
     padding: ${DimensionsPx.MEDIUM} ${DimensionsPx.MLARGE};
     text-align: center;
     text-decoration: none;
+    text-transform: uppercase;
     transition: background-color 0.3s, transform 0.3s;
   }
 
   .paper-button:hover {
-    background-color: ${Colors.BACKGROUND_HOVER};
+    background-color: ${Colors.BUTTON_BACKGROUND}c0;
   }
 
   .paper-button:active {

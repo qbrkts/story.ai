@@ -7,12 +7,14 @@ const LINE_INPUT_STYLE = `
 }
 
 .${LINE_INPUT_CLS} {
-  background-color: ${Colors.BACKGROUND_DEFAULT};
+  background-color: ${Colors.PAPER_BACKGROUND};
   border: none;
   border-radius: ${DimensionsPx.SMALL};
-  color: ${Colors.TEXT};
+  color: ${Colors.PAPER_TEXT};
   cursor: pointer;
   font-size: 1em;
+  font-family: ${Font.DEFAULT_FAMILY};
+  height: ${DimensionsPx.MLARGE};
   padding: ${DimensionsPx.MEDIUM} ${DimensionsPx.MLARGE};
   text-decoration: none;
   transition: background-color 0.3s, transform 0.3s;
@@ -86,7 +88,7 @@ customElements.define(
 .${LINE_INPUT_TITLE_CLS}::before {
 ${textInputTitleStyle(this.inputEl)}}`;
         this.root.appendChild(style);
-      }, 300);
+      }, DEFAULT_RENDER_DELAY_MS);
     }
   }
 );

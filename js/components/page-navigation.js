@@ -13,7 +13,7 @@ const PAGE_NAVIGATION_CODE_TEMPLATE = `
   border-radius: ${DimensionsPx.SMALL};
 }
 #${PageNavigationIds.PAGE_LINKS} a.active {
-  background-color: ${Colors.BACKGROUND_HOVER};
+  background-color: ${Colors.PAPER_TEXT}30;
   font-weight: bold;
 }
 </style>
@@ -82,8 +82,8 @@ customElements.define(
       const bottomNavigation = document.createElement("div");
       bottomNavigation.style.display = "none";
       document.body.appendChild(bottomNavigation);
-      bottomNavigation.style.backgroundColor = Colors.BACKGROUND_DEFAULT;
-      bottomNavigation.style.border = `solid ${DimensionsPx.XXSMALL} ${Colors.BACKGROUND_DISABLED}90`;
+      bottomNavigation.style.backgroundColor = Colors.PAPER_BACKGROUND;
+      bottomNavigation.style.border = `solid ${DimensionsPx.XXSMALL} ${Colors.PAPER_TEXT}30`;
       bottomNavigation.style.borderRadius = DimensionsPx.XSMALL;
       bottomNavigation.style.bottom = DimensionsPx.XSMALL;
       bottomNavigation.style.position = "fixed";

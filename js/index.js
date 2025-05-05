@@ -23,6 +23,7 @@ const style = document.createElement("style");
 style.innerHTML = `
 html,
 body {
+  background-color: ${Colors.PAPER};
   scroll-behavior: smooth;
 }
 

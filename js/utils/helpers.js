@@ -1,6 +1,8 @@
 // --- helper constants
 const STORY_AI_NS = "https://qbrkts.com/story.ai";
 
+const DEFAULT_RENDER_DELAY_MS = 0;
+
 const Font = {
   DEFAULT_FAMILY: "Pangolin, sans-serif",
 };
@@ -8,8 +10,17 @@ const Font = {
 const Colors = {
   BACKGROUND_DISABLED: "#c0c0c0",
   BACKGROUND_HOVER: "#e0e0e0",
-  BACKGROUND_DEFAULT: "#f0f0f0",
-  TEXT: "#303030",
+  get BUTTON_BACKGROUND() {
+    return "#d9a168";
+  },
+  get BUTTON_TEXT() {
+    return "#302010";
+  },
+  PAPER_BACKGROUND: "#fcf8f4",
+  PAPER_TEXT: "#303030",
+  get TEXT_BACKGROUND() {
+    return this.PAPER;
+  },
   TEXT_DISABLED: "#909090",
 };
 
@@ -107,7 +118,7 @@ const AppText = {
   GENERATE_OUTLINE: "Generate outline",
   GENERATE_OUTLINE_GUIDE:
     "Include any specific directions for the outline you want to create. Example, medium length story with 20 chapters and 3000 words per chapter etc. This will replace existing chapters and scenes.",
-  GENERATE_STYLE_AND_SETTING: "Generate style and setting for story",
+  GENERATE_STYLE_AND_SETTING: "Generate style and setting",
   GENERATE_SYNOPSIS: "Generate synopsis",
   GENERATE_SYNOPSIS_INSTRUCTIONS:
     "Generated synopsis goes here. You can modify it to your liking or update your summary and regenerate the synopsis.",
@@ -231,7 +242,7 @@ function keyAsTitleCase(title) {
 function textInputTitleStyle(element) {
   return `background-color: transparent;
 border-radius: ${DimensionsPx.XSMALL};
-color: ${Colors.TEXT};
+color: ${Colors.PAPER_TEXT};
 content: "${keyAsTitleCase(
     element.title || element.name || element.id || ""
   )} ▾";
@@ -572,6 +583,10 @@ function renameStoryTitle(title, newTitle) {
   removeStoryDocumentFromLocalStorage(title);
 }
 
+function getCharactersForQuery(storyDocument) {
+  return JSON.stringify(Object.values(storyDocument.characters), null, 2);
+}
+
 async function generateStoryContents() {
   const storyTitle = getCurrentTitle();
   const storyDocument = getStoryDocumentByTitle(storyTitle);
@@ -586,11 +601,7 @@ async function generateStoryContents() {
     // `This is the setting of the story: "${storyDocument.setting}"`,
     // `This is the synopsis of the story: "${storyDocument.synopsis}"`,
     // `This is the outline of the story: ${outline.join("\n")}`,
-    `These are the main characters involved in the story: ${JSON.stringify(
-      storyDocument.characters,
-      null,
-      2
-    )}`,
+    `These are the main characters involved in the story: ${getCharactersForQuery(storyDocument)}`,
     `CRITICAL: The generated story MUST strictly adhere to this writing style style: ${storyDocument.style}`,
     `CRITICAL: The primary goal is to generate content ONLY for the specified chapter, strictly following its description and scenes.`,
     `CRITICAL: Maintain narrative consistency with the overall story progression implied by the chapter outlines.`,

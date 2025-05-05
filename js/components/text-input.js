@@ -7,11 +7,12 @@ const TEXT_INPUT_STYLE = `
 }
 
 .${TEXT_INPUT_CLS} {
-  background-color: ${Colors.BACKGROUND_DEFAULT};
+  background-color: ${Colors.PAPER_BACKGROUND};
   border: none;
   border-radius: ${DimensionsPx.SMALL};
-  color: ${Colors.TEXT};
+  color: ${Colors.PAPER_TEXT};
   cursor: pointer;
+  font-family: ${Font.DEFAULT_FAMILY};
   font-size: 1em;
   padding: ${DimensionsPx.MEDIUM} ${DimensionsPx.MLARGE};
   text-decoration: none;
@@ -89,7 +90,7 @@ customElements.define(
 ${textInputTitleStyle(this.textAreaEl)}
 }`;
         this.root.appendChild(style);
-      }, 300);
+      }, DEFAULT_RENDER_DELAY_MS);
     }
   }
 );

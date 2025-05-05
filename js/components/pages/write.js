@@ -126,7 +126,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
         <line-input
           id="${WritePageIds.NEW_CHARACTER_INPUT}"
           placeholder="${AppText.NEW_CHARACTER_GUIDELINE}"
-          style="width: calc(100vw - 223px)">
+          style="width: calc(100vw - 240px)">
         </line-input>
         <paper-button
           id="${WritePageIds.ADD_CHARACTER_BTN}"
@@ -147,7 +147,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
         <line-input
           id="${WritePageIds.GENERATE_OUTLINE_INPUT}"
           placeholder="${AppText.GENERATE_OUTLINE_GUIDE}"
-          style="width: calc(100vw - 238px)">
+          style="width: calc(100vw - 260px)">
         </line-input>
         <paper-button
           id="${WritePageIds.GENERATE_OUTLINE}"
@@ -521,11 +521,7 @@ customElements.define(
           `This is the genre of the story: "${storyDocument.genre}"`,
           `This is the setting of the story: "${storyDocument.setting}"`,
           `This is the synopsis of the story: "${storyDocument.synopsis}"`,
-          `These are the existing characters: ${JSON.stringify(
-            storyDocument.characters,
-            null,
-            2
-          )}`,
+          `These are the existing characters: ${getCharactersForQuery(storyDocument)}`,
           `Attempt to maintain a balance between the ages, cultures and genders of characters.`,
           `The character should be tailored to the story based on the synopsis.`,
           `The character should not be redundant with the existing characters.`,
@@ -559,7 +555,7 @@ customElements.define(
             `[name="${result.character.name}"]`
           )
         )?.focus();
-      }, 300);
+      }, DEFAULT_RENDER_DELAY_MS);
     };
 
     /**
@@ -602,11 +598,7 @@ customElements.define(
           `This is the genre of the story: "${storyDocument.genre}"`,
           `This is the setting of the story: "${storyDocument.setting}"`,
           `This is the synopsis of the story: "${storyDocument.synopsis}"`,
-          `These are the existing characters: ${JSON.stringify(
-            storyDocument.characters,
-            null,
-            2
-          )}`,
+          `These are the existing characters: ${getCharactersForQuery(storyDocument)}`,
           `The outline should be tailored to the story based on the synopsis.`,
           outlinePrompt &&
             `The outline should adhere to the following instructions: ${outlinePrompt}`,

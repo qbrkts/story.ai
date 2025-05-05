@@ -10,7 +10,7 @@ const PROGRESS_INDICATOR_TEMPLATE = (
 ) => {
   const progressPercent = progressRatio * 100;
   return `
-<div id="${ProgressIndicatorIds.CONTAINER}"} title="${Math.round(
+<div id="${ProgressIndicatorIds.CONTAINER}" title="${Math.round(
     progressPercent
   )} percent complete">
 </div>
@@ -39,11 +39,11 @@ const PROGRESS_INDICATOR_TEMPLATE = (
 }
 #${ProgressIndicatorIds.CONTAINER}::before {
   width: 100%;
-  background-color: ${Colors.BACKGROUND_DEFAULT};
+  background-color: ${Colors.BUTTON_TEXT};
 }
 #${ProgressIndicatorIds.CONTAINER}::after {
   width: ${progressPercent}%;
-  background-color: ${Colors.TEXT};
+  background-color: ${Colors.BUTTON_BACKGROUND};
 }
 </style>
 `;
