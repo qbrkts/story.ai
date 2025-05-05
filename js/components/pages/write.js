@@ -39,7 +39,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
 
   <div>
     <h2>${AppText.WRITE}</h2>
-    <div style="display: flex; flex-direction: row; gap: ${
+    <div style="display: flex; flex-direction: row; justify-content: center; gap: ${
       DimensionsPx.LARGE
     };">
       <line-input
@@ -54,24 +54,28 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
       </paper-button>
     </div>
 
-    <details open id=${WritePageIds.STORY_SUMMARY_SECTION}>
+    <br />
+    <br />
+    <text-input
+      id="${WritePageIds.SUMMARY_TEXT_INPUT}"
+      style="${TEXT_INPUT_INLINE_STYLE}"
+      placeholder="${AppText.BRAIN_DUMP}">
+    </text-input>
+    <br />
+    <br />
+    <paper-button
+      id="${WritePageIds.STORY_STYLE_SETTING_GENRE_BTN}"
+      title="${AppText.GENERATE_STYLE_AND_SETTING}">
+      ${AppText.GENERATE_STYLE_AND_SETTING}
+    </paper-button>
+    <br />
+    <br />
+
+    <details id=${WritePageIds.STORY_SUMMARY_SECTION}>
       <summary style="cursor: pointer; margin: ${DimensionsPx.MLARGE};">
         ${AppText.SUMMARY}
       </summary>
       <div style="display: flex; flex-direction: column;">
-        <text-input
-          id="${WritePageIds.SUMMARY_TEXT_INPUT}"
-          style="${TEXT_INPUT_INLINE_STYLE}"
-          placeholder="${AppText.BRAIN_DUMP}">
-        </text-input>
-        <br />
-        <paper-button
-          id="${WritePageIds.STORY_STYLE_SETTING_GENRE_BTN}"
-          title="${AppText.GENERATE_STYLE_AND_SETTING}">
-          ${AppText.GENERATE_STYLE_AND_SETTING}
-        </paper-button>
-        <br />
-        <br />
         <line-input
           id="${WritePageIds.GENRE_TEXT_INPUT}"
           list="${WritePageIds.GENRE_LIST}"
@@ -388,9 +392,13 @@ customElements.define(
         this.storySummaryBrainDumpInput.focus();
         return;
       }
-      const hasStyleOrSetting = storyDocument.style || storyDocument.setting;
+      const hasStyleOrSetting =
+        storyDocument.style ||
+        (storyDocument.setting &&
+          storyDocument.setting != StoryDefaults.setting.EARTH);
       if (hasStyleOrSetting) {
         alert(AppText.STYLE_OR_SETTING_ALREADY_PRESENT);
+        this.openSection(this.storySummarySection);
         if (storyDocument.style) {
           this.storyStyleInput.focus();
         } else {
@@ -455,6 +463,8 @@ customElements.define(
       console.log(storyDocument);
       addStoryDocumentToLocalStorage(currentTitle, storyDocument);
       this.render();
+      this.openSection(this.storySummarySection);
+      this.synopsisGenBtn.focus();
     };
 
     /**

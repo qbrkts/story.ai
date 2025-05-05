@@ -118,7 +118,7 @@ const AppText = {
   GEMINI_API_KEY_NOT_SET: "Gemini API Key not set",
   GENERATE_CHAPTER: "Generate chapter",
   GENERATE_CHAPTER_GUIDE:
-    "Include any specific directions for the outline you want to create. Example, medium length story with 20 chapters and 3000 words per chapter etc. This will replace existing chapters and scenes.",
+    "Include any specific directions for the chapter you want to create. Example, 4000 word chapter for a medium length story etc.",
   GENERATE_STYLE_AND_SETTING: "Generate style and setting",
   GENERATE_SYNOPSIS: "Generate synopsis",
   GENERATE_SYNOPSIS_INSTRUCTIONS:
@@ -130,7 +130,7 @@ const AppText = {
     "Optionally enter the name and any traits to guide character generation.",
   NO_API_KEY: "If you do not have an api key, visit here to generate one.",
   NO_STORY_CONTENT:
-    "This story has no content. Attempting to generate some from the outline. If you want to make any changes, return to the chapters outline page and make changes.",
+    "This story has no content. Attempting to generate some from the outline. If you want to make any changes, return to the write page and make changes.",
   NO_STORIES_YET: "No stories yet... continue above",
   NO_STORY_SELECTED: "No story selected",
   OUTLINE: "Outline",
@@ -624,6 +624,7 @@ async function generateStoryContents() {
   for (let i = 0; i < window.__chapterCount; i++) {
     const chapter = outline[i];
     const chapNum = i + 1;
+    // TODO: ensure the chapter meets the required length
     if (chapter.content) {
       console.log("chap already had content", chapNum);
       window.__chaptersGenerated += 1;
