@@ -105,6 +105,7 @@ const AppText = {
   COPYRIGHT: "Copyright",
   COPY_SHARE_LINK_SUCCESS: "Successfully copied share link to clipboard",
   CHARACTERS: "Characters",
+  DELETE_CHAPTER: "Delete",
   ENTER_GEMINI_API_KEY: "Enter your Gemini API Key",
   ENTER_GENRE: "Enter genre e.g. Sci-Fi Fantasy, Thriller Romance",
   ENTER_STYLE:
@@ -542,6 +543,7 @@ const DEFAULT_DOCUMENT = {
    * }]
    */
   outline: [],
+  outlineGuide: "",
 };
 /** @returns {typeof DEFAULT_DOCUMENT} */
 function getStoryDocumentByTitle(title) {

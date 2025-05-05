@@ -205,6 +205,14 @@ customElements.define(
 
       this.generateOutlineBtn.handler = this.generateOutline;
 
+      this.generateOutlineInput.addEventListener("input", () => {
+        const currentTitle = getCurrentTitle();
+        const storyDocument = getStoryDocumentByTitle(currentTitle);
+        storyDocument.outlineGuide =
+          this.generateOutlineInput.value?.trim() || "";
+        addStoryDocumentToLocalStorage(currentTitle, storyDocument);
+      });
+
       this.storySummaryBrainDumpInput.addEventListener("input", () => {
         const currentTitle = getCurrentTitle();
         const storyDocument = getStoryDocumentByTitle(currentTitle);
@@ -296,9 +304,10 @@ customElements.define(
         });
     };
 
-    renderOutline = (storyDocument) => {
+    renderOutline = (/** @type {typeof DEFAULT_DOCUMENT} */ storyDocument) => {
+      this.generateOutlineInput.value = storyDocument.outlineGuide;
       this.outlineContainer.innerHTML = "";
-      storyDocument.outline.forEach((outline, i) => {
+      storyDocument.outline.forEach((outline, i, outlines) => {
         const outlineEl = /** @type {import ('../../../types').TextInput} */ (
           document.createElement(ComponentName.TEXT_INPUT)
         );
@@ -314,10 +323,26 @@ customElements.define(
           storyDocument.outline[i].title = chapterTitle;
           storyDocument.outline[i].description = description.join("\n").trim();
           // clear generated story content if outline changes
-          storyDocument.outline[i].scenes = "";
-          storyDocument.outline[i].content = "";
+          for (let j = i; j < outlines.length; j++) {
+            storyDocument.outline[j].scenes = "";
+            storyDocument.outline[j].content = "";
+          }
           addStoryDocumentToLocalStorage(storyTitle, storyDocument);
         });
+        const deleteBtn = /** @type {import ('../../../types').PaperButton} */ (
+          document.createElement(ComponentName.PAPER_BUTTON)
+        );
+        deleteBtn.title = AppText.DELETE_CHAPTER;
+        deleteBtn.innerText = AppText.DELETE_CHAPTER;
+        deleteBtn.handler = () => {
+          const storyTitle = getCurrentTitle();
+          const storyDocument = getStoryDocumentByTitle(storyTitle);
+          storyDocument.outline.splice(i, 1);
+          addStoryDocumentToLocalStorage(storyTitle, storyDocument);
+          // outlineEl.remove();
+          this.renderOutline(storyDocument);
+        };
+        outlineEl.root.append(deleteBtn);
         this.outlineContainer.appendChild(outlineEl);
       });
     };

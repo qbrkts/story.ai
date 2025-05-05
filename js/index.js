@@ -23,7 +23,7 @@ const style = document.createElement("style");
 style.innerHTML = `
 html,
 body {
-  background-color: ${Colors.PAPER_BACKGROUND};
+  background: linear-gradient(transparent, ${Colors.PAPER_BACKGROUND}, transparent);
   scroll-behavior: smooth;
 }
 

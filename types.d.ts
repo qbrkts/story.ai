@@ -8,7 +8,9 @@ export class ProgressIndicator extends HTMLElement {
 
 export class LineInput extends HTMLInputElement {}
 
-export class TextInput extends HTMLTextAreaElement {}
+export class TextInput extends HTMLTextAreaElement {
+  root: ShadowRoot;
+}
 
 export class PaperButton extends HTMLButtonElement {
   handler(e: MouseEvent): unknown;
