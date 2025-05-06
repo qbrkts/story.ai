@@ -318,11 +318,13 @@ customElements.define(
         viewBtn.innerHTML = AppText.VIEW_CHAPTER;
         viewBtn.handler = async () => {
           viewBtn.disabled = true;
-          const storyDocument = getStoryDocumentByTitle(getCurrentTitle());
+          let storyDocument = getStoryDocumentByTitle(getCurrentTitle());
           let chapter = storyDocument.outline[i];
-          if (!chapter.content) {
-            chapter = (await generateStoryContents([i + 1])).outline[i];
-          }
+          const chaptersToGenerate = new Array(storyDocument.outline.length - i)
+            .fill(null)
+            .map((_, j) => i + j + 1);
+          storyDocument = await generateStoryContents(chaptersToGenerate);
+          chapter = storyDocument.outline[i];
           const pageDialog = getPageDialog(
             `<chapter-content>
             <h4>${AppText.CHAPTER} ${i + 1}: ${chapter.title}</h4>
