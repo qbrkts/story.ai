@@ -118,6 +118,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
       <summary style="cursor: pointer; padding: ${DimensionsPx.MLARGE};">
         ${AppText.CHARACTERS}
       </summary>
+      <p>${AppText.REMOVE_CHARACTER_GUIDE}</p>
       <div
         style="display: flex; flex-direction: column;"
         id=${WritePageIds.CHARACTERS_CONTAINER}>
@@ -647,7 +648,13 @@ customElements.define(
         Object.entries(result.character)
           .map((v) => v.join(": "))
           .join("\n\n");
-      alert(AppText.SUCCESS_NEW_CHARACTER + "\n\n" + characterName);
+      alert(
+        [
+          AppText.SUCCESS_NEW_CHARACTER,
+          AppText.REMOVE_CHARACTER_GUIDE,
+          characterName,
+        ].join("\n\n")
+      );
       addStoryDocumentToLocalStorage(title, storyDocument);
       this.addCharacterBtn.disabled = false;
       this.render();

@@ -159,7 +159,8 @@ const AppText = {
   STORY_STYLE_NOT_SET:
     "Deciding on a style will help generate outlines, scenes and chapters for your story in a consistent way.",
   SUCCESS: "Success",
-  SUCCESS_NEW_CHARACTER: `Successfully generated new character. Add any extra traits to their description matching the same format. To remove a character, replace their description with '${DELETE_CHARACTER_MARKER}'.`,
+  SUCCESS_NEW_CHARACTER: `Successfully generated new character. Add any extra traits to their description matching the same format.`,
+  REMOVE_CHARACTER_GUIDE: `To remove a character, replace their description with '${DELETE_CHARACTER_MARKER}'.`,
   SUCCESS_NEW_CHAPTER: `Successfully generated a new chapter`,
   SUMMARY: "Summary",
   STYLE_OR_SETTING_ALREADY_PRESENT:
