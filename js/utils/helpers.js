@@ -167,7 +167,7 @@ const AppText = {
     "Delete the existing story style and settings if you want to generate new ones.",
   UPDATE_GEMINI_API_KEY: "Update",
   UPDATE_STORY_TITLE: "Update story title",
-  VIEW_CHAPTER: "View Chapter",
+  VIEW_CHAPTER: "View",
   VISIT_STORIES: "Visit stories",
   WELCOME: "Welcome",
   WRITE: "Write",
