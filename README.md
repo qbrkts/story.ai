@@ -5,5 +5,6 @@ Assists with writing stories from novel ideas.
 ## TODO
 
 - [ ] During outline generation create a changelog for the world setting, character traits and relationships
-- [ ] Add controls for length of chapter generated
+- [ ] Have the tool review the outline and story contents generated for improvements to story structure and formatting
+- [ ] Tag shared story with the title of the story for easier linking (take into account multiple stories with the same title)
 - [ ] Add graphic novel visualisation
