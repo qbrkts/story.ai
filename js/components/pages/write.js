@@ -70,7 +70,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
     <br />
 
     <details id=${WritePageIds.STORY_SUMMARY_SECTION}>
-      <summary style="cursor: pointer; margin: ${DimensionsPx.MLARGE};">
+      <summary style="cursor: pointer; padding: ${DimensionsPx.MLARGE};">
         ${AppText.SUMMARY}
       </summary>
       <div style="display: flex; flex-direction: column;">
@@ -115,7 +115,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
     </details>
 
     <details id=${WritePageIds.STORY_CHARACTERS_SECTION}>
-      <summary style="cursor: pointer; margin: ${DimensionsPx.MLARGE};">
+      <summary style="cursor: pointer; padding: ${DimensionsPx.MLARGE};">
         ${AppText.CHARACTERS}
       </summary>
       <div
@@ -140,7 +140,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
     </details>
 
     <details id=${WritePageIds.STORY_OUTLINE_SECTION}>
-      <summary style="cursor: pointer; margin: ${DimensionsPx.MLARGE};">
+      <summary style="cursor: pointer; padding: ${DimensionsPx.MLARGE};">
         ${AppText.OUTLINE}
       </summary>
       <div
@@ -293,13 +293,12 @@ customElements.define(
         addChapterBtn.handler = async () => {
           const chapterPrompt = prompt(
             AppText.GENERATE_CHAPTER_GUIDE,
-            "This chapter is " +
-              [
-                i >= 0 && `after chapter ${i + 1}`,
-                i < outlines.length - 1 && `before chapter ${i + 2}`,
-              ]
-                .filter(Boolean)
-                .join(" and ")
+            [
+              i >= 0 && `after chapter ${i + 1}`,
+              i < outlines.length - 1 && `before chapter ${i + 2}`,
+            ]
+              .filter(Boolean)
+              .join(" and ") || `Chapter 1`
           );
           if (!chapterPrompt) {
             return;

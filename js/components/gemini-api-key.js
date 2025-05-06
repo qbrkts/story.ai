@@ -9,7 +9,7 @@ const GEMINI_API_KEY_CODE_TEMPLATE = `
 <details id="gemini-api-key-details" style="margin: ${DimensionsPx.MLARGE}" ${
   isGeminiKeySet() ? "" : "open"
 }>
-  <summary style="cursor:pointer; margin-bottom: ${DimensionsPx.MEDIUM}">
+  <summary style="cursor:pointer; padding: ${DimensionsPx.MEDIUM}">
     ${AppText.GEMINI_API_KEY}
   </summary>
   <br />

@@ -73,19 +73,26 @@ customElements.define(
         window.__cacheShareLinks = {};
       }
       if (!window.__cacheShareLinks[storyContents]) {
-        const name = prompt(AppText.ENTER_NAME)?.trim(); // Use optional chaining and trim
+        const name = prompt(
+          AppText.ENTER_NAME
+          // AppText.DEFAULT_NAME
+        )?.trim(); // Use optional chaining and trim
         if (!name) {
           console.warn("Author name not provided. Share cancelled.");
           alert("Author name is required to share."); // Inform user
           return;
         }
-        const email = prompt(AppText.ENTER_EMAIL)?.trim(); // Use optional chaining and trim
+        const email = prompt(
+          AppText.ENTER_EMAIL
+          // AppText.DEFAULT_EMAIL
+        )?.trim(); // Use optional chaining and trim
         if (!email) {
           console.warn("Author email not provided. Share cancelled.");
           alert("Author email is required to share."); // Inform user
           return;
         }
         const storyRef = await storeTextInRepo({
+          commitMessage: title,
           author: { name, email },
           content: storyContents,
         });
