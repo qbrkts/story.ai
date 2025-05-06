@@ -6,6 +6,10 @@ export class ProgressIndicator extends HTMLElement {
   value: number;
 }
 
+export class ChapterContent extends HTMLElement {
+  addInfo(info: string): void;
+}
+
 export class LineInput extends HTMLInputElement {}
 
 export class TextInput extends HTMLTextAreaElement {

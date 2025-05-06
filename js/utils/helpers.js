@@ -107,8 +107,8 @@ const AppText = {
   COPY_SHARE_LINK_SUCCESS: "Successfully copied share link to clipboard",
   CHARACTERS: "Characters",
   DELETE_CHAPTER: "Delete",
-  DEFAULT_EMAIL: 'anon@mail.com',
-  DEFAULT_NAME: 'Anonymous',
+  DEFAULT_EMAIL: "anon@mail.com",
+  DEFAULT_NAME: "Anonymous",
   ENTER_GEMINI_API_KEY: "Enter your Gemini API Key",
   ENTER_GENRE: "Enter genre e.g. Sci-Fi Fantasy, Thriller Romance",
   ENTER_STYLE:
@@ -129,6 +129,8 @@ const AppText = {
   INFINITE_STORIES: "Enter the world of infinite tales",
   INVALID_API_KEY: "Please enter a valid API Key.",
   LOADING: "Loading...",
+  MODIFY_OUTLINE_TO_REGENERATE_CHAPTER_CONTENT:
+    "To edit the generated chapter, modify the chapter outline description",
   NEW_CHARACTER_GUIDELINE:
     "Optionally enter the name and any traits to guide character generation.",
   NO_API_KEY: "If you do not have an api key, visit here to generate one.",
@@ -164,6 +166,7 @@ const AppText = {
     "Delete the existing story style and settings if you want to generate new ones.",
   UPDATE_GEMINI_API_KEY: "Update",
   UPDATE_STORY_TITLE: "Update story title",
+  VIEW_CHAPTER: "View Chapter",
   VISIT_STORIES: "Visit stories",
   WELCOME: "Welcome",
   WRITE: "Write",
@@ -591,7 +594,9 @@ function getCharactersForQuery(storyDocument) {
   return JSON.stringify(Object.values(storyDocument.characters), null, 2);
 }
 
-async function generateStoryContents() {
+async function generateStoryContents(
+  /** @type {number[]} */ chaptersToGenerate = []
+) {
   const storyTitle = getCurrentTitle();
   const storyDocument = getStoryDocumentByTitle(storyTitle);
 
@@ -623,8 +628,11 @@ async function generateStoryContents() {
   }
 
   const outline = storyDocument.outline;
-  const chapWordCount = window.__chapterCount * 200;
-  for (let i = 0; i < window.__chapterCount; i++) {
+  const chapterIndexes =
+    chaptersToGenerate && chaptersToGenerate.length > 0
+      ? chaptersToGenerate.map((chapterNum) => chapterNum - 1)
+      : new Array(window.__chapterCount).fill(null).map((_, i) => i);
+  for (const i of chapterIndexes) {
     const chapter = outline[i];
     const chapNum = i + 1;
     // TODO: ensure the chapter meets the required length
@@ -666,7 +674,10 @@ async function generateStoryContents() {
         false
       );
       console.log(sceneResult);
-      chapter.scenes = sceneResult.scenes;
+      // reload story document incase other changes have been made to it
+      const storyDocument = getStoryDocumentByTitle(storyTitle);
+      storyDocument.outline[i].scenes = sceneResult.scenes;
+      Object.assign(chapter, storyDocument.outline[i]);
       addStoryDocumentToLocalStorage(storyTitle, storyDocument);
     }
     window.__chaptersGenerationProgress += chapterGenerationStepSize;
@@ -684,11 +695,10 @@ async function generateStoryContents() {
         ...promptParts,
         `CRITICAL: Write the narrative by strictly following the scenes provided above, in order.`,
         `CRITICAL: Ensure the tone, style, and character voices are consistent with the overall style provided.`,
-        `CRITICAL: Aim for a chapter length of approximately ${chapWordCount} words.`,
         `CRITICAL: Prioritize fulfilling the scenes and narrative flow.`,
         `CRITICAL: The chapter should be well formatted with appropriate paragraphs line breaks.`,
         `CRITICAL: Do not include the chapter title in the contents.`,
-        `CRITICAL: Do not inlcude scene notation in the contents.`,
+        `CRITICAL: Do not include scene notation in the contents.`,
         `CRITICAL: Format the chapter content with double line spaces ensure dialog is clearly readable.`,
       ].join("\n\n"),
       `{content: "Full narrative content for chapter ${chapNum} in plain text, adhering strictly to the provided scenes and style."}`,
@@ -696,6 +706,9 @@ async function generateStoryContents() {
       false
     );
     console.log(chapterResult);
+    // reload story document incase other changes have been made to it
+    const storyDocument = getStoryDocumentByTitle(storyTitle);
+    chapterResult.content = chapterResult.content.split("\n").join("\n");
     storyDocument.outline[i].content = chapterResult.content;
     addStoryDocumentToLocalStorage(storyTitle, storyDocument);
     // add chapter content to story
@@ -703,7 +716,7 @@ async function generateStoryContents() {
     window.__chaptersGenerationProgress =
       window.__chaptersGenerated / window.__chapterCount;
   }
-  addStoryDocumentToLocalStorage(storyTitle, storyDocument);
+  return getStoryDocumentByTitle(storyTitle);
 }
 
 function fallbackCopyTextToClipboard(text) {
@@ -744,4 +757,42 @@ async function copyTextToClipboard(text) {
     console.error("Async: Could not copy text: ", err);
     fallbackCopyTextToClipboard(text);
   }
+}
+
+function getPageDialog(contentHTML = "") {
+  const PAGE_DIALOG_ID = "page-dialog";
+  const pageDialog = /** @type {HTMLDialogElement} */ (
+    document.getElementById(PAGE_DIALOG_ID) || document.createElement("dialog")
+  );
+  if (!pageDialog.id) {
+    pageDialog.style.backgroundColor = "transparent";
+    pageDialog.style.border = "none";
+    pageDialog.style.margin = "auto";
+    pageDialog.style.padding = "0";
+    pageDialog.style.textAlign = "center";
+    pageDialog.innerHTML = `
+<div style="
+    background: ${Colors.PAPER_BACKGROUND};
+    border-radius: ${DimensionsPx.SMALL};
+    color: ${Colors.PAPER_TEXT};
+    display: flex;
+    flex-direction: column;
+    font-family: ${Font.DEFAULT_FAMILY};
+    overflow: hidden;
+    padding: ${DimensionsPx.LARGE};
+    margin: ${DimensionsPx.LARGE} auto;
+    width: 50%;">
+</div>`;
+    pageDialog.id = PAGE_DIALOG_ID;
+    document.body.appendChild(pageDialog);
+  }
+  if (pageDialog.firstElementChild) {
+    pageDialog.firstElementChild.innerHTML = contentHTML;
+    pageDialog.firstElementChild.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  }
+  pageDialog.addEventListener("click", () => pageDialog.close());
+  return pageDialog;
 }

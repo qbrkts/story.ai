@@ -10,9 +10,14 @@ const CHAPTER_CONTENT_CODE_TEMPLATE = `
 </div>
 <style>
 #${ChapterContentIds.TEXT_BLOCK} {
-  white-space: pre-wrap;
+  white-space: break-spaces;
 }
 #${ChapterContentIds.INFO} {
+  display: flex;
+  flex-direction: row;
+  gap: ${DimensionsPx.MEDIUM};
+  justify-content: space-between;
+  border-bottom: solid ${DimensionsPx.XXSMALL} ${Colors.BUTTON_BACKGROUND};
 }
 </style>
 `;
@@ -24,15 +29,29 @@ customElements.define(
       super();
       this.attachShadow({ mode: "open" });
       this.root.innerHTML = CHAPTER_CONTENT_CODE_TEMPLATE;
+      this.info = [];
     }
 
     connectedCallback() {
+      const chapterWordCount = this.innerText.split(" ").length;
+      this.info.push(`${chapterWordCount} words`);
       this.render();
     }
 
     render() {
-      const chapterWordCount = this.innerText.split(" ").length;
-      this.contentInfoEl.innerText = `${chapterWordCount} words`;
+      this.contentInfoEl.innerHTML = this.info
+        .map((text) => `<span>${text}</span>`)
+        .join("");
+    }
+
+    addInfo(...text) {
+      this.info.push(...text);
+      this.render();
+    }
+
+    setInfo(...text) {
+      this.info.splice(0, this.info.length, ...text);
+      this.render();
     }
 
     get root() {

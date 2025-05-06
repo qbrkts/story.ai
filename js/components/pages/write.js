@@ -303,11 +303,61 @@ customElements.define(
           if (!chapterPrompt) {
             return;
           }
-          await this.generateChapter(i + 1, chapterPrompt);
+          await this.generateChapterDescription(i + 1, chapterPrompt);
           this.renderOutline(getStoryDocumentByTitle(getCurrentTitle()));
         };
         containerEl.appendChild(addChapterBtn);
         return addChapterBtn;
+      };
+
+      const addViewChapterBtn = (i, containerEl) => {
+        const viewBtn = /** @type {import ('../../../types').PaperButton} */ (
+          document.createElement(ComponentName.PAPER_BUTTON)
+        );
+        viewBtn.title = AppText.VIEW_CHAPTER;
+        viewBtn.innerHTML = AppText.VIEW_CHAPTER;
+        viewBtn.handler = async () => {
+          viewBtn.disabled = true;
+          const storyDocument = getStoryDocumentByTitle(getCurrentTitle());
+          let chapter = storyDocument.outline[i];
+          if (!chapter.content) {
+            chapter = (await generateStoryContents([i + 1])).outline[i];
+          }
+          const pageDialog = getPageDialog(
+            `<chapter-content>
+            <h4>${AppText.CHAPTER} ${i + 1}: ${chapter.title}</h4>
+            <span>${chapter.content}</span>
+            </chapter-content>`
+          );
+          const chapterContentEl =
+            /** @type {import('../../../types').ChapterContent} */ (
+              pageDialog.getElementsByTagName(ComponentName.CHAPTER_CONTENT)[0]
+            );
+          chapterContentEl.addInfo(
+            AppText.MODIFY_OUTLINE_TO_REGENERATE_CHAPTER_CONTENT
+          );
+          pageDialog.showModal();
+          viewBtn.disabled = false;
+        };
+        containerEl.appendChild(viewBtn);
+        return viewBtn;
+      };
+
+      const addDeleteChapterBtn = (i, containerEl) => {
+        const deleteBtn = /** @type {import ('../../../types').PaperButton} */ (
+          document.createElement(ComponentName.PAPER_BUTTON)
+        );
+        deleteBtn.title = AppText.DELETE_CHAPTER;
+        deleteBtn.innerText = AppText.DELETE_CHAPTER;
+        deleteBtn.handler = () => {
+          const storyTitle = getCurrentTitle();
+          const storyDocument = getStoryDocumentByTitle(storyTitle);
+          storyDocument.outline.splice(i, 1);
+          addStoryDocumentToLocalStorage(storyTitle, storyDocument);
+          this.renderOutline(storyDocument);
+        };
+        containerEl.appendChild(deleteBtn);
+        return deleteBtn;
       };
 
       const createFirstChapterBtn = addCreateChapterBtn(
@@ -348,21 +398,10 @@ customElements.define(
         chapterControlsContainerEl.style.justifyContent = "end";
         chapterControlsContainerEl.style.gap = DimensionsPx.MEDIUM;
 
+        // view chapter controls
+        addViewChapterBtn(i, chapterControlsContainerEl);
         // delete chapter control
-        const deleteBtn = /** @type {import ('../../../types').PaperButton} */ (
-          document.createElement(ComponentName.PAPER_BUTTON)
-        );
-        deleteBtn.title = AppText.DELETE_CHAPTER;
-        deleteBtn.innerText = AppText.DELETE_CHAPTER;
-        deleteBtn.handler = () => {
-          const storyTitle = getCurrentTitle();
-          const storyDocument = getStoryDocumentByTitle(storyTitle);
-          storyDocument.outline.splice(i, 1);
-          addStoryDocumentToLocalStorage(storyTitle, storyDocument);
-          this.renderOutline(storyDocument);
-        };
-        chapterControlsContainerEl.appendChild(deleteBtn);
-
+        addDeleteChapterBtn(i, chapterControlsContainerEl);
         // insert chapter here control
         addCreateChapterBtn(i, outlines, chapterControlsContainerEl);
 
@@ -619,7 +658,7 @@ customElements.define(
       }, DEFAULT_RENDER_DELAY_MS);
     };
 
-    generateChapter = async (
+    generateChapterDescription = async (
       /** @type {number} */ chapNum,
       /** @type {string | undefined} */ chapterPrompt
     ) => {
