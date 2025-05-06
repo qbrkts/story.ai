@@ -320,9 +320,9 @@ customElements.define(
           viewBtn.disabled = true;
           let storyDocument = getStoryDocumentByTitle(getCurrentTitle());
           let chapter = storyDocument.outline[i];
-          const chaptersToGenerate = new Array(storyDocument.outline.length - i)
+          const chaptersToGenerate = new Array(i + 1)
             .fill(null)
-            .map((_, j) => i + j + 1);
+            .map((_, j) => j + 1);
           storyDocument = await generateStoryContents(chaptersToGenerate);
           chapter = storyDocument.outline[i];
           const pageDialog = getPageDialog(
