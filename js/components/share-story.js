@@ -100,6 +100,10 @@ customElements.define(
       }
       const continueRef = window.__cacheShareLinks[storyContents];
       const storyUrl = `${STORY_AI_NS}/?continue=${continueRef}`;
+      getPageDialog(
+        `<h2>${AppText.SHARE_STORY}</h2>
+        <a href="${storyUrl}">${storyUrl}</a>`
+      ).showModal();
       copyTextToClipboard(storyUrl);
     };
   }

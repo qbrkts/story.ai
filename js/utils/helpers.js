@@ -781,7 +781,8 @@ function getPageDialog(contentHTML = "") {
     overflow: hidden;
     padding: ${DimensionsPx.LARGE};
     margin: ${DimensionsPx.LARGE} auto;
-    width: 50%;">
+    width: 50%;
+    word-break: break-word;">
 </div>`;
     pageDialog.id = PAGE_DIALOG_ID;
     document.body.appendChild(pageDialog);
