@@ -97,6 +97,7 @@ const Level = {
 
 const DELETE_CHARACTER_MARKER = "delete";
 const AppText = {
+  ADD_CHAPTER: "Add Chapter",
   ADD_CHARACTER: "Add Character",
   API_KEY_SAVED: "API Key updated successfully!",
   BRAIN_DUMP:
@@ -542,7 +543,6 @@ const DEFAULT_DOCUMENT = {
    * }]
    */
   outline: [],
-  outlineGuide: "",
 };
 /** @returns {typeof DEFAULT_DOCUMENT} */
 function getStoryDocumentByTitle(title) {
@@ -606,7 +606,7 @@ async function generateStoryContents() {
     `These are the main characters involved in the story: ${getCharactersForQuery(
       storyDocument
     )}`,
-    `CRITICAL: The generated story MUST strictly adhere to this writing style style: ${storyDocument.style}`,
+    `CRITICAL: The generated story MUST strictly adhere to this writing style: ${storyDocument.style}`,
     `CRITICAL: The primary goal is to generate content ONLY for the specified chapter, strictly following its description and scenes.`,
     `CRITICAL: Maintain narrative consistency with the overall story progression implied by the chapter outlines.`,
     `CRITICAL: The generated content MUST be set up that the story flows between the scenes and chapters in a natural way.`,
@@ -686,6 +686,8 @@ async function generateStoryContents() {
         `CRITICAL: Prioritize fulfilling the scenes and narrative flow.`,
         `CRITICAL: The chapter should be well formatted with appropriate paragraphs line breaks.`,
         `CRITICAL: Do not include the chapter title in the contents.`,
+        `CRITICAL: Do not inlcude scene notation in the contents.`,
+        `CRITICAL: Format the chapter content with double line spaces ensure dialog is clearly readable.`,
       ].join("\n\n"),
       `{content: "Full narrative content for chapter ${chapNum} in plain text, adhering strictly to the provided scenes and style."}`,
       GeminiConfig.Temperature.BALANCED,
