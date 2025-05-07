@@ -119,6 +119,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
         ${AppText.CHARACTERS}
       </summary>
       <p>${AppText.REMOVE_CHARACTER_GUIDE}</p>
+      <br />
       <div
         style="display: flex; flex-direction: column;"
         id=${WritePageIds.CHARACTERS_CONTAINER}>

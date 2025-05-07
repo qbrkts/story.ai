@@ -18,6 +18,7 @@ const CHAPTER_CONTENT_CODE_TEMPLATE = `
   gap: ${DimensionsPx.MEDIUM};
   justify-content: space-between;
   border-bottom: solid ${DimensionsPx.XXSMALL} ${Colors.BUTTON_BACKGROUND};
+  flex-wrap: wrap;
 }
 </style>
 `;

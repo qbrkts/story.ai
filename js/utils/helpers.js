@@ -768,6 +768,7 @@ function getPageDialog(contentHTML = "") {
   if (!pageDialog.id) {
     pageDialog.style.backgroundColor = "transparent";
     pageDialog.style.border = "none";
+    pageDialog.style.outline = "none;"
     pageDialog.style.margin = "auto";
     pageDialog.style.padding = "0";
     pageDialog.style.textAlign = "center";
