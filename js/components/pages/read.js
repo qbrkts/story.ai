@@ -1,3 +1,4 @@
+const REGENERATE_STORY_PROGRESS_TIMEOUT_MS = 1000;
 const ReadPageIds = {
   STORY_CONTENT: "story-content",
   PROGRESS_INDICATOR: "progress-indicator",
@@ -12,10 +13,6 @@ const READ_PAGE_CODE_TEMPLATE = () => {
   <share-story></share-story>
 
   <h2>${title}</h2>
-
-  <paper-button id=${ReadPageIds.GENERATE_STORY_CONTENT_BTN}>${AppText.GENERATE_CHAPTER}</paper-button>
-
-  <br/>
 
   <progress-indicator id=${ReadPageIds.PROGRESS_INDICATOR}></progress-indicator>
 
@@ -36,11 +33,7 @@ customElements.define(
     }
 
     connectedCallback() {
-      this.generateStoryBtn.handler = async () => {
-        await this.generateStory();
-      };
       this.render();
-      this.generateStoryBtn.disabled = window.__chaptersGenerationProgress >= 1;
     }
 
     async generateStory() {
@@ -48,20 +41,18 @@ customElements.define(
         alert(AppText.GEMINI_API_KEY_NOT_SET);
         return gotoPage({ page: Page.WRITE });
       }
-      this.generateStoryBtn.disabled = true;
       const intervalId = setInterval(() => {
         this.render();
         if (window.__chaptersGenerationProgress >= 1) {
           clearInterval(intervalId);
         }
-      }, 1000); // refresh every 1 second
+      }, REGENERATE_STORY_PROGRESS_TIMEOUT_MS);
       try {
         await generateStoryContents();
       } catch (error) {
         console.error(error);
         alert("Error occurred attempting to generate story");
       }
-      this.generateStoryBtn.disabled = window.__chaptersGenerationProgress >= 1;
     }
 
     render() {
@@ -74,9 +65,6 @@ customElements.define(
       const chapterCount = storyDocument.outline.length;
       const chapterIdxToGenerate =
         lastChapterGenerated < 0 ? chapterCount : lastChapterGenerated;
-      this.generateStoryBtn.innerText = `${AppText.GENERATE_CHAPTER} ${
-        chapterIdxToGenerate < chapterCount ? chapterIdxToGenerate + 1 : ""
-      }`;
       window.__chaptersGenerationProgress = chapterIdxToGenerate / chapterCount;
       this.progressIndicator.value = window.__chaptersGenerationProgress;
 
@@ -119,17 +107,6 @@ customElements.define(
         throw new Error("Progress indicator not found");
       }
       return progressIndicator;
-    }
-
-    get generateStoryBtn() {
-      const regenerateBtn =
-        /** @type {import('../../../types').PaperButton} */ (
-          this.root.getElementById(ReadPageIds.GENERATE_STORY_CONTENT_BTN)
-        );
-      if (!regenerateBtn) {
-        throw new Error("Generate story button not found");
-      }
-      return regenerateBtn;
     }
 
     get storyContentEl() {

@@ -1,4 +1,5 @@
 const CHARACTER_DELETE_TIMEOUT_MS = 5000;
+const PAGE_LAYOUT_TIMEOUT_MS = 150;
 const WritePageIds = {
   ADD_CHARACTER_BTN: "add-character-btn",
   CHARACTERS_CONTAINER: "characters-container",
@@ -234,6 +235,19 @@ customElements.define(
         storyDocument.setting = this.storySettingInput.value;
         addStoryDocumentToLocalStorage(currentTitle, storyDocument);
       });
+
+      setTimeout(() => {
+        const storyDocument = getStoryDocumentByTitle(getCurrentTitle());
+        if (!storyDocument.summary) {
+          this.storySummaryBrainDumpInput.click();
+        } else if (!storyDocument.synopsis) {
+          this.openSection(this.storySummarySection);
+        } else if (Object.keys(storyDocument.characters).length === 0) {
+          this.openSection(this.storyCharactersSection);
+        } else {
+          this.openSection(this.storyOutlineSection);
+        }
+      }, PAGE_LAYOUT_TIMEOUT_MS);
     }
 
     render() {
@@ -318,7 +332,7 @@ customElements.define(
           if (!chapterPrompt) {
             return;
           }
-          await this.generateChapterDescription(i + 2, chapterPrompt);
+          await this.generateChapterContent(i + 2, chapterPrompt);
           this.renderOutline(getStoryDocumentByTitle(getCurrentTitle()));
         };
         containerEl.appendChild(addChapterBtn);
@@ -330,53 +344,41 @@ customElements.define(
           document.createElement(ComponentName.PAPER_BUTTON)
         );
         const chapNum = i + 1;
-        writeBtn.title = `${AppText.WRITE_CHAPTER} ${chapNum}`;
-        writeBtn.innerHTML = AppText.WRITE;
+        const chapterName = `${AppText.CHAPTER} ${chapNum}`;
+        writeBtn.title = `${AppText.GENERATE_CHAPTER} ${chapNum}`;
+        writeBtn.innerHTML = AppText.GENERATE_CHAPTER;
         writeBtn.handler = async () => {
           writeBtn.disabled = true;
-          let storyDocument = getStoryDocumentByTitle(getCurrentTitle());
-          let chapter = storyDocument.outline[i];
-          const chaptersToGenerate = new Array(chapNum)
-            .fill(null)
-            .map((_, j) => j + 1);
-          storyDocument = await generateStoryContents(chaptersToGenerate);
-          this.renderOutline(storyDocument);
-          chapter = storyDocument.outline[i];
-          const escapedText = htmlEscape(chapter.content);
-          const pageDialog = getPageDialog(
-            `<chapter-content text="${escapedText}"></chapter-content>`
-          );
-          const chapterContentEl =
-            /** @type {import('../../../types').ChapterContent} */ (
-              pageDialog.getElementsByTagName(ComponentName.CHAPTER_CONTENT)[0]
-            );
-          chapterContentEl.addInfo(
-            AppText.MODIFY_OUTLINE_TO_REGENERATE_CHAPTER_CONTENT,
-            `${AppText.CHAPTER} ${chapNum}`
-          );
-          chapterContentEl.addEventListener("input", () => {
-            const contentValue = chapterContentEl.storyContentEl.value;
-            const storyTitle = getCurrentTitle();
-            const storyDocument = getStoryDocumentByTitle(storyTitle);
-            storyDocument.outline[i].content = contentValue;
-            addStoryDocumentToLocalStorage(storyTitle, storyDocument);
-          });
-          const lockScrollY = document.documentElement.scrollTop;
-          const resetScrollPosition = () => {
-            setTimeout(() => {
-              document.documentElement.scrollTop = lockScrollY;
-              // window.scrollTo({ left: 0, top: lockScrollY, behavior: "auto" });
-            }, 150);
-          };
-          pageDialog.showModal();
-          // resetScrollPosition();
-          pageDialog.onclose = () => {
+          const storyDocument = getStoryDocumentByTitle(getCurrentTitle());
+          const chapter = storyDocument.outline[i];
+          try {
+            if (!chapter.content) {
+              alert(AppText.GENERATE_CHAPTER_GUIDE);
+              const chapterContentInputEl =
+                /** @type {import('../../../types').TextInput} */ (
+                  this.root.querySelector(
+                    `${ComponentName.TEXT_INPUT}[title^="${chapterName}"]`
+                  )
+                );
+              chapterContentInputEl?.focus();
+              return;
+            }
+            const lockScrollY = document.documentElement.scrollTop;
+            // rewrite existing chapter
+            // const chapterPrompt = htmlEscape(chapter.content);
+            // await this.generateChapterContent(chapNum, chapterPrompt, true);
+            await generateStoryContents([chapNum]);
+            const resetScrollPosition = () => {
+              return setTimeout(() => {
+                document.documentElement.scrollTop = lockScrollY;
+                // window.scrollTo({ left: 0, top: lockScrollY, behavior: "auto" });
+              }, PAGE_LAYOUT_TIMEOUT_MS);
+            };
             this.renderOutline(getStoryDocumentByTitle(getCurrentTitle()));
-            // reset scroll position giving the layout some time to settle
-            // because for some reason rendering the dialog fucks it up
             resetScrollPosition();
-          };
-          writeBtn.disabled = false;
+          } finally {
+            writeBtn.disabled = false;
+          }
         };
         containerEl.appendChild(writeBtn);
         return writeBtn;
@@ -409,32 +411,31 @@ customElements.define(
       createFirstChapterBtn.style.alignSelf = "end";
 
       storyDocument.outline.forEach((outline, i, outlines) => {
-        const chapterOutlineEl =
+        const chapterContentInput =
           /** @type {import ('../../../types').TextInput} */ (
             document.createElement(ComponentName.TEXT_INPUT)
           );
-        chapterOutlineEl.value = `${outline.title}\n\n${
-          (Array.isArray(outline.scenes)
-            ? outline.scenes.join("\n\n")
-            : outline.scenes) || outline.description
-        }`.trim();
+
+        chapterContentInput.setAttribute(
+          "placeholder",
+          AppText.GENERATE_CHAPTER_GUIDE
+        );
+        chapterContentInput.value = [
+          outline.title,
+          "",
+          outline.content || AppText.GENERATE_CHAPTER_GUIDE,
+        ].join("\n");
         const chapterNum = `${AppText.CHAPTER} ${i + 1}`;
-        chapterOutlineEl.title = `${chapterNum}: ${outline.title}`;
-        chapterOutlineEl.name = chapterNum;
-        chapterOutlineEl.setAttribute("style", TEXT_INPUT_INLINE_STYLE);
-        chapterOutlineEl.addEventListener("input", () => {
+        chapterContentInput.title = `${chapterNum}: ${outline.title}`;
+        chapterContentInput.name = chapterNum;
+        chapterContentInput.setAttribute("style", TEXT_INPUT_INLINE_STYLE);
+        chapterContentInput.addEventListener("input", () => {
           const storyTitle = getCurrentTitle();
           const storyDocument = getStoryDocumentByTitle(storyTitle);
-
           const [chapterTitle, ...description] =
-            chapterOutlineEl.value.split("\n");
+            chapterContentInput.value.split("\n");
           storyDocument.outline[i].title = chapterTitle;
-          storyDocument.outline[i].description = description.join("\n").trim();
-          // clear generated story content if outline changes
-          for (let j = i; j < outlines.length; j++) {
-            storyDocument.outline[j].scenes = "";
-            storyDocument.outline[j].content = "";
-          }
+          storyDocument.outline[i].content = htmlEscape(description.join("\n"));
           addStoryDocumentToLocalStorage(storyTitle, storyDocument);
         });
         const chapterControlsContainerEl = document.createElement("div");
@@ -450,9 +451,9 @@ customElements.define(
         // insert chapter here control
         addCreateChapterBtn(i, outlines, chapterControlsContainerEl);
 
-        chapterOutlineEl.root.append(chapterControlsContainerEl);
-        this.outlineContainer.appendChild(chapterOutlineEl);
-        chapterOutlineEl.style.marginBottom = DimensionsPx.LARGE;
+        chapterContentInput.root.append(chapterControlsContainerEl);
+        this.outlineContainer.appendChild(chapterContentInput);
+        chapterContentInput.style.marginBottom = DimensionsPx.LARGE;
       });
     };
 
@@ -709,10 +710,12 @@ customElements.define(
       }, DEFAULT_RENDER_DELAY_MS);
     };
 
-    generateChapterDescription = async (
+    generateChapterContent = async (
       /** @type {number} */ chapNum,
-      /** @type {string | undefined} */ chapterPrompt
+      /** @type {string | undefined} */ chapterPrompt,
+      isReplacement = false
     ) => {
+      console.log("generate chapter content", { chapNum, chapterPrompt });
       const apiKey = getGeminiKeyFromLocalStorage();
       if (!apiKey) {
         alert(AppText.GEMINI_API_KEY_NOT_SET);
@@ -742,7 +745,7 @@ customElements.define(
       const result = await fetchFromGemini(
         apiKey,
         [
-          `Generate outline for chapter ${chapNum} of the story "${title}"`,
+          `Generate chapter ${chapNum} of the story "${title}"`,
           `This is the summary of the story: "${storyDocument.summary}"`,
           `This is the genre of the story: "${storyDocument.genre}"`,
           `This is the setting of the story: "${storyDocument.setting}"`,
@@ -751,7 +754,7 @@ customElements.define(
             storyDocument
           )}`,
           `These are the existing chapters:\n${storyDocument.outline
-            .map((c) => c.description)
+            .map((c) => c.content)
             .filter(Boolean)
             .map((c, i) => `Chapter ${i + 1}: ${c}`)
             .join("\n\n")}`,
@@ -761,13 +764,12 @@ customElements.define(
         ]
           .filter(Boolean)
           .join("\n\n"),
-        `{"chapter": {"title": "chapter title excluding the chapter number", "description": "chapter description goes here"}}`
+        `{"chapter": {"title": "chapter title excluding the chapter number", "content": "chapter content goes here"}}`
       );
-      storyDocument.outline.splice(chapNum, 0, {
+      const doReplace = Number(isReplacement);
+      storyDocument.outline.splice(chapNum - doReplace, doReplace, {
         title: result.chapter.title,
-        description: result.chapter.description,
-        scenes: "",
-        content: "",
+        content: result.chapter.content,
         characters: [],
       });
       alert(AppText.SUCCESS_NEW_CHAPTER);

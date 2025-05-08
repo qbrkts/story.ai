@@ -19,7 +19,7 @@ const TEXT_INPUT_STYLE = `
   padding: ${DimensionsPx.MLARGE};
   text-decoration: none;
   transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .${TEXT_INPUT_CLS}[readonly] {

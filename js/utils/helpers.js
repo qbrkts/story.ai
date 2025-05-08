@@ -125,7 +125,7 @@ const AppText = {
   GEMINI_API_KEY_NOT_SET: "Gemini API Key not set",
   GENERATE_CHAPTER: "Generate chapter",
   GENERATE_CHAPTER_GUIDE:
-    "Include any specific directions for the chapter you want to create. Example, 4000 word chapter for a medium length story etc.",
+    "Include any specific directions for this chapter being created. Example, 4000 word chapter for a medium length story etc.",
   GENERATE_STYLE_AND_SETTING: "Generate style and setting",
   GENERATE_SYNOPSIS: "Generate synopsis",
   GENERATE_SYNOPSIS_INSTRUCTIONS:
@@ -133,8 +133,6 @@ const AppText = {
   INFINITE_STORIES: "Enter the world of infinite tales",
   INVALID_API_KEY: "Please enter a valid API Key.",
   LOADING: "Loading...",
-  MODIFY_OUTLINE_TO_REGENERATE_CHAPTER_CONTENT:
-    "To regenerate this content, modify the chapter outline description or scenes",
   NEW_CHARACTER_GUIDELINE:
     "Optionally enter the name and any traits to guide character generation.",
   NO_API_KEY: "If you do not have an api key, visit here to generate one.",
@@ -153,15 +151,15 @@ const AppText = {
   STORY_AI: "Story AI",
   STORY: "Story",
   STORY_CHARACTERS_NOT_SET:
-    "You must have characters for your story before generating outlines or scenes.",
+    "You must have characters for your story before generating chapters.",
   STORY_SUMMARY_NOT_SET:
     "Please enter a summary before attempting to generate a story.",
   STORY_GENRE_NOT_SET:
-    "You must have a genre before generating synopsis, outlines, scenes or chapters.",
+    "You must have a genre before generating story synopsis or chapters.",
   STORY_SETTING_NOT_SET:
-    "You must have a setting for your story before generating synopsis, outlines or scenes",
+    "You must have a setting for your story before generating synopsis or chapters",
   STORY_STYLE_NOT_SET:
-    "Deciding on a style will help generate outlines, scenes and chapters for your story in a consistent way.",
+    "Deciding on a style will help generate chapters for your story in a consistent way.",
   SUCCESS: "Success",
   SUCCESS_NEW_CHARACTER: `Successfully generated new character. Add any extra traits to their description matching the same format.`,
   REMOVE_CHARACTER_GUIDE: `To remove a character, replace their description with '${DELETE_CHARACTER_MARKER}'.`,
@@ -171,7 +169,6 @@ const AppText = {
     "Delete the existing story style and settings if you want to generate new ones.",
   UPDATE_GEMINI_API_KEY: "Update",
   UPDATE_STORY_TITLE: "Update story title",
-  WRITE_CHAPTER: "Write Chapter",
   VISIT_STORIES: "Visit stories",
   WELCOME: "Welcome",
   WRITE: "Write",
@@ -535,16 +532,16 @@ const DEFAULT_DOCUMENT = {
   summary: "",
   /** User generated title for the story @type {string | undefined} */
   title: undefined,
-  /** User specified genre for generating synopsis, outline, scenes and chapters */
+  /** User specified genre */
   genre: "",
-  /** User specified style for generating outlines, scenes and chapters */
+  /** User specified style */
   style: "",
-  /** User created story world setting for generating synopsis, outline and scenes @type {string | undefined} */
+  /** @type {string | undefined} */
   setting: undefined,
   /** AI generated synopsis of the story for generating characters */
   synopsis: "",
   /**
-   * AI generated characters for generating outline and scenes
+   * AI generated characters for generating chapters
    * @type {Record<string, string>}
    * @example { "Name of the character": "physical description, personality, background, dialog and conversational style, including their role in the story, relationships with other characters, and any other relevant traits and details" }
    */
@@ -554,18 +551,13 @@ const DEFAULT_DOCUMENT = {
    *
    * @type {{
    *    title: string;
-   *    description: string;
-   *    scenes: string;
    *    content: string,
    *    characters: string[],
    * }[]}
    *
    * @example [{
-   *    name: "Name of the chapter",
-   *    description: "Summary description of the chapter for generating the scenes",
-   *    scenes: "Scenes in the chapter for generating the full content",
-   *    content: "Full content of the chapter",
-   *    characters: ["Name of the character present in this chapter"],
+   *   content: "The title is always the first line of the content. The starts with description and scenes used to generate full content of the chapter.",
+   *   characters: ["Name of the character present in this chapter"],
    * }]
    */
   outline: [],
@@ -615,6 +607,10 @@ function getCharactersForQuery(storyDocument) {
   return JSON.stringify(Object.values(storyDocument.characters), null, 2);
 }
 
+async function delay(seconds) {
+  return new Promise((resolve) => setTimeout(resolve, 1000 * seconds));
+}
+
 async function generateStoryContents(
   /** @type {number[]} */ chaptersToGenerate = []
 ) {
@@ -631,7 +627,7 @@ async function generateStoryContents(
     // `This is the setting of the story: "${storyDocument.setting}"`,
     // `This is the synopsis of the story: "${storyDocument.synopsis}"`,
     `This is the outline of the story: ${storyDocument.outline
-      .map((o, i) => `Chapter ${i + 1}: ${o.description}`)
+      .map((o, i) => `Chapter ${i + 1}: ${o.content}`)
       .join("\n")}`,
     `These are the main characters involved in the story: ${getCharactersForQuery(
       storyDocument
@@ -639,7 +635,7 @@ async function generateStoryContents(
     `CRITICAL: The generated story MUST strictly adhere to this writing style: ${storyDocument.style}`,
     `CRITICAL: The primary goal is to generate content ONLY for the specified chapter.`,
     `CRITICAL: Maintain narrative consistency with the overall story progression implied by the chapter outlines.`,
-    `CRITICAL: The generated content MUST be set up that the story flows between the scenes and chapters in a natural way.`,
+    `CRITICAL: The generated content MUST be set up that the story flows between the chapters in a natural way.`,
   ];
   const chapterGenerationStepSize =
     1 / ((storyDocument.outline.length ?? 0) * 2);
@@ -658,27 +654,17 @@ async function generateStoryContents(
   for (const i of chapterIndexes) {
     const chapter = outline[i];
     const chapNum = i + 1;
-    // TODO: ensure the chapter meets the required length
-    if (chapter.content) {
-      console.log("Chapter already had content", chapNum);
-      window.__chaptersGenerated += 1;
-      window.__chaptersGenerationProgress =
-        window.__chaptersGenerated / window.__chapterCount;
-      continue;
-    }
     const generationDelaySeconds = chapGenerationDelay * 5;
 
     // --- Determine Previous Chapter Context (for prompt, even in parallel) ---
     const previousChapter = outline?.[i - 1];
     const prevChapterContext = previousChapter
-      ? `Context from previous chapter ${i + 1} (${
-          previousChapter.title
-        }):\nOutline: ${
-          previousChapter.scenes || previousChapter.description || "N/A"
+      ? `Context from previous chapter ${i + 1} (${previousChapter.title}):\n${
+          previousChapter.content || "N/A"
         }`
       : "This is the first chapter.";
 
-    if (!chapter.scenes) {
+    if (!chapter.content) {
       // generate chapter scenes
       await delay(generationDelaySeconds); // wait seconds between scene generation requests
       console.log("Generating chapter scenes", chapNum);
@@ -687,7 +673,6 @@ async function generateStoryContents(
         [
           `Generate the scenes for chapter ${chapNum} ONLY of the story "${storyTitle}"`,
           `Chapter ${chapNum} Title: ${chapter.title}`,
-          `Chapter ${chapNum} Description: ${chapter.description}`,
           "",
           prevChapterContext,
           ...promptParts,
@@ -700,7 +685,11 @@ async function generateStoryContents(
       console.log(sceneResult);
       // reload story document incase other changes have been made to it
       const storyDocument = getStoryDocumentByTitle(storyTitle);
-      storyDocument.outline[i].scenes = sceneResult.scenes.trim?.();
+      storyDocument.outline[i].content = htmlEscape(
+        Array.isArray(sceneResult.scenes)
+          ? sceneResult.scenes.join("\n")
+          : sceneResult.scenes
+      )
       Object.assign(chapter, storyDocument.outline[i]);
       addStoryDocumentToLocalStorage(storyTitle, storyDocument);
     }
@@ -713,8 +702,8 @@ async function generateStoryContents(
       [
         `Generate the content for chapter ${chapNum} ONLY of the story "${storyTitle}"`,
         `Chapter ${chapNum} title: ${chapter.title}`,
-        // if a chapter has scenes generated use that, otherwise fallback to the simple description
-        `Chapter ${chapNum} outline: ${chapter.scenes || chapter.description}`,
+        // Iterate on the chapter content using the instructions given
+        `Chapter ${chapNum} outline: ${chapter.content}`,
         prevChapterContext,
         ...promptParts,
         `CRITICAL: Write the narrative by strictly following the scenes provided above, in order.`,
@@ -725,7 +714,7 @@ async function generateStoryContents(
         `CRITICAL: Do not include scene notation in the contents.`,
         `CRITICAL: Format the chapter content with double line spaces ensure dialog is clearly readable.`,
       ].join("\n\n"),
-      `{content: "Full narrative content for chapter ${chapNum} in plain text, adhering strictly to the provided scenes and style."}`,
+      `{content: "Full narrative content for chapter ${chapNum} in plain text, adhering strictly to existing content style."}`,
       GeminiConfig.Temperature.BALANCED,
       false
     );
@@ -838,7 +827,7 @@ const setRepeat = (handler, ...options) => {
   const intervalId = setInterval(
     () => {
       count -= 1;
-      setTimeout(handler, 0);
+      setTimeout(handler, DEFAULT_RENDER_DELAY_MS);
       if (count < 0) {
         clearInterval(intervalId);
       }
