@@ -110,7 +110,7 @@ ${textInputTitleStyle(this.textArea)}
 }`;
         this.root.appendChild(style);
       }, DEFAULT_RENDER_DELAY_MS);
-      setRepeat(this.updateInputHeight, DEFAULT_RENDER_DELAY_MS, 2);
+      setRepeat(this.updateInputHeight, DEFAULT_RENDER_DELAY_MS, 3);
     }
   }
 );

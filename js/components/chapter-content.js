@@ -44,8 +44,6 @@ customElements.define(
     }
 
     connectedCallback() {
-      const chapterWordCount = this.text.split(" ").length;
-      this.addInfo(`${chapterWordCount} words`);
       this.render();
     }
 
@@ -55,7 +53,8 @@ customElements.define(
     }
 
     render() {
-      this.contentInfoEl.innerHTML = this.info
+      const chapterWordCount = this.text.split(" ").length;
+      this.contentInfoEl.innerHTML = [...this.info, `${chapterWordCount} words`]
         .map((text) => `<span>${text}</span>`)
         .join("");
       this.storyContentEl.value = this.text;

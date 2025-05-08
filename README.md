@@ -8,3 +8,4 @@ Assists with writing stories from novel ideas.
 - [ ] Have the tool review the outline and story contents generated for improvements to story structure and formatting
 - [ ] Tag shared story with the title of the story for easier linking (take into account multiple stories with the same title)
 - [ ] Add graphic novel visualisation
+- [ ] Replace content `innerHTML = ""` without affecting layout or scrolling

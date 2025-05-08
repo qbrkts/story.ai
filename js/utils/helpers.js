@@ -134,7 +134,7 @@ const AppText = {
   INVALID_API_KEY: "Please enter a valid API Key.",
   LOADING: "Loading...",
   MODIFY_OUTLINE_TO_REGENERATE_CHAPTER_CONTENT:
-    "To regenerate the chapter, modify the outline description or scenes",
+    "To regenerate this content, modify the chapter outline description or scenes",
   NEW_CHARACTER_GUIDELINE:
     "Optionally enter the name and any traits to guide character generation.",
   NO_API_KEY: "If you do not have an api key, visit here to generate one.",

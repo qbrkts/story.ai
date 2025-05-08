@@ -27,7 +27,7 @@ export class TextInput extends HTMLTextAreaElement {
   static get observedAttributes(): string[];
   root: ShadowRoot;
   textArea: HTMLTextAreaElement;
-  value: String;
+  value: string;
 }
 
 export class PaperButton extends HTMLButtonElement {

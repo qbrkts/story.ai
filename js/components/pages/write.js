@@ -359,7 +359,21 @@ customElements.define(
             storyDocument.outline[i].content = contentValue;
             addStoryDocumentToLocalStorage(storyTitle, storyDocument);
           });
+          const lockScrollY = document.documentElement.scrollTop;
+          const resetScrollPosition = () => {
+            setTimeout(() => {
+              document.documentElement.scrollTop = lockScrollY;
+              // window.scrollTo({ left: 0, top: lockScrollY, behavior: "auto" });
+            }, 150);
+          };
           pageDialog.showModal();
+          // resetScrollPosition();
+          pageDialog.onclose = () => {
+            this.renderOutline(getStoryDocumentByTitle(getCurrentTitle()));
+            // reset scroll position giving the layout some time to settle
+            // because for some reason rendering the dialog fucks it up
+            resetScrollPosition();
+          };
           writeBtn.disabled = false;
         };
         containerEl.appendChild(writeBtn);
