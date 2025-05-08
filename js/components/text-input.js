@@ -83,8 +83,22 @@ customElements.define(
     }
 
     updateInputHeight = () => {
-      this.textArea.style.height = "";
-      this.textArea.style.height = this.textArea.scrollHeight + "px";
+      const shadowTextArea = /** @type {HTMLTextAreaElement} */ (
+        this.textArea.cloneNode(true)
+      );
+
+      this.root.appendChild(shadowTextArea);
+
+      // create a hidden shadow to accurately predict the required height
+      shadowTextArea.style.visibility = "hidden";
+      shadowTextArea.style.position = "fixed";
+      shadowTextArea.style.overflow = "scroll";
+      shadowTextArea.style.height = "";
+      shadowTextArea.style.height = shadowTextArea.scrollHeight + "px";
+
+      this.textArea.style.height = shadowTextArea.style.height;
+
+      this.root.removeChild(shadowTextArea);
     };
 
     connectedCallback() {
