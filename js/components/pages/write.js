@@ -481,6 +481,7 @@ customElements.define(
         chapterControlsContainerEl.style.flexDirection = "row";
         chapterControlsContainerEl.style.justifyContent = "end";
         chapterControlsContainerEl.style.gap = DimensionsPx.MEDIUM;
+        chapterControlsContainerEl.style.marginBottom = DimensionsPx.LARGE;
 
         // write chapter controls
         addExtendChapterBtn(i, chapterControlsContainerEl);
@@ -492,7 +493,7 @@ customElements.define(
 
         chapterContentInput.root.append(chapterControlsContainerEl);
         this.outlineContainer.appendChild(chapterContentInput);
-        chapterContentInput.style.marginBottom = DimensionsPx.LARGE;
+        chapterContentInput.style.marginBottom = DimensionsPx.SMALL;
       });
     };
 

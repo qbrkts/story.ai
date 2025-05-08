@@ -6,7 +6,8 @@ const ChapterContentIds = {
 const CHAPTER_CONTENT_CODE_TEMPLATE = `
 <div style="display: flex; flex-direction: column;">
   <div id=${ChapterContentIds.INFO}></div>
-  <text-input id=${ChapterContentIds.TEXT_BLOCK}></text-input>
+  <!-- title is set to empty string to hide -->
+  <text-input id=${ChapterContentIds.TEXT_BLOCK} title></text-input>
 </div>
 <style>
 #${ChapterContentIds.TEXT_BLOCK} {

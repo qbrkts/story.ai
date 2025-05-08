@@ -17,6 +17,7 @@ const PAPER_BUTTON_STYLE = `
     text-decoration: none;
     text-transform: uppercase;
     transition: background-color 0.3s, transform 0.3s;
+    text-shadow: 0 0 ${DimensionsPx.SMALL} ${Colors.PAPER_BACKGROUND}90;
   }
 
   .paper-button:active {

@@ -10,7 +10,8 @@ const SHARE_STORY_CODE_TEMPLATE = `
     border-radius: ${DimensionsPx.SMALL};
     border: none;
     position: fixed;
-    bottom: ${DimensionsPx.SMALL}; left: ${DimensionsPx.SMALL};
+    bottom: ${DimensionsPx.SMALL};
+    left: ${DimensionsPx.SMALL};
     font-weight: bold;
     z-index: ${Level.TOP};
   "></paper-button>
@@ -33,7 +34,7 @@ customElements.define(
     connectHandlers() {
       this.copyLinkButton.handler = this.copyShareLink;
       this.copyLinkButton.textContent = AppText.SHARE_STORY;
-      this.copyLinkButton.textIcon = "📖";
+      this.copyLinkButton.textIcon = "🔗";
     }
 
     render() {}
