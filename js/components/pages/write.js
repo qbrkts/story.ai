@@ -390,14 +390,21 @@ customElements.define(
         return deleteBtn;
       };
 
-      const createFirstChapterBtn = addCreateChapterBtn(
-        -1,
-        storyDocument.outline,
-        this.outlineContainer
-      );
-      createFirstChapterBtn.style.marginBottom = DimensionsPx.LARGE;
-      createFirstChapterBtn.style.marginRight = DimensionsPx.LARGE;
-      createFirstChapterBtn.style.alignSelf = "end";
+      const addFirstChapterContainer = document.createElement("div");
+      addFirstChapterContainer.style.display = "flex";
+      addFirstChapterContainer.style.flexDirection = "row";
+      addFirstChapterContainer.style.justifyContent = "space-between";
+      addFirstChapterContainer.style.alignItems = "center";
+      addFirstChapterContainer.style.gap = DimensionsPx.LARGE;
+      addFirstChapterContainer.style.paddingBottom = DimensionsPx.LARGE;
+      this.outlineContainer.appendChild(addFirstChapterContainer);
+
+      const addFirstChapterGuide = document.createElement("p");
+      addFirstChapterGuide.innerText = AppText.ADD_FIRST_CHAPTER_GUIDE;
+      addFirstChapterGuide.style.marginLeft = DimensionsPx.MEDIUM;
+      addFirstChapterContainer.appendChild(addFirstChapterGuide);
+
+      addCreateChapterBtn(-1, storyDocument.outline, addFirstChapterContainer);
 
       storyDocument.outline.forEach((outline, i, outlines) => {
         const chapterContentInput =

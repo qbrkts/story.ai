@@ -103,6 +103,8 @@ const DELETE_CHARACTER_MARKER = "delete";
 const AppText = {
   ADD_CHAPTER: "Add Chapter",
   ADD_CHARACTER: "Add Character",
+  ADD_FIRST_CHAPTER_GUIDE:
+    "Add a new chapter here, afterwards you can modify the contents of each chapter with assistance or add chapters in between as needed.",
   API_KEY_SAVED: "API Key updated successfully!",
   BRAIN_DUMP:
     "Dump your story synopsis here. Anything goes and everything helps. If you want a more dramatic twist, add that idea here too!",
@@ -685,7 +687,7 @@ async function generateStoryContents(
         Array.isArray(sceneResult.scenes)
           ? sceneResult.scenes.join("\n")
           : sceneResult.scenes
-      )
+      );
       Object.assign(chapter, storyDocument.outline[i]);
       addStoryDocumentToLocalStorage(storyTitle, storyDocument);
     }
