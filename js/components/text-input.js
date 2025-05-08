@@ -76,6 +76,7 @@ customElements.define(
 
     set value(v) {
       this.textArea.value = htmlEscape(v);
+      this.updateInputHeight();
     }
 
     focus() {

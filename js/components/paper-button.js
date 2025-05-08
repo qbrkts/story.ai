@@ -19,10 +19,6 @@ const PAPER_BUTTON_STYLE = `
     transition: background-color 0.3s, transform 0.3s;
   }
 
-  .paper-button:hover {
-    background-color: ${Colors.BUTTON_BACKGROUND}c0;
-  }
-
   .paper-button:active {
     transform: scale(0.95);
   }

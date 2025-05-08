@@ -13,8 +13,6 @@ const WritePageIds = {
   STORY_SETTING_INPUT: "story-setting",
   STORY_STYLE_MATCH_BTN: "story-style-match-btn",
   STORY_SUMMARY_SECTION: "story-summary-section",
-  STORY_SYNOPSIS_GEN_BTN: "story-synopsis-gen-btn",
-  STORY_SYNOPSIS: "story-synopsis",
   STORY_TITLE_INPUT: "story-title",
   STORY_TITLE_UPDATE_BTN: "update-story-title-btn",
   STYLE_TEXT_INPUT: "story-style",
@@ -55,28 +53,25 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
       </paper-button>
     </div>
 
-    <br />
-    <br />
-    <text-input
-      title="${WritePageIds.SUMMARY_TEXT_INPUT}"
-      id="${WritePageIds.SUMMARY_TEXT_INPUT}"
-      style="${TEXT_INPUT_INLINE_STYLE}"
-      placeholder="${AppText.BRAIN_DUMP}">
-    </text-input>
-    <br />
-    <br />
-    <paper-button
-      id="${WritePageIds.STORY_STYLE_SETTING_GENRE_BTN}"
-      title="${AppText.GENERATE_STYLE_AND_SETTING}">
-      ${AppText.GENERATE_STYLE_AND_SETTING}
-    </paper-button>
-    <br />
-    <br />
-
     <details id=${WritePageIds.STORY_SUMMARY_SECTION}>
       <summary style="cursor: pointer; padding: ${DimensionsPx.MLARGE};">
         ${AppText.SUMMARY}
       </summary>
+      <text-input
+        title="${WritePageIds.SUMMARY_TEXT_INPUT}"
+        id="${WritePageIds.SUMMARY_TEXT_INPUT}"
+        style="${TEXT_INPUT_INLINE_STYLE} max-height: ${DimensionsPx.XXLARGE}"
+        placeholder="${AppText.BRAIN_DUMP}">
+      </text-input>
+      <br />
+      <br />
+      <paper-button
+        id="${WritePageIds.STORY_STYLE_SETTING_GENRE_BTN}"
+        title="${AppText.GENERATE_STYLE_AND_SETTING}">
+        ${AppText.GENERATE_STYLE_AND_SETTING}
+      </paper-button>
+      <br />
+      <br />
       <div style="display: flex; flex-direction: column;">
         <line-input
           id="${WritePageIds.GENRE_TEXT_INPUT}"
@@ -105,20 +100,6 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
           title="${WritePageIds.STORY_SETTING_INPUT}"
           style="${TEXT_INPUT_INLINE_STYLE}"
           placeholder="${AppText.ENTER_SETTING}">
-        </text-input>
-        <br />
-        <paper-button
-          id="${WritePageIds.STORY_SYNOPSIS_GEN_BTN}"
-          title="${AppText.GENERATE_SYNOPSIS}">
-          ${AppText.GENERATE_SYNOPSIS}
-        </paper-button>
-        <br />
-        <br />
-        <text-input
-          id="${WritePageIds.STORY_SYNOPSIS}"
-          title="${WritePageIds.STORY_SYNOPSIS}"
-          style="${TEXT_INPUT_INLINE_STYLE}"
-          placeholder="${AppText.GENERATE_SYNOPSIS_INSTRUCTIONS}">
         </text-input>
       </div>
       <br />
@@ -197,8 +178,6 @@ customElements.define(
 
       this.styleSettingGenBtn.handler = this.generateStyleSetting;
 
-      this.synopsisGenBtn.handler = this.generateSynopsis;
-
       this.addCharacterBtn.handler = this.addGeneratedCharacter;
 
       this.storySummaryBrainDumpInput.addEventListener("input", () => {
@@ -222,13 +201,6 @@ customElements.define(
         addStoryDocumentToLocalStorage(currentTitle, storyDocument);
       });
 
-      this.storySynopsisInput.addEventListener("input", () => {
-        const currentTitle = getCurrentTitle();
-        const storyDocument = getStoryDocumentByTitle(currentTitle);
-        storyDocument.synopsis = this.storySynopsisInput.value;
-        addStoryDocumentToLocalStorage(currentTitle, storyDocument);
-      });
-
       this.storySettingInput.addEventListener("input", () => {
         const currentTitle = getCurrentTitle();
         const storyDocument = getStoryDocumentByTitle(currentTitle);
@@ -238,14 +210,32 @@ customElements.define(
 
       setTimeout(() => {
         const storyDocument = getStoryDocumentByTitle(getCurrentTitle());
-        if (!storyDocument.summary) {
-          this.storySummaryBrainDumpInput.click();
-        } else if (!storyDocument.synopsis) {
+        if (
+          !storyDocument.summary ||
+          !storyDocument.genre ||
+          !storyDocument.style ||
+          !storyDocument.setting
+        ) {
           this.openSection(this.storySummarySection);
+          if (!storyDocument.summary) {
+            this.storySummaryBrainDumpInput.focus();
+          } else if (!storyDocument.genre) {
+            this.storyGenreInput.focus();
+          } else if (!storyDocument.style) {
+            this.storyStyleInput.focus();
+          } else if (!storyDocument.setting) {
+            this.storySettingInput.focus();
+          }
         } else if (Object.keys(storyDocument.characters).length === 0) {
           this.openSection(this.storyCharactersSection);
+          this.newCharacterInput.focus();
         } else {
           this.openSection(this.storyOutlineSection);
+          /** @type {import('../../../types').PaperButton} */ (
+            this.root.querySelector(
+              `${ComponentName.PAPER_BUTTON}[title^="${AppText.ADD_CHAPTER}"]`
+            )
+          )?.focus();
         }
       }, PAGE_LAYOUT_TIMEOUT_MS);
     }
@@ -256,7 +246,6 @@ customElements.define(
       this.storySummaryBrainDumpInput.value = storyDocument.summary;
       this.storyGenreInput.value = storyDocument.genre;
       this.storyStyleInput.value = storyDocument.style;
-      this.storySynopsisInput.value = storyDocument.synopsis;
       this.storySettingInput.value = storyDocument.setting || "";
 
       this.renderCharacters(storyDocument);
@@ -569,68 +558,6 @@ customElements.define(
       addStoryDocumentToLocalStorage(currentTitle, storyDocument);
       this.render();
       this.openSection(this.storySummarySection);
-      this.synopsisGenBtn.focus();
-    };
-
-    /**
-     * @param {MouseEvent} e click
-     */
-    generateSynopsis = async (e) => {
-      const title = getCurrentTitle();
-      const storyDocument = getStoryDocumentByTitle(title);
-      if (!storyDocument.title) {
-        alert(AppText.STORY_TITLE_NOT_SET);
-        this.storyTitleInput.focus();
-        return;
-      }
-      if (!storyDocument.summary) {
-        alert(AppText.STORY_SUMMARY_NOT_SET);
-        this.storySummaryBrainDumpInput.focus();
-        return;
-      }
-      if (!storyDocument.genre) {
-        alert(AppText.STORY_GENRE_NOT_SET);
-        this.storyGenreInput.focus();
-        return;
-      }
-      if (!storyDocument.setting) {
-        alert(AppText.STORY_SETTING_NOT_SET);
-        this.storySettingInput.focus();
-        return;
-      }
-      const apiKey = getGeminiKeyFromLocalStorage();
-      if (!apiKey) {
-        alert(AppText.GEMINI_API_KEY_NOT_SET);
-        this.geminiApiKeyComponent.grabFocus();
-        return;
-      }
-      this.synopsisGenBtn.disabled = true;
-      const synopsisResultPromise = fetchFromGemini(
-        apiKey,
-        [
-          `Generate a synopsis for the story "${title}"`,
-          `This is the summary of the story: "${storyDocument.summary}"`,
-          `This is the genre of the story: "${storyDocument.genre}"`,
-          `This is the setting of the story: "${storyDocument.setting}"`,
-          storyDocument.style &&
-            `This is the style of the writing: "${storyDocument.style}"`,
-        ]
-          .filter(Boolean)
-          .join("\n\n"),
-        `{"synopsis": "detailed synopsis of the story for generating characters and plot outline goes here."}`
-      );
-      if (!storyDocument.style) {
-        alert(AppText.STORY_STYLE_NOT_SET);
-        this.storyStyleInput.focus();
-        // continue as this is not blocking
-      }
-      const result = await synopsisResultPromise;
-      console.log("synopsis result:", result);
-      storyDocument.synopsis = result.synopsis;
-      alert(AppText.SUCCESS);
-      this.synopsisGenBtn.disabled = false;
-      addStoryDocumentToLocalStorage(title, storyDocument);
-      this.render();
     };
 
     /**
@@ -644,9 +571,9 @@ customElements.define(
         this.storyTitleInput.focus();
         return;
       }
-      if (!storyDocument.synopsis) {
-        alert(AppText.STORY_SYNOPSIS_NOT_SET);
-        this.storySynopsisInput.focus();
+      if (!storyDocument.summary) {
+        alert(AppText.STORY_SUMMARY_NOT_SET);
+        this.storySummaryBrainDumpInput.focus();
         return;
       }
       const apiKey = getGeminiKeyFromLocalStorage();
@@ -729,12 +656,6 @@ customElements.define(
         this.storyTitleInput.focus();
         return;
       }
-      if (!storyDocument.synopsis) {
-        alert(AppText.STORY_SYNOPSIS_NOT_SET);
-        this.openSection(this.storySummarySection);
-        this.storySynopsisInput.focus();
-        return;
-      }
       const hasCharacters = Object.keys(storyDocument.characters).length > 0;
       if (!hasCharacters) {
         alert(AppText.STORY_CHARACTERS_NOT_SET);
@@ -749,7 +670,6 @@ customElements.define(
           `This is the summary of the story: "${storyDocument.summary}"`,
           `This is the genre of the story: "${storyDocument.genre}"`,
           `This is the setting of the story: "${storyDocument.setting}"`,
-          `This is the synopsis of the story: "${storyDocument.synopsis}"`,
           `These are the existing characters: ${getCharactersForQuery(
             storyDocument
           )}`,
@@ -854,16 +774,6 @@ customElements.define(
       return inputEl;
     }
 
-    get storySynopsisInput() {
-      const inputEl = /** @type {import("../../../types").TextInput} */ (
-        this.root.querySelector(`#${WritePageIds.STORY_SYNOPSIS}`)
-      );
-      if (!inputEl) {
-        throw new Error("Story synopsis input not found");
-      }
-      return inputEl;
-    }
-
     get storySettingInput() {
       const inputEl = /** @type {import("../../../types").TextInput} */ (
         this.root.querySelector(`#${WritePageIds.STORY_SETTING_INPUT}`)
@@ -882,16 +792,6 @@ customElements.define(
       );
       if (!btnEl) {
         throw new Error("Story style setting generation button not found");
-      }
-      return btnEl;
-    }
-
-    get synopsisGenBtn() {
-      const btnEl = /** @type {import("../../../types").PaperButton} */ (
-        this.root.querySelector(`#${WritePageIds.STORY_SYNOPSIS_GEN_BTN}`)
-      );
-      if (!btnEl) {
-        throw new Error("Story synopsis generation button not found");
       }
       return btnEl;
     }

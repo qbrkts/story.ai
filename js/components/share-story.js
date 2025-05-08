@@ -9,7 +9,6 @@ const SHARE_STORY_CODE_TEMPLATE = `
   style="
     border-radius: ${DimensionsPx.SMALL};
     border: none;
-    box-shadow: 0px 0px ${DimensionsPx.SMALL} ${DimensionsPx.XXSMALL} ${Colors.BUTTON_TEXT}30;
     position: fixed;
     bottom: ${DimensionsPx.SMALL}; left: ${DimensionsPx.SMALL};
     font-weight: bold;

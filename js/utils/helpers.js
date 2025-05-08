@@ -105,7 +105,7 @@ const AppText = {
   ADD_CHARACTER: "Add Character",
   API_KEY_SAVED: "API Key updated successfully!",
   BRAIN_DUMP:
-    "Dump your story ideas here. Anything goes and everything helps. If you want a more dramatic twist, add that idea here and regenerate the synopsis.",
+    "Dump your story synopsis here. Anything goes and everything helps. If you want a more dramatic twist, add that idea here too!",
   CHAPTER: "Chapter",
   COPYRIGHT: "Copyright",
   COPY_SHARE_LINK_SUCCESS: "Successfully copied share link to clipboard",
@@ -127,9 +127,6 @@ const AppText = {
   GENERATE_CHAPTER_GUIDE:
     "Include any specific directions for this chapter being created. Example, 4000 word chapter for a medium length story etc.",
   GENERATE_STYLE_AND_SETTING: "Generate style and setting",
-  GENERATE_SYNOPSIS: "Generate synopsis",
-  GENERATE_SYNOPSIS_INSTRUCTIONS:
-    "Generated synopsis goes here. You can modify it to your liking or update your summary and regenerate the synopsis.",
   INFINITE_STORIES: "Enter the world of infinite tales",
   INVALID_API_KEY: "Please enter a valid API Key.",
   LOADING: "Loading...",
@@ -155,9 +152,9 @@ const AppText = {
   STORY_SUMMARY_NOT_SET:
     "Please enter a summary before attempting to generate a story.",
   STORY_GENRE_NOT_SET:
-    "You must have a genre before generating story synopsis or chapters.",
+    "You must have a genre before generating story chapters.",
   STORY_SETTING_NOT_SET:
-    "You must have a setting for your story before generating synopsis or chapters",
+    "You must have a setting for your story before generating chapters",
   STORY_STYLE_NOT_SET:
     "Deciding on a style will help generate chapters for your story in a consistent way.",
   SUCCESS: "Success",
@@ -539,7 +536,7 @@ const DEFAULT_DOCUMENT = {
   /** @type {string | undefined} */
   setting: undefined,
   /** AI generated synopsis of the story for generating characters */
-  synopsis: "",
+  // synopsis: "",
   /**
    * AI generated characters for generating chapters
    * @type {Record<string, string>}
@@ -625,7 +622,6 @@ async function generateStoryContents(
     // `This is the summary of the story: "${storyDocument.summary}"`,
     `This is the genre of the story: "${storyDocument.genre}"`,
     // `This is the setting of the story: "${storyDocument.setting}"`,
-    // `This is the synopsis of the story: "${storyDocument.synopsis}"`,
     `This is the outline of the story: ${storyDocument.outline
       .map((o, i) => `Chapter ${i + 1}: ${o.content}`)
       .join("\n")}`,
