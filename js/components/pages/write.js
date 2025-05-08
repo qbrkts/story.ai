@@ -161,7 +161,6 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
       </div>
     </details>
   </div>
-  <br /><br /><br />
   <qb-copyright></qb-copyright>
 `;
 };
@@ -238,7 +237,8 @@ customElements.define(
     }
 
     render() {
-      const storyDocument = getStoryDocumentByTitle(getCurrentTitle());
+      const title = getCurrentTitle();
+      const storyDocument = getStoryDocumentByTitle(title);
       this.storySummaryBrainDumpInput.value = storyDocument.summary;
       this.storyGenreInput.value = storyDocument.genre;
       this.storyStyleInput.value = storyDocument.style;
@@ -341,8 +341,9 @@ customElements.define(
           storyDocument = await generateStoryContents(chaptersToGenerate);
           this.renderOutline(storyDocument);
           chapter = storyDocument.outline[i];
+          const escapedText = htmlEscape(chapter.content);
           const pageDialog = getPageDialog(
-            `<chapter-content text="${htmlEscape(chapter.content)}"></chapter-content>`
+            `<chapter-content text="${escapedText}"></chapter-content>`
           );
           const chapterContentEl =
             /** @type {import('../../../types').ChapterContent} */ (

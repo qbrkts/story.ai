@@ -22,7 +22,6 @@ const READ_PAGE_CODE_TEMPLATE = () => {
   <div id=${ReadPageIds.STORY_CONTENT} style="font-family: ${Font.DEFAULT_FAMILY}; white-space: break-spaces; padding: ${DimensionsPx.MEDIUM};">
     ${AppText.NO_STORY_CONTENT}
   </div>
-  <br /><br /><br />
   <qb-copyright></qb-copyright>
 `;
 };

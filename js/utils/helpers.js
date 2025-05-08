@@ -175,6 +175,9 @@ const AppText = {
   VISIT_STORIES: "Visit stories",
   WELCOME: "Welcome",
   WRITE: "Write",
+  PAGE_TITLE(pageName) {
+    return `${pageName} - ${this.STORY_AI}`;
+  },
 };
 
 // --- helper functions
@@ -321,7 +324,11 @@ function getCurrentTitleKey() {
 function getCurrentTitle() {
   try {
     const titleKey = getCurrentTitleKey();
-    return keyAsTitleCase(titleKey);
+    const title = keyAsTitleCase(titleKey);
+    if (title) {
+      document.title = AppText.PAGE_TITLE(`${title} (${getCurrentPage()})`);
+    }
+    return title;
   } catch (e) {
     console.error(e);
     return null;
@@ -845,17 +852,19 @@ const setRepeat = (handler, ...options) => {
 const htmlEscape = (text) => {
   const span = document.createElement("span");
   span.innerText = text.trim();
-  return span.innerHTML
-    // These ones are replaced natively
-    // .replaceAll("&", "&amp;")
-    // .replaceAll("<", "&lt;")
-    // .replaceAll(">", "&gt;")
-    .replaceAll('"', "″")
-    .replaceAll("'", "′")
-    // ensure no sneaky unsupported line breaks
-    .replaceAll("\\n", "\n")
-    .replaceAll("<br>", "\n")
-    .replaceAll("<br/>", "\n")
-    .replaceAll("<br />", "\n")
-    .trim();
+  return (
+    span.innerHTML
+      // These ones are replaced natively
+      // .replaceAll("&", "&amp;")
+      // .replaceAll("<", "&lt;")
+      // .replaceAll(">", "&gt;")
+      .replaceAll('"', "″")
+      .replaceAll("'", "′")
+      // ensure no sneaky unsupported line breaks
+      .replaceAll("\\n", "\n")
+      .replaceAll("<br>", "\n")
+      .replaceAll("<br/>", "\n")
+      .replaceAll("<br />", "\n")
+      .trim()
+  );
 };

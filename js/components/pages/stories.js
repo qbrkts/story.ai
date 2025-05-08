@@ -35,7 +35,6 @@ const STORY_PAGE_CODE_TEMPLATE = `
       style="display: flex; flex-direction: row; gap: ${DimensionsPx.MEDIUM}; flex-wrap: wrap; justify-content: center; align-items: center;">
     </div>
   </div>
-  <br /><br /><br />
   <qb-copyright></qb-copyright>
 `;
 

@@ -1,5 +1,6 @@
 // load app
 const APP_ID = "app";
+document.title = AppText.PAGE_TITLE("Welcome");
 
 const currentPage = getCurrentPage();
 

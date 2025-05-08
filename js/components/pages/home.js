@@ -9,7 +9,6 @@ const HOME_PAGE_TEMPLATE = `
     <div>
         <paper-button onclick="gotoPage({ page: Page.STORIES })">${AppText.VISIT_STORIES}</paper-button>
     </div>
-    <br /><br /><br />
     <qb-copyright></qb-copyright>
 `;
 
