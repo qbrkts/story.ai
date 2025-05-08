@@ -353,7 +353,7 @@ customElements.define(
             `${AppText.CHAPTER} ${i + 1}`
           );
           chapterContentEl.addEventListener("input", () => {
-            const contentValue = chapterContentEl.storyContentEl.value.trim();
+            const contentValue = chapterContentEl.storyContentEl.value;
             const storyTitle = getCurrentTitle();
             const storyDocument = getStoryDocumentByTitle(storyTitle);
             storyDocument.outline[i].content = contentValue;

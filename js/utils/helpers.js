@@ -725,7 +725,7 @@ async function generateStoryContents(
     console.log(chapterResult);
     // reload story document incase other changes have been made to it
     const storyDocument = getStoryDocumentByTitle(storyTitle);
-    chapterResult.content = chapterResult.content.split("\n").join("\n").trim();
+    chapterResult.content = htmlEscape(chapterResult.content);
     storyDocument.outline[i].content = chapterResult.content;
     addStoryDocumentToLocalStorage(storyTitle, storyDocument);
     // add chapter content to story
@@ -845,5 +845,17 @@ const setRepeat = (handler, ...options) => {
 const htmlEscape = (text) => {
   const span = document.createElement("span");
   span.innerText = text.trim();
-  return span.innerHTML.trim();
+  return span.innerHTML
+    // These ones are replaced natively
+    // .replaceAll("&", "&amp;")
+    // .replaceAll("<", "&lt;")
+    // .replaceAll(">", "&gt;")
+    .replaceAll('"', "″")
+    .replaceAll("'", "′")
+    // ensure no sneaky unsupported line breaks
+    .replaceAll("\\n", "\n")
+    .replaceAll("<br>", "\n")
+    .replaceAll("<br/>", "\n")
+    .replaceAll("<br />", "\n")
+    .trim();
 };

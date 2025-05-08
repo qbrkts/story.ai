@@ -71,11 +71,11 @@ customElements.define(
     }
 
     get value() {
-      return this.textArea.value.trim();
+      return htmlEscape(this.textArea.value);
     }
 
     set value(v) {
-      this.textArea.value = v;
+      this.textArea.value = htmlEscape(v);
     }
 
     focus() {
