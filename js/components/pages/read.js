@@ -81,23 +81,26 @@ customElements.define(
       window.__chaptersGenerationProgress = chapterIdxToGenerate / chapterCount;
       this.progressIndicator.value = window.__chaptersGenerationProgress;
 
-      const storyContent = storyDocument.outline
+      const storyTextContent = storyDocument.outline
+        .map((o) => o.content)
+        .filter(Boolean)
+        .join("");
+      const storyContentHTML = storyDocument.outline
         .map((o, i) => {
           return (
             o.content &&
-            [
-              `<h4>${AppText.CHAPTER} ${i + 1}: ${o.title}</h4>`,
-              `<chapter-content>${o.content}</chapter-content>`,
-            ].join("")
+            `<chapter-content info="${AppText.CHAPTER} ${i + 1}: ${
+              o.title
+            }" text="${o.content}" readonly></chapter-content>`
           );
         })
         .filter(Boolean)
         .join("<br/><br/>")
         .trim();
       const storyElem = document.createElement("span");
-      storyElem.innerHTML = storyContent;
-      if (storyElem.textContent?.trim()) {
-        this.storyContentEl.innerHTML = storyContent;
+      storyElem.innerHTML = storyContentHTML;
+      if (storyTextContent?.trim()) {
+        this.storyContentEl.innerHTML = storyContentHTML;
       }
     }
 

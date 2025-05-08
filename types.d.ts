@@ -7,13 +7,27 @@ export class ProgressIndicator extends HTMLElement {
 }
 
 export class ChapterContent extends HTMLElement {
-  addInfo(info: string): void;
+  addInfo(...texts: string[]): void;
+  storyContentEl: TextInput;
 }
 
-export class LineInput extends HTMLInputElement {}
+export class LineInput extends HTMLInputElement {
+  root: ShadowRoot;
+}
 
 export class TextInput extends HTMLTextAreaElement {
+  constructor();
+  connectedCallback(): void;
+  disconnectedCallback(): void;
+  attributeChangedCallback(
+    name: string,
+    oldValue: string,
+    newValue: string
+  ): void;
+  static get observedAttributes(): string[];
   root: ShadowRoot;
+  textArea: HTMLTextAreaElement;
+  value: String;
 }
 
 export class PaperButton extends HTMLButtonElement {

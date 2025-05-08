@@ -46,6 +46,10 @@ a {
 details > summary {
   cursor: pointer;
 }
+
+body:has(dialog[open]) {
+  overflow: hidden;
+}
 `;
 document.head.appendChild(style);
 

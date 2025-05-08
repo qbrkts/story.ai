@@ -15,7 +15,9 @@ const GEMINI_API_KEY_CODE_TEMPLATE = `
   <br />
   <line-input
     id="${GeminiApiKeyIds.KEY_INPUT}"
-    placeholder="${AppText.ENTER_GEMINI_API_KEY}" style="width: ${DimensionsPx.XXLARGE}; max-width: calc(100vw - 200px);">
+    placeholder="${AppText.ENTER_GEMINI_API_KEY}" style="width: ${
+  DimensionsPx.XXLARGE
+}; max-width: calc(100vw - 200px);">
   </line-input>
   <paper-button id="${GeminiApiKeyIds.UPDATE_BTN}">
     ${AppText.UPDATE_GEMINI_API_KEY}
@@ -84,6 +86,7 @@ customElements.define(
     }
 
     render() {
+      this.apiKeyInput.title = this.apiKeyInput.id;
       this.apiKeyInput.value = getGeminiKeyFromLocalStorage() || "";
       this.updateButton.addEventListener("click", () => {
         const apiKey = this.apiKeyInput.value.trim();

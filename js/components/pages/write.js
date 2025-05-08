@@ -19,7 +19,8 @@ const WritePageIds = {
   STYLE_TEXT_INPUT: "story-style",
   SUMMARY_TEXT_INPUT: "brain-dump",
 };
-const TEXT_INPUT_INLINE_STYLE = `max-width: calc(100vw - 70px); min-width: calc(100vw - 70px); min-height: ${DimensionsPx.XLARGE}; font-family: ${Font.DEFAULT_FAMILY};`;
+const WIDTH = "calc(100vw - 30px)";
+const TEXT_INPUT_INLINE_STYLE = `max-width: ${WIDTH}; min-width: ${WIDTH}; min-height: ${DimensionsPx.XLARGE}; font-family: ${Font.DEFAULT_FAMILY};`;
 const WRITE_PAGE_CODE_TEMPLATE = () => {
   const title = getCurrentTitle();
 
@@ -41,6 +42,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
       DimensionsPx.LARGE
     };">
       <line-input
+        title="${WritePageIds.STORY_TITLE_INPUT}"
         id="${WritePageIds.STORY_TITLE_INPUT}"
         placeholder="${AppText.ENTER_NEW_STORY}"
         style="width: calc(100vw - 155px)" value="${getCurrentTitle()}">
@@ -55,6 +57,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
     <br />
     <br />
     <text-input
+      title="${WritePageIds.SUMMARY_TEXT_INPUT}"
       id="${WritePageIds.SUMMARY_TEXT_INPUT}"
       style="${TEXT_INPUT_INLINE_STYLE}"
       placeholder="${AppText.BRAIN_DUMP}">
@@ -76,6 +79,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
       <div style="display: flex; flex-direction: column;">
         <line-input
           id="${WritePageIds.GENRE_TEXT_INPUT}"
+          title="${WritePageIds.GENRE_TEXT_INPUT}"
           list="${WritePageIds.GENRE_LIST}"
           style="width: calc(100vw - 70px);"
           placeholder="${AppText.ENTER_GENRE}">
@@ -86,14 +90,18 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
           </datalist>
         </line-input>
         <br />
+        <br />
         <text-input
           id="${WritePageIds.STYLE_TEXT_INPUT}"
+          title="${WritePageIds.STYLE_TEXT_INPUT}"
           style="${TEXT_INPUT_INLINE_STYLE}"
           placeholder="${StoryDefaults.STYLE_TEMPLATE}">
         </text-input>
         <br />
+        <br />
         <text-input
           id="${WritePageIds.STORY_SETTING_INPUT}"
+          title="${WritePageIds.STORY_SETTING_INPUT}"
           style="${TEXT_INPUT_INLINE_STYLE}"
           placeholder="${AppText.ENTER_SETTING}">
         </text-input>
@@ -107,6 +115,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
         <br />
         <text-input
           id="${WritePageIds.STORY_SYNOPSIS}"
+          title="${WritePageIds.STORY_SYNOPSIS}"
           style="${TEXT_INPUT_INLINE_STYLE}"
           placeholder="${AppText.GENERATE_SYNOPSIS_INSTRUCTIONS}">
         </text-input>
@@ -129,6 +138,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
       };">
         <line-input
           id="${WritePageIds.NEW_CHARACTER_INPUT}"
+          title="${WritePageIds.NEW_CHARACTER_INPUT}"
           placeholder="${AppText.NEW_CHARACTER_GUIDELINE}"
           style="width: calc(100vw - 240px)">
         </line-input>
@@ -258,7 +268,8 @@ customElements.define(
               document.createElement(ComponentName.TEXT_INPUT)
             );
           characterInput.value = description;
-          characterInput.setAttribute("name", name);
+          characterInput.title = name;
+          characterInput.name = name;
           characterInput.setAttribute("style", TEXT_INPUT_INLINE_STYLE);
           characterInput.style.marginBottom = "16px";
           this.charactersContainer.appendChild(characterInput);
@@ -314,39 +325,45 @@ customElements.define(
         return addChapterBtn;
       };
 
-      const addViewChapterBtn = (i, containerEl) => {
-        const viewBtn = /** @type {import ('../../../types').PaperButton} */ (
+      const addWriteChapterBtn = (i, containerEl) => {
+        const writeBtn = /** @type {import ('../../../types').PaperButton} */ (
           document.createElement(ComponentName.PAPER_BUTTON)
         );
-        viewBtn.title = AppText.VIEW_CHAPTER;
-        viewBtn.innerHTML = AppText.VIEW_CHAPTER;
-        viewBtn.handler = async () => {
-          viewBtn.disabled = true;
+        writeBtn.title = AppText.WRITE_CHAPTER;
+        writeBtn.innerHTML = AppText.WRITE;
+        writeBtn.handler = async () => {
+          writeBtn.disabled = true;
           let storyDocument = getStoryDocumentByTitle(getCurrentTitle());
           let chapter = storyDocument.outline[i];
           const chaptersToGenerate = new Array(i + 1)
             .fill(null)
             .map((_, j) => j + 1);
           storyDocument = await generateStoryContents(chaptersToGenerate);
+          this.renderOutline(storyDocument);
           chapter = storyDocument.outline[i];
           const pageDialog = getPageDialog(
-            `<chapter-content>
-            <h4>${AppText.CHAPTER} ${i + 1}: ${chapter.title}</h4>
-            <span>${chapter.content}</span>
-            </chapter-content>`
+            `<chapter-content text="${chapter.content}"></chapter-content>`
           );
           const chapterContentEl =
             /** @type {import('../../../types').ChapterContent} */ (
               pageDialog.getElementsByTagName(ComponentName.CHAPTER_CONTENT)[0]
             );
           chapterContentEl.addInfo(
-            AppText.MODIFY_OUTLINE_TO_REGENERATE_CHAPTER_CONTENT
+            AppText.MODIFY_OUTLINE_TO_REGENERATE_CHAPTER_CONTENT,
+            `${AppText.CHAPTER} ${i + 1}`
           );
+          chapterContentEl.addEventListener("input", () => {
+            const contentValue = chapterContentEl.storyContentEl.value.trim();
+            const storyTitle = getCurrentTitle();
+            const storyDocument = getStoryDocumentByTitle(storyTitle);
+            storyDocument.outline[i].content = contentValue;
+            addStoryDocumentToLocalStorage(storyTitle, storyDocument);
+          });
           pageDialog.showModal();
-          viewBtn.disabled = false;
+          writeBtn.disabled = false;
         };
-        containerEl.appendChild(viewBtn);
-        return viewBtn;
+        containerEl.appendChild(writeBtn);
+        return writeBtn;
       };
 
       const addDeleteChapterBtn = (i, containerEl) => {
@@ -380,8 +397,14 @@ customElements.define(
           /** @type {import ('../../../types').TextInput} */ (
             document.createElement(ComponentName.TEXT_INPUT)
           );
-        chapterOutlineEl.value = `${outline.title}\n\n${outline.description}`;
-        chapterOutlineEl.setAttribute("name", `${AppText.CHAPTER} ${i + 1}`);
+        chapterOutlineEl.value = `${outline.title}\n\n${
+          (Array.isArray(outline.scenes)
+            ? outline.scenes.join("\n\n")
+            : outline.scenes) || outline.description
+        }`.trim();
+        const chapterNum = `${AppText.CHAPTER} ${i + 1}`;
+        chapterOutlineEl.title = `${chapterNum}: ${outline.title}`;
+        chapterOutlineEl.name = chapterNum;
         chapterOutlineEl.setAttribute("style", TEXT_INPUT_INLINE_STYLE);
         chapterOutlineEl.addEventListener("input", () => {
           const storyTitle = getCurrentTitle();
@@ -404,8 +427,8 @@ customElements.define(
         chapterControlsContainerEl.style.justifyContent = "end";
         chapterControlsContainerEl.style.gap = DimensionsPx.MEDIUM;
 
-        // view chapter controls
-        addViewChapterBtn(i, chapterControlsContainerEl);
+        // write chapter controls
+        addWriteChapterBtn(i, chapterControlsContainerEl);
         // delete chapter control
         addDeleteChapterBtn(i, chapterControlsContainerEl);
         // insert chapter here control

@@ -6,7 +6,7 @@ const ChapterContentIds = {
 const CHAPTER_CONTENT_CODE_TEMPLATE = `
 <div style="display: flex; flex-direction: column;">
   <div id=${ChapterContentIds.INFO}></div>
-  <p id=${ChapterContentIds.TEXT_BLOCK}><slot></slot></p>
+  <text-input id=${ChapterContentIds.TEXT_BLOCK}></text-input>
 </div>
 <style>
 #${ChapterContentIds.TEXT_BLOCK} {
@@ -23,19 +23,34 @@ const CHAPTER_CONTENT_CODE_TEMPLATE = `
 </style>
 `;
 
+const ChapterContentAttributes = Object.freeze({
+  INFO: "info",
+  TEXT: "text",
+});
+
+const INFO_DELIMITER = "|||";
+
 customElements.define(
   ComponentName.CHAPTER_CONTENT,
   class extends HTMLElement {
+    static get observedAttributes() {
+      return Object.values(ChapterContentAttributes);
+    }
+
     constructor() {
       super();
       this.attachShadow({ mode: "open" });
       this.root.innerHTML = CHAPTER_CONTENT_CODE_TEMPLATE;
-      this.info = [];
     }
 
     connectedCallback() {
-      const chapterWordCount = this.innerText.split(" ").length;
-      this.info.push(`${chapterWordCount} words`);
+      const chapterWordCount = this.text.split(" ").length;
+      this.addInfo(`${chapterWordCount} words`);
+      this.render();
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+      if (oldValue === newValue) return;
       this.render();
     }
 
@@ -43,16 +58,14 @@ customElements.define(
       this.contentInfoEl.innerHTML = this.info
         .map((text) => `<span>${text}</span>`)
         .join("");
+      this.storyContentEl.value = this.text;
+      this.storyContentEl.textArea.style.width = "100%";
+      this.storyContentEl.textArea.style.minWidth = "50%";
+      copyAttributes(this, this.storyContentEl.textArea, [], ["readonly"]);
     }
 
-    addInfo(...text) {
-      this.info.push(...text);
-      this.render();
-    }
-
-    setInfo(...text) {
-      this.info.splice(0, this.info.length, ...text);
-      this.render();
+    addInfo(...texts) {
+      this.setAttribute("info", [...this.info, ...texts].join(INFO_DELIMITER));
     }
 
     get root() {
@@ -62,9 +75,21 @@ customElements.define(
       return this.shadowRoot;
     }
 
+    get info() {
+      return (
+        this.getAttribute(ChapterContentAttributes.INFO)?.split(
+          INFO_DELIMITER
+        ) || []
+      );
+    }
+
+    get text() {
+      return this.getAttribute(ChapterContentAttributes.TEXT) || "";
+    }
+
     get storyContentEl() {
-      const chapterBlockEl = this.root.getElementById(
-        ChapterContentIds.TEXT_BLOCK
+      const chapterBlockEl = /** @type {import('../../types').TextInput} */ (
+        this.root.getElementById(ChapterContentIds.TEXT_BLOCK)
       );
       if (!chapterBlockEl) {
         throw new Error("Chapter block not found");

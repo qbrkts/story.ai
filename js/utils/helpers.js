@@ -24,7 +24,7 @@ const Colors = {
   TEXT_DISABLED: "#909090",
 };
 
-const DimensionsPx = {
+const DimensionsPx = Object.freeze({
   XXSMALL: "1px",
   XSMALL: "2px",
   SMALL: "4px",
@@ -33,7 +33,11 @@ const DimensionsPx = {
   LARGE: "48px",
   XLARGE: "100px",
   XXLARGE: "400px",
-};
+
+  asNumber: (
+    /** @type {keyof Exclude<typeof DimensionsPx, 'asNumber'>} */ key
+  ) => parseInt(DimensionsPx[key].toString().replace("px", "")),
+});
 
 const DEFAULT_PAGE = "HOME";
 const PageNames = [DEFAULT_PAGE, "STORIES", "WRITE", "READ"];
@@ -130,7 +134,7 @@ const AppText = {
   INVALID_API_KEY: "Please enter a valid API Key.",
   LOADING: "Loading...",
   MODIFY_OUTLINE_TO_REGENERATE_CHAPTER_CONTENT:
-    "To edit the generated chapter, modify the chapter outline description",
+    "To regenerate the chapter, modify the outline description or scenes",
   NEW_CHARACTER_GUIDELINE:
     "Optionally enter the name and any traits to guide character generation.",
   NO_API_KEY: "If you do not have an api key, visit here to generate one.",
@@ -167,7 +171,7 @@ const AppText = {
     "Delete the existing story style and settings if you want to generate new ones.",
   UPDATE_GEMINI_API_KEY: "Update",
   UPDATE_STORY_TITLE: "Update story title",
-  VIEW_CHAPTER: "View",
+  WRITE_CHAPTER: "Write Chapter",
   VISIT_STORIES: "Visit stories",
   WELCOME: "Welcome",
   WRITE: "Write",
@@ -206,15 +210,23 @@ function toggleCheckBoxList(checkBoxList) {
   });
 }
 
-function copyAttributes(source, target, exclude = ["style"]) {
+function copyAttributes(
+  source,
+  target,
+  exclude = ["style"],
+  /** @type {string[] | undefined} */ include = undefined
+) {
   const attributes = source.attributes;
   for (let i = 0; i < attributes.length; i++) {
     const attr = attributes[i];
+    if (include && !include.includes(attr.name)) continue;
     if (!exclude.includes(attr.name)) {
       target.setAttribute(attr.name, attr.value);
     }
   }
-  target.style.cssText = source.style.cssText;
+  if (!include || include?.includes("style")) {
+    target.style.cssText = source.style.cssText;
+  }
 }
 
 function getValueFromLocalStorage(key) {
@@ -247,12 +259,13 @@ function keyAsTitleCase(title) {
 }
 
 function textInputTitleStyle(element) {
+  const title = keyAsTitleCase(
+    element.title ?? element.name ?? element.id ?? ""
+  );
   return `background-color: transparent;
 border-radius: ${DimensionsPx.XSMALL};
 color: ${Colors.PAPER_TEXT};
-content: "${keyAsTitleCase(
-    element.title || element.name || element.id || ""
-  )} ▾";
+content: "${title ? title + " ▾" : ""}";
 display: block;
 font-size: 0.8em;
 font-weight: bold;
@@ -640,7 +653,7 @@ async function generateStoryContents(
     const chapNum = i + 1;
     // TODO: ensure the chapter meets the required length
     if (chapter.content) {
-      console.log("chap already had content", chapNum);
+      console.log("Chapter already had content", chapNum);
       window.__chaptersGenerated += 1;
       window.__chaptersGenerationProgress =
         window.__chaptersGenerated / window.__chapterCount;
@@ -649,25 +662,26 @@ async function generateStoryContents(
     const generationDelaySeconds = chapGenerationDelay * 5;
 
     // --- Determine Previous Chapter Context (for prompt, even in parallel) ---
-    const prevChapterContext =
-      i > 0
-        ? `\n\nContext from Previous Chapter (${
-            outline[i - 1].title
-          }):\nDescription: ${outline[i - 1].description}\nScenes: ${
-            outline[i - 1].scenes || "N/A"
-          }`
-        : "\n\nThis is the first chapter.";
+    const previousChapter = outline?.[i - 1];
+    const prevChapterContext = previousChapter
+      ? `Context from previous chapter ${i + 1} (${
+          previousChapter.title
+        }):\nOutline: ${
+          previousChapter.scenes || previousChapter.description || "N/A"
+        }`
+      : "This is the first chapter.";
 
     if (!chapter.scenes) {
       // generate chapter scenes
       await delay(generationDelaySeconds); // wait seconds between scene generation requests
-      console.log("chap scenes generating", chapNum);
+      console.log("Generating chapter scenes", chapNum);
       const sceneResult = await fetchFromGemini(
         apiKey,
         [
           `Generate the scenes for chapter ${chapNum} ONLY of the story "${storyTitle}"`,
           `Chapter ${chapNum} Title: ${chapter.title}`,
           `Chapter ${chapNum} Description: ${chapter.description}`,
+          "",
           prevChapterContext,
           ...promptParts,
           `CRITICAL: Base the scenes strictly on the chapter description provided above.`,
@@ -679,21 +693,21 @@ async function generateStoryContents(
       console.log(sceneResult);
       // reload story document incase other changes have been made to it
       const storyDocument = getStoryDocumentByTitle(storyTitle);
-      storyDocument.outline[i].scenes = sceneResult.scenes;
+      storyDocument.outline[i].scenes = sceneResult.scenes.trim?.();
       Object.assign(chapter, storyDocument.outline[i]);
       addStoryDocumentToLocalStorage(storyTitle, storyDocument);
     }
     window.__chaptersGenerationProgress += chapterGenerationStepSize;
     // generate chapter content
     await delay(generationDelaySeconds); // wait seconds between chapter generation requests
-    console.log("chap content generating", chapNum);
+    console.log("Generating chapter contents", chapNum);
     const chapterResult = await fetchFromGemini(
       apiKey,
       [
         `Generate the content for chapter ${chapNum} ONLY of the story "${storyTitle}"`,
-        `Chapter ${chapNum} Title: ${chapter.title}`,
-        `Chapter ${chapNum} Description: ${chapter.description}`,
-        `Chapter ${chapNum} Scenes: ${chapter.scenes}`,
+        `Chapter ${chapNum} title: ${chapter.title}`,
+        // if a chapter has scenes generated use that, otherwise fallback to the simple description
+        `Chapter ${chapNum} outline: ${chapter.scenes || chapter.description}`,
         prevChapterContext,
         ...promptParts,
         `CRITICAL: Write the narrative by strictly following the scenes provided above, in order.`,
@@ -711,7 +725,7 @@ async function generateStoryContents(
     console.log(chapterResult);
     // reload story document incase other changes have been made to it
     const storyDocument = getStoryDocumentByTitle(storyTitle);
-    chapterResult.content = chapterResult.content.split("\n").join("\n");
+    chapterResult.content = chapterResult.content.split("\n").join("\n").trim();
     storyDocument.outline[i].content = chapterResult.content;
     addStoryDocumentToLocalStorage(storyTitle, storyDocument);
     // add chapter content to story
@@ -771,8 +785,12 @@ function getPageDialog(contentHTML = "") {
     pageDialog.style.backgroundColor = "transparent";
     pageDialog.style.border = "none";
     pageDialog.style.outline = "none;";
-    pageDialog.style.margin = "auto";
-    pageDialog.style.padding = "0";
+    pageDialog.style.margin = "0";
+    pageDialog.style.padding = DimensionsPx.MEDIUM;
+    pageDialog.style.width = `calc(100vw - ${pageDialog.style.padding} * 2)`;
+    pageDialog.style.maxWidth = "100vw";
+    pageDialog.style.height = `calc(100vh - ${pageDialog.style.padding} * 2)`;
+    pageDialog.style.maxHeight = "100vh";
     pageDialog.style.textAlign = "center";
     pageDialog.innerHTML = `
 <div style="
@@ -783,9 +801,9 @@ function getPageDialog(contentHTML = "") {
     flex-direction: column;
     font-family: ${Font.DEFAULT_FAMILY};
     overflow: hidden;
-    padding: ${DimensionsPx.LARGE};
+    padding: ${DimensionsPx.MLARGE};
     margin: ${DimensionsPx.LARGE} auto;
-    width: 50%;
+    width: 77%;
     word-break: break-word;">
 </div>`;
     pageDialog.id = PAGE_DIALOG_ID;
@@ -798,6 +816,28 @@ function getPageDialog(contentHTML = "") {
       e.stopPropagation();
     });
   }
-  pageDialog.addEventListener("click", () => pageDialog.close());
+  pageDialog.addEventListener("click", () => {
+    pageDialog.close();
+  });
   return pageDialog;
 }
+
+/** @type {typeof setInterval} */
+const setRepeat = (handler, ...options) => {
+  let [timeout, count, ...args] = options;
+  if (count < 2) {
+    throw new Error("Just use setTimeout instead");
+  }
+  const intervalId = setInterval(
+    () => {
+      count -= 1;
+      setTimeout(handler, 0);
+      if (count < 0) {
+        clearInterval(intervalId);
+      }
+    },
+    timeout,
+    ...args
+  );
+  return intervalId;
+};

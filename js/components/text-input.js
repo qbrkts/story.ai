@@ -11,14 +11,21 @@ const TEXT_INPUT_STYLE = `
   box-shadow: 0px 0px 0px ${DimensionsPx.XXSMALL} ${Colors.PAPER_TEXT}30;
   border: none;
   border-radius: ${DimensionsPx.SMALL};
+  box-sizing: border-box;
   color: ${Colors.PAPER_TEXT};
   cursor: pointer;
   font-family: ${Font.DEFAULT_FAMILY};
   font-size: 1em;
-  padding: ${DimensionsPx.MEDIUM} ${DimensionsPx.MLARGE};
+  padding: ${DimensionsPx.MLARGE};
   text-decoration: none;
-  transition: background-color 0.3s, transform 0.3s;
-  overflow: hidden;
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  overflow: auto;
+}
+
+.${TEXT_INPUT_CLS}[readonly] {
+  background-color: transparent;
+  box-shadow: 0px 0px 0px ${DimensionsPx.XXSMALL} ${Colors.PAPER_TEXT}00;
+  pointer-events: none;
 }
 
 .${TEXT_INPUT_CLS}:hover {
@@ -53,7 +60,7 @@ customElements.define(
       return this.shadowRoot;
     }
 
-    get textAreaEl() {
+    get textArea() {
       const inputEl = /** @type {HTMLInputElement} */ (
         this.root.getElementById(TEXT_INPUT_ID)
       );
@@ -64,34 +71,46 @@ customElements.define(
     }
 
     get value() {
-      return this.textAreaEl.value.trim();
+      return this.textArea.value.trim();
     }
 
     set value(v) {
-      this.textAreaEl.value = v;
+      this.textArea.value = v;
     }
 
     focus() {
-      this.textAreaEl.focus();
+      this.textArea.focus();
     }
 
+    updateInputHeight = () => {
+      this.textArea.style.height = "";
+      this.textArea.style.height = this.textArea.scrollHeight + "px";
+    };
+
     connectedCallback() {
+      this.textArea.oninput = this.updateInputHeight;
+      this.render();
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+      if (oldValue === newValue) return;
       this.render();
     }
 
     render() {
-      if (this.id && !this.textAreaEl.name) this.textAreaEl.name = this.id;
-      copyAttributes(this, this.textAreaEl, ["id"]);
+      if (this.id && !this.textArea.name) this.textArea.name = this.id;
+      copyAttributes(this, this.textArea, ["id"]);
 
       // set style after element has been added to document
       setTimeout(() => {
         const style = document.createElement("style");
         style.textContent = `${TEXT_INPUT_STYLE}
 .${TEXT_INPUT_TITLE_CLS}::before {
-${textInputTitleStyle(this.textAreaEl)}
+${textInputTitleStyle(this.textArea)}
 }`;
         this.root.appendChild(style);
       }, DEFAULT_RENDER_DELAY_MS);
+      setRepeat(this.updateInputHeight, DEFAULT_RENDER_DELAY_MS, 2);
     }
   }
 );
