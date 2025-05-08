@@ -29,7 +29,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
   }
 
   return `
-  <page-navigation></page-navigation>
+  <site-navigation></site-navigation>
 
   <gemini-api-key></gemini-api-key>
 

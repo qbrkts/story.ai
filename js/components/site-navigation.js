@@ -1,18 +1,18 @@
-const PageNavigationIds = {
+const SiteNavigationIds = {
   PAGE_LINKS: "page-links",
 };
-const PAGE_NAVIGATION_CODE_TEMPLATE = `
+const SITE_NAVIGATION_CODE_TEMPLATE = `
 <div
-  id="${PageNavigationIds.PAGE_LINKS}"
+  id="${SiteNavigationIds.PAGE_LINKS}"
   style="font-size: 0.7em; text-transform: capitalize; display: flex; flex-direction: row; justify-content: center">
 </div>
 <style>
-#${PageNavigationIds.PAGE_LINKS} a {
+#${SiteNavigationIds.PAGE_LINKS} a {
   background-color: transparent;
   border: none;
   border-radius: ${DimensionsPx.XSMALL};
 }
-#${PageNavigationIds.PAGE_LINKS} a.active {
+#${SiteNavigationIds.PAGE_LINKS} a.active {
   background-color: ${Colors.PAPER_TEXT}30;
   font-weight: bold;
 }
@@ -20,7 +20,7 @@ const PAGE_NAVIGATION_CODE_TEMPLATE = `
 `;
 
 customElements.define(
-  ComponentName.PAGE_NAVIGATION,
+  ComponentName.SITE_NAVIGATION,
   class extends HTMLElement {
     constructor() {
       super();
@@ -57,9 +57,9 @@ customElements.define(
     }
 
     createLinks(containerEl) {
-      containerEl.innerHTML = PAGE_NAVIGATION_CODE_TEMPLATE;
+      containerEl.innerHTML = SITE_NAVIGATION_CODE_TEMPLATE;
       const linksContainer = containerEl.querySelector(
-        `#${PageNavigationIds.PAGE_LINKS}`
+        `#${SiteNavigationIds.PAGE_LINKS}`
       );
       if (!linksContainer) {
         throw new Error("Links container not found");

@@ -56,7 +56,7 @@ const Page = Object.assign(
   COPYRIGHT: 'qb-copyright';
   GEMINI_API_KEY: 'gemini-api-key';
   LINE_INPUT: 'line-input';
-  PAGE_NAVIGATION: 'page-navigation';
+  SITE_NAVIGATION: 'site-navigation';
   PAPER_BUTTON: 'paper-button';
   PROGRESS_INDICATOR: 'progress-indicator';
   SHARE_STORY: 'share-story';
@@ -72,7 +72,7 @@ const ComponentName = Object.assign(
     COPYRIGHT: "qb-copyright",
     GEMINI_API_KEY: "gemini-api-key",
     LINE_INPUT: "line-input",
-    PAGE_NAVIGATION: "page-navigation",
+    SITE_NAVIGATION: "site-navigation",
     PAPER_BUTTON: "paper-button",
     PROGRESS_INDICATOR: "progress-indicator",
     SHARE_STORY: "share-story",

@@ -7,7 +7,7 @@ const StoriesPageIds = {
 };
 
 const STORY_PAGE_CODE_TEMPLATE = `
-  <page-navigation></page-navigation>
+  <site-navigation></site-navigation>
 
   <div>
     <h2>${AppText.STORY}</h2>

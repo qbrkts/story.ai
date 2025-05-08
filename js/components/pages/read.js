@@ -8,7 +8,7 @@ const READ_PAGE_CODE_TEMPLATE = () => {
   const title = getCurrentTitle();
 
   return `
-  <page-navigation></page-navigation>
+  <site-navigation></site-navigation>
 
   <share-story></share-story>
 
