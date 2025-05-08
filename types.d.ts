@@ -32,6 +32,7 @@ export class TextInput extends HTMLTextAreaElement {
 
 export class PaperButton extends HTMLButtonElement {
   handler(e: MouseEvent): unknown;
+  textIcon: string;
 }
 
 declare global {

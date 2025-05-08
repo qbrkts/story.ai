@@ -72,6 +72,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
       </paper-button>
       <br />
       <br />
+      <br />
       <div style="display: flex; flex-direction: column;">
         <line-input
           id="${WritePageIds.GENRE_TEXT_INPUT}"
@@ -305,7 +306,8 @@ customElements.define(
             document.createElement(ComponentName.PAPER_BUTTON)
           );
         addChapterBtn.title = AppText.ADD_CHAPTER;
-        addChapterBtn.innerText = AppText.ADD_CHAPTER;
+        addChapterBtn.textContent = AppText.ADD_CHAPTER;
+        addChapterBtn.textIcon = "➕";
         addChapterBtn.handler = async () => {
           const chapterPrompt = prompt(
             AppText.GENERATE_CHAPTER_GUIDE,
@@ -332,8 +334,8 @@ customElements.define(
         const extendBtn = /** @type {import ('../../../types').PaperButton} */ (
           document.createElement(ComponentName.PAPER_BUTTON)
         );
-        extendBtn.title = AppText.EXTEND_CHAPTER;
-        extendBtn.innerHTML = AppText.EXTEND_CHAPTER;
+        extendBtn.title = `${AppText.EXTEND_CHAPTER} ${AppText.CHAPTER}`;
+        extendBtn.textContent = AppText.EXTEND_CHAPTER;
         const chapNum = i + 1;
         const chapterName = `${AppText.CHAPTER} ${chapNum}`;
         extendBtn.handler = async () => {
@@ -368,8 +370,8 @@ customElements.define(
         );
         const chapNum = i + 1;
         const chapterName = `${AppText.CHAPTER} ${chapNum}`;
-        writeBtn.title = `${AppText.REWRITE_CHAPTER} ${chapNum}`;
-        writeBtn.innerHTML = AppText.REWRITE_CHAPTER;
+        writeBtn.title = `${AppText.REWRITE_CHAPTER} ${chapterName}`;
+        writeBtn.textContent = AppText.REWRITE_CHAPTER;
         writeBtn.handler = async () => {
           writeBtn.disabled = true;
           const storyDocument = getStoryDocumentByTitle(getCurrentTitle());
@@ -409,7 +411,8 @@ customElements.define(
           document.createElement(ComponentName.PAPER_BUTTON)
         );
         deleteBtn.title = AppText.DELETE_CHAPTER;
-        deleteBtn.innerText = AppText.DELETE_CHAPTER;
+        deleteBtn.textContent = AppText.DELETE_CHAPTER;
+        deleteBtn.textIcon = "🗑️";
         deleteBtn.handler = () => {
           const storyTitle = getCurrentTitle();
           const storyDocument = getStoryDocumentByTitle(storyTitle);
@@ -431,7 +434,7 @@ customElements.define(
       this.outlineContainer.appendChild(addFirstChapterContainer);
 
       const addFirstChapterGuide = document.createElement("p");
-      addFirstChapterGuide.innerText = AppText.ADD_FIRST_CHAPTER_GUIDE;
+      addFirstChapterGuide.textContent = AppText.ADD_FIRST_CHAPTER_GUIDE;
       addFirstChapterGuide.style.marginLeft = DimensionsPx.MEDIUM;
       addFirstChapterContainer.appendChild(addFirstChapterGuide);
 

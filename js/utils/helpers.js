@@ -123,12 +123,12 @@ const AppText = {
   ENTER_EMAIL: "Enter your email address",
   ENTER_NAME: "Enter your name",
   ENTER_NEW_STORY: "Enter new story title",
-  EXTEND_CHAPTER: "Extend chapter",
+  EXTEND_CHAPTER: "Extend",
   EXTEND_CHAPTER_GUIDE:
     "Enter specific instructions for the next scene in the chapter.",
   GEMINI_API_KEY: "Gemini",
   GEMINI_API_KEY_NOT_SET: "Gemini API Key not set",
-  REWRITE_CHAPTER: "Rewrite chapter",
+  REWRITE_CHAPTER: "Rewrite",
   GENERATE_CHAPTER_GUIDE:
     "Include any specific directions for this chapter being created. Example, 4000 word chapter for a medium length story etc.",
   GENERATE_STYLE_AND_SETTING: "Generate style and setting",
@@ -841,7 +841,7 @@ const setRepeat = (handler, ...options) => {
 
 const htmlEscape = (text) => {
   const span = document.createElement("span");
-  span.innerText = text.trim();
+  span.textContent = text.trim();
   return (
     span.innerHTML
       // These ones are replaced natively

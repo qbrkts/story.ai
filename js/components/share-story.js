@@ -32,20 +32,11 @@ customElements.define(
 
     connectHandlers() {
       this.copyLinkButton.handler = this.copyShareLink;
-      window.addEventListener("resize", this.updateShareButtonLink);
+      this.copyLinkButton.textContent = AppText.SHARE_STORY;
+      this.copyLinkButton.textIcon = "📖";
     }
 
-    render() {
-      this.updateShareButtonLink();
-    }
-
-    updateShareButtonLink = () => {
-      if (window.innerWidth < 640) {
-        this.copyLinkButton.innerHTML = "📖";
-      } else {
-        this.copyLinkButton.innerHTML = AppText.SHARE_STORY;
-      }
-    };
+    render() {}
 
     get root() {
       if (!this.shadowRoot) {

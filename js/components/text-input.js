@@ -104,7 +104,13 @@ customElements.define(
 
     connectedCallback() {
       this.textArea.oninput = this.updateInputHeight;
+      window.addEventListener("resize", this.updateInputHeight);
       this.render();
+    }
+
+    disconnectedCallback() {
+      this.textArea.oninput = null;
+      window.removeEventListener("resize", this.updateInputHeight);
     }
 
     attributeChangedCallback(name, oldValue, newValue) {

@@ -66,11 +66,17 @@ customElements.define(
       return this.buttonEl.disabled == true;
     }
 
-    get value() {
-      return this.buttonEl.value;
+    get fullText() {
+      return this.__fullText;
     }
-    set value(value) {
-      this.buttonEl.value = value;
+
+    get textIcon() {
+      return this.__textIcon || this.fullText;
+    }
+
+    set textIcon(value) {
+      this.__textIcon = value;
+      this.render();
     }
 
     set handler(value) {
@@ -81,10 +87,16 @@ customElements.define(
     }
 
     connectedCallback() {
+      this.__fullText = this.textContent;
       this.render();
+      window.addEventListener("resize", () => this.render());
     }
+
     render() {
+      if (!this.isConnected) return;
       copyAttributes(this, this.buttonEl, ["id"]);
+      this.buttonEl.textContent =
+        window.innerWidth < 640 ? this.textIcon : this.fullText;
     }
   }
 );
