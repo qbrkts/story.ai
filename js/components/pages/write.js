@@ -295,17 +295,19 @@ customElements.define(
         addChapterBtn.handler = async () => {
           const chapterPrompt = prompt(
             AppText.GENERATE_CHAPTER_GUIDE,
-            [
-              i >= 0 && `after chapter ${i + 1}`,
-              i < outlines.length - 1 && `before chapter ${i + 2}`,
-            ]
-              .filter(Boolean)
-              .join(" and ") || `Chapter 1`
+            `The chapter to generate is ` +
+              ([
+                i >= 0 && `after chapter ${i + 1}`,
+                i < outlines.length - 1 &&
+                  `before what is currently chapter ${i + 2}`,
+              ]
+                .filter(Boolean)
+                .join(" and ") || `chapter 1`)
           );
           if (!chapterPrompt) {
             return;
           }
-          await this.generateChapterDescription(i + 1, chapterPrompt);
+          await this.generateChapterDescription(i + 2, chapterPrompt);
           this.renderOutline(getStoryDocumentByTitle(getCurrentTitle()));
         };
         containerEl.appendChild(addChapterBtn);
