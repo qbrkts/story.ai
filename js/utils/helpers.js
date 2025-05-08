@@ -128,7 +128,7 @@ const AppText = {
     "Enter specific instructions for the next scene in the chapter.",
   GEMINI_API_KEY: "Gemini",
   GEMINI_API_KEY_NOT_SET: "Gemini API Key not set",
-  REWRITE_CHAPTER: "Rewrite",
+  REWRITE_CHAPTER: "Write for me",
   GENERATE_CHAPTER_GUIDE:
     "Include any specific directions for this chapter being created. Example, 4000 word chapter for a medium length story etc.",
   GENERATE_STYLE_AND_SETTING: "Generate style and setting",
