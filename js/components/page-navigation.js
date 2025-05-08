@@ -41,7 +41,7 @@ customElements.define(
 
     createLink(page, container) {
       const link = document.createElement("a");
-      link.title = page;
+      link.setAttribute("title", page);
       link.textContent = page;
       link.style.textDecoration = "none";
       link.style.cursor = "pointer";

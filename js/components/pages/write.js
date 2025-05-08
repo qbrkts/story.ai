@@ -272,8 +272,8 @@ customElements.define(
               document.createElement(ComponentName.TEXT_INPUT)
             );
           characterInput.value = description;
-          characterInput.title = name;
-          characterInput.name = name;
+          characterInput.setAttribute("title", name);
+          characterInput.setAttribute("name", name);
           characterInput.setAttribute("style", TEXT_INPUT_INLINE_STYLE);
           characterInput.style.marginBottom = "16px";
           this.charactersContainer.appendChild(characterInput);
@@ -305,7 +305,7 @@ customElements.define(
           /** @type {import ('../../../types').PaperButton} */ (
             document.createElement(ComponentName.PAPER_BUTTON)
           );
-        addChapterBtn.title = AppText.ADD_CHAPTER;
+        addChapterBtn.setAttribute("title", AppText.ADD_CHAPTER);
         addChapterBtn.textContent = AppText.ADD_CHAPTER;
         addChapterBtn.textIcon = "➕";
         addChapterBtn.handler = async () => {
@@ -334,7 +334,7 @@ customElements.define(
         const extendBtn = /** @type {import ('../../../types').PaperButton} */ (
           document.createElement(ComponentName.PAPER_BUTTON)
         );
-        extendBtn.title = `${AppText.EXTEND_CHAPTER} ${AppText.CHAPTER}`;
+        extendBtn.setAttribute("title", `${AppText.EXTEND_CHAPTER} ${AppText.CHAPTER}`);
         extendBtn.textContent = AppText.EXTEND_CHAPTER;
         const chapNum = i + 1;
         const chapterName = `${AppText.CHAPTER} ${chapNum}`;
@@ -375,7 +375,7 @@ customElements.define(
         );
         const chapNum = i + 1;
         const chapterName = `${AppText.CHAPTER} ${chapNum}`;
-        writeBtn.title = `${AppText.REWRITE_CHAPTER} ${chapterName}`;
+        writeBtn.setAttribute("title", `${AppText.REWRITE_CHAPTER} ${chapterName}`);
         writeBtn.textContent = AppText.REWRITE_CHAPTER;
         writeBtn.textIcon = "📝";
         writeBtn.handler = async () => {
@@ -416,7 +416,7 @@ customElements.define(
         const deleteBtn = /** @type {import ('../../../types').PaperButton} */ (
           document.createElement(ComponentName.PAPER_BUTTON)
         );
-        deleteBtn.title = AppText.DELETE_CHAPTER;
+        deleteBtn.setAttribute("title", AppText.DELETE_CHAPTER);
         deleteBtn.textContent = AppText.DELETE_CHAPTER;
         deleteBtn.textIcon = "🗑️";
         deleteBtn.handler = () => {
@@ -462,7 +462,7 @@ customElements.define(
           outline.content || AppText.GENERATE_CHAPTER_GUIDE,
         ].join("\n");
         const chapterNum = `${AppText.CHAPTER} ${i + 1}`;
-        chapterContentInput.title = `${chapterNum}: ${outline.title}`;
+        chapterContentInput.setAttribute("title", `${chapterNum}: ${outline.title}`);
         chapterContentInput.name = chapterNum;
         chapterContentInput.setAttribute("style", TEXT_INPUT_INLINE_STYLE);
         chapterContentInput.addEventListener("input", () => {
@@ -471,6 +471,8 @@ customElements.define(
           const [chapterTitle, ...description] =
             chapterContentInput.value.split("\n");
           storyDocument.outline[i].title = chapterTitle;
+          chapterContentInput.setAttribute("title", `${chapterNum}: ${chapterTitle}`);
+          storyDocument.outline[i].content = `${chapterNum}: ${chapterTitle}`;
           storyDocument.outline[i].content = htmlEscape(description.join("\n"));
           addStoryDocumentToLocalStorage(storyTitle, storyDocument);
         });

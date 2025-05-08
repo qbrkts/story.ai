@@ -86,7 +86,7 @@ customElements.define(
     }
 
     render() {
-      this.apiKeyInput.title = this.apiKeyInput.id;
+      this.apiKeyInput.setAttribute("title", this.apiKeyInput.id);
       this.apiKeyInput.value = getGeminiKeyFromLocalStorage() || "";
       this.updateButton.addEventListener("click", () => {
         const apiKey = this.apiKeyInput.value.trim();

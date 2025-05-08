@@ -262,7 +262,10 @@ function keyAsTitleCase(title) {
 
 function textInputTitleStyle(element) {
   const title = keyAsTitleCase(
-    element.title ?? element.name ?? element.id ?? ""
+    element.getAttribute("title") ??
+      element.getAttribute("name") ??
+      element.getAttribute("id") ??
+      ""
   );
   return `background-color: transparent;
 border-radius: ${DimensionsPx.XSMALL};
@@ -569,7 +572,7 @@ function getStoryDocumentByTitle(title) {
   const storyDocument =
     getValueFromLocalStorage(storyContentStorageKey(title)) ?? DEFAULT_DOCUMENT;
   if (storyDocument.title == null) {
-    storyDocument.title = keyAsTitleCase(title);
+    storyDocument.setAttribute("title", keyAsTitleCase(title));
   }
   if (storyDocument.setting == null) {
     storyDocument.setting = StoryDefaults.setting.EARTH;
@@ -600,7 +603,7 @@ function removeStoryDocumentFromLocalStorage(title) {
 
 function renameStoryTitle(title, newTitle) {
   const storyDocument = getStoryDocumentByTitle(title);
-  storyDocument.title = keyAsTitleCase(newTitle);
+  storyDocument.setAttribute("title", keyAsTitleCase(newTitle));
   addStoryDocumentToLocalStorage(newTitle, storyDocument);
   removeStoryDocumentFromLocalStorage(title);
 }

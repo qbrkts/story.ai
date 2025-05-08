@@ -84,7 +84,8 @@ customElements.define(
       });
       // set style after element has been added to document
       setTimeout(() => {
-        const style = document.createElement("style");
+        const style =
+          this.root.querySelector("style") || document.createElement("style");
         style.textContent = `${LINE_INPUT_STYLE}
 .${LINE_INPUT_TITLE_CLS}::before {
 ${textInputTitleStyle(this.inputEl)}}`;

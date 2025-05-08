@@ -47,6 +47,10 @@ const TEXT_INPUT_CODE_TEMPLATE = `
 customElements.define(
   ComponentName.TEXT_INPUT,
   class extends HTMLElement {
+    static get observedAttributes() {
+      return ["id", "title"];
+    }
+
     constructor() {
       super();
       this.attachShadow({ mode: "open" });
@@ -124,7 +128,8 @@ customElements.define(
 
       // set style after element has been added to document
       setTimeout(() => {
-        const style = document.createElement("style");
+        const style =
+          this.root.querySelector("style") || document.createElement("style");
         style.textContent = `${TEXT_INPUT_STYLE}
 .${TEXT_INPUT_TITLE_CLS}::before {
 ${textInputTitleStyle(this.textArea)}

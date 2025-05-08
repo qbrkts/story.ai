@@ -81,7 +81,7 @@ customElements.define(
       this.progressContainer.style.marginTop = `${
         Math.round(this.value + 1) * 4
       }px`;
-      this.progressContainer.title = Math.round(progressPercent) + "% complete";
+      this.progressContainer.setAttribute("title", Math.round(progressPercent) + "% complete");
     }
 
     get root() {
