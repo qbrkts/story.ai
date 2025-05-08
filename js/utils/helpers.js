@@ -610,12 +610,14 @@ async function generateStoryContents(
     `This is the genre of the story: "${storyDocument.genre}"`,
     // `This is the setting of the story: "${storyDocument.setting}"`,
     // `This is the synopsis of the story: "${storyDocument.synopsis}"`,
-    // `This is the outline of the story: ${outline.join("\n")}`,
+    `This is the outline of the story: ${storyDocument.outline
+      .map((o, i) => `Chapter ${i + 1}: ${o.description}`)
+      .join("\n")}`,
     `These are the main characters involved in the story: ${getCharactersForQuery(
       storyDocument
     )}`,
     `CRITICAL: The generated story MUST strictly adhere to this writing style: ${storyDocument.style}`,
-    `CRITICAL: The primary goal is to generate content ONLY for the specified chapter, strictly following its description and scenes.`,
+    `CRITICAL: The primary goal is to generate content ONLY for the specified chapter.`,
     `CRITICAL: Maintain narrative consistency with the overall story progression implied by the chapter outlines.`,
     `CRITICAL: The generated content MUST be set up that the story flows between the scenes and chapters in a natural way.`,
   ];
@@ -768,7 +770,7 @@ function getPageDialog(contentHTML = "") {
   if (!pageDialog.id) {
     pageDialog.style.backgroundColor = "transparent";
     pageDialog.style.border = "none";
-    pageDialog.style.outline = "none;"
+    pageDialog.style.outline = "none;";
     pageDialog.style.margin = "auto";
     pageDialog.style.padding = "0";
     pageDialog.style.textAlign = "center";
