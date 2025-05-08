@@ -329,13 +329,14 @@ customElements.define(
         const writeBtn = /** @type {import ('../../../types').PaperButton} */ (
           document.createElement(ComponentName.PAPER_BUTTON)
         );
-        writeBtn.title = AppText.WRITE_CHAPTER;
+        const chapNum = i + 1;
+        writeBtn.title = `${AppText.WRITE_CHAPTER} ${chapNum}`;
         writeBtn.innerHTML = AppText.WRITE;
         writeBtn.handler = async () => {
           writeBtn.disabled = true;
           let storyDocument = getStoryDocumentByTitle(getCurrentTitle());
           let chapter = storyDocument.outline[i];
-          const chaptersToGenerate = new Array(i + 1)
+          const chaptersToGenerate = new Array(chapNum)
             .fill(null)
             .map((_, j) => j + 1);
           storyDocument = await generateStoryContents(chaptersToGenerate);
@@ -351,7 +352,7 @@ customElements.define(
             );
           chapterContentEl.addInfo(
             AppText.MODIFY_OUTLINE_TO_REGENERATE_CHAPTER_CONTENT,
-            `${AppText.CHAPTER} ${i + 1}`
+            `${AppText.CHAPTER} ${chapNum}`
           );
           chapterContentEl.addEventListener("input", () => {
             const contentValue = chapterContentEl.storyContentEl.value;
