@@ -26,7 +26,7 @@ const LINE_INPUT_STYLE = `
 }
 
 .${LINE_INPUT_CLS}:active {
-  transform: scale(0.95);
+  transform: scale(0.98);
 }
 `;
 const LINE_INPUT_CODE_TEMPLATE = `

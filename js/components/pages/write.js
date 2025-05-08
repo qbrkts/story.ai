@@ -328,14 +328,48 @@ customElements.define(
         return addChapterBtn;
       };
 
+      const addExtendChapterBtn = (i, containerEl) => {
+        const extendBtn = /** @type {import ('../../../types').PaperButton} */ (
+          document.createElement(ComponentName.PAPER_BUTTON)
+        );
+        extendBtn.title = AppText.EXTEND_CHAPTER;
+        extendBtn.innerHTML = AppText.EXTEND_CHAPTER;
+        const chapNum = i + 1;
+        const chapterName = `${AppText.CHAPTER} ${chapNum}`;
+        extendBtn.handler = async () => {
+          extendBtn.disabled = true;
+          const extendPrompt = htmlEscape(prompt(AppText.EXTEND_CHAPTER_GUIDE));
+          await this.generateChapterContent(
+            chapNum,
+            `Extends the chapter to add the following: '${extendPrompt}'`,
+            true
+          );
+          const chapterContent = getStoryDocumentByTitle(getCurrentTitle())
+            .outline[i].content;
+          const chapterContentInputEl =
+            /** @type {import('../../../types').TextInput} */ (
+              this.root.querySelector(
+                `${ComponentName.TEXT_INPUT}[title^="${chapterName}"]`
+              )
+            );
+          if (chapterContentInputEl) {
+            chapterContentInputEl.value = chapterContent;
+            chapterContentInputEl.focus();
+          }
+          extendBtn.disabled = false;
+        };
+        containerEl.appendChild(extendBtn);
+        return extendBtn;
+      };
+
       const addWriteChapterBtn = (i, containerEl) => {
         const writeBtn = /** @type {import ('../../../types').PaperButton} */ (
           document.createElement(ComponentName.PAPER_BUTTON)
         );
         const chapNum = i + 1;
         const chapterName = `${AppText.CHAPTER} ${chapNum}`;
-        writeBtn.title = `${AppText.GENERATE_CHAPTER} ${chapNum}`;
-        writeBtn.innerHTML = AppText.GENERATE_CHAPTER;
+        writeBtn.title = `${AppText.REWRITE_CHAPTER} ${chapNum}`;
+        writeBtn.innerHTML = AppText.REWRITE_CHAPTER;
         writeBtn.handler = async () => {
           writeBtn.disabled = true;
           const storyDocument = getStoryDocumentByTitle(getCurrentTitle());
@@ -353,9 +387,6 @@ customElements.define(
               return;
             }
             const lockScrollY = document.documentElement.scrollTop;
-            // rewrite existing chapter
-            // const chapterPrompt = htmlEscape(chapter.content);
-            // await this.generateChapterContent(chapNum, chapterPrompt, true);
             await generateStoryContents([chapNum]);
             const resetScrollPosition = () => {
               return setTimeout(() => {
@@ -441,6 +472,7 @@ customElements.define(
         chapterControlsContainerEl.style.gap = DimensionsPx.MEDIUM;
 
         // write chapter controls
+        addExtendChapterBtn(i, chapterControlsContainerEl);
         addWriteChapterBtn(i, chapterControlsContainerEl);
         // delete chapter control
         addDeleteChapterBtn(i, chapterControlsContainerEl);
@@ -699,7 +731,7 @@ customElements.define(
         content: result.chapter.content,
         characters: [],
       });
-      alert(AppText.SUCCESS_NEW_CHAPTER);
+      alert(AppText.SUCCESS_CHAPTER_GENERATION);
       addStoryDocumentToLocalStorage(title, storyDocument);
     };
 

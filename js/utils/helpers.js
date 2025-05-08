@@ -123,9 +123,12 @@ const AppText = {
   ENTER_EMAIL: "Enter your email address",
   ENTER_NAME: "Enter your name",
   ENTER_NEW_STORY: "Enter new story title",
+  EXTEND_CHAPTER: "Extend chapter",
+  EXTEND_CHAPTER_GUIDE:
+    "Enter specific instructions for the next scene in the chapter.",
   GEMINI_API_KEY: "Gemini",
   GEMINI_API_KEY_NOT_SET: "Gemini API Key not set",
-  GENERATE_CHAPTER: "Generate chapter",
+  REWRITE_CHAPTER: "Rewrite chapter",
   GENERATE_CHAPTER_GUIDE:
     "Include any specific directions for this chapter being created. Example, 4000 word chapter for a medium length story etc.",
   GENERATE_STYLE_AND_SETTING: "Generate style and setting",
@@ -162,7 +165,7 @@ const AppText = {
   SUCCESS: "Success",
   SUCCESS_NEW_CHARACTER: `Successfully generated new character. Add any extra traits to their description matching the same format.`,
   REMOVE_CHARACTER_GUIDE: `To remove a character, replace their description with '${DELETE_CHARACTER_MARKER}'.`,
-  SUCCESS_NEW_CHAPTER: `Successfully generated a new chapter`,
+  SUCCESS_CHAPTER_GENERATION: `Successfully generated chapter content`,
   SUMMARY: "Summary",
   STYLE_OR_SETTING_ALREADY_PRESENT:
     "Delete the existing story style and settings if you want to generate new ones.",
