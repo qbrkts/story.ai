@@ -342,7 +342,7 @@ customElements.define(
           this.renderOutline(storyDocument);
           chapter = storyDocument.outline[i];
           const pageDialog = getPageDialog(
-            `<chapter-content text="${chapter.content}"></chapter-content>`
+            `<chapter-content text="${htmlEscape(chapter.content)}"></chapter-content>`
           );
           const chapterContentEl =
             /** @type {import('../../../types').ChapterContent} */ (

@@ -841,3 +841,9 @@ const setRepeat = (handler, ...options) => {
   );
   return intervalId;
 };
+
+const htmlEscape = (text) => {
+  const span = document.createElement("span");
+  span.innerText = text.trim();
+  return span.innerHTML.trim();
+};

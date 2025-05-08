@@ -91,7 +91,7 @@ customElements.define(
             o.content &&
             `<chapter-content info="${AppText.CHAPTER} ${i + 1}: ${
               o.title
-            }" text="${o.content}" readonly></chapter-content>`
+            }" text="${htmlEscape(o.content)}" readonly></chapter-content>`
           );
         })
         .filter(Boolean)
