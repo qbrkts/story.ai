@@ -111,6 +111,7 @@ const AppText = {
   BRAIN_DUMP:
     "Dump your story synopsis here. Anything goes and everything helps. If you want a more dramatic twist, add that idea here too!",
   CHAPTER: "Chapter",
+  CHAPTER_LIST: "Chapters",
   COPYRIGHT: "Copyright",
   COPY_SHARE_LINK_SUCCESS: "Successfully copied share link to clipboard",
   CHARACTERS: "Characters",
@@ -131,6 +132,7 @@ const AppText = {
   GEMINI_API_KEY: "Gemini",
   GEMINI_API_KEY_NOT_SET: "Gemini API Key not set",
   REWRITE_CHAPTER: "Write for me",
+  GENRE: "Genre",
   GENERATE_CHAPTER_GUIDE:
     "Include any specific directions for this chapter being created. Example, 4000 word chapter for a medium length story etc.",
   GENERATE_STYLE_AND_SETTING: "Generate style and setting",
@@ -145,11 +147,11 @@ const AppText = {
     "This story has no content. Attempting to generate some from the outline. If you want to make any changes, return to the write page and make changes.",
   NO_STORIES_YET: "No stories yet... continue above",
   NO_STORY_SELECTED: "No story selected",
-  OUTLINE: "Outline",
   OWNER_NAME: "Quantum Brackets",
   PREVIOUSLY_ON: "Previously on...",
   RANDOM: "Random",
   SAVE: "Save",
+  SETTING: "Setting",
   SHARE_STORY: "Copy link to share story",
   START: "Start",
   STORY_AI_DESCRIPTION: "A tool to generate stories using AI",
@@ -170,8 +172,10 @@ const AppText = {
   REMOVE_CHARACTER_GUIDE: `To remove a character, replace their description with '${DELETE_CHARACTER_MARKER}'.`,
   SUCCESS_CHAPTER_GENERATION: `Successfully generated chapter content`,
   SUMMARY: "Summary",
+  STYLE: "Style",
   STYLE_OR_SETTING_ALREADY_PRESENT:
     "Delete the existing story style and settings if you want to generate new ones.",
+  TITLE: "Title",
   UPDATE_GEMINI_API_KEY: "Update",
   UPDATE_STORY_TITLE: "Update story title",
   VISIT_STORIES: "Visit stories",
@@ -868,7 +872,7 @@ const htmlEscape = (text) => {
 };
 
 /** @type {Record<string, {text: string; onClick?: () => void;}>} */
-const PageNavigationLinks = {}
+const PageNavigationLinks = {};
 const addPageNavigationLinks = (
   /** @type {({id: keyof typeof PageNavigationLinks} & (typeof PageNavigationLinks)[keyof typeof PageNavigationLinks])[]} */ ...links
 ) => {
@@ -876,6 +880,7 @@ const addPageNavigationLinks = (
     PageNavigationLinks[id] = { ...link };
   });
 };
-const goToPageNavigationLink = (id) => {
+const goToPageNavigationLink = (id) => (e) => {
+  e?.target?.scrollIntoView?.({ block: "center" });
   PageNavigationLinks[id]?.onClick?.();
 };

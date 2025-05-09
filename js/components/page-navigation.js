@@ -79,7 +79,7 @@ customElements.define(
             ${this.links
               .map(
                 (link) =>
-                  `<p class="page-navigation-cls" onclick="goToPageNavigationLink('${link.id}')">${link.text}</p>`
+                  `<p class="page-navigation-cls" onclick="goToPageNavigationLink('${link.id}')(event)">${link.text}</p>`
               )
               .join("")}
         </div>

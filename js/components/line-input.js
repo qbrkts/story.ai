@@ -68,7 +68,7 @@ customElements.define(
     }
 
     focus() {
-      this.inputEl.focus();
+      setTimeout(() => this.inputEl.focus(), DEFAULT_RENDER_DELAY_MS);
     }
 
     connectedCallback() {

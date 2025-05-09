@@ -84,7 +84,7 @@ customElements.define(
     }
 
     focus() {
-      this.textArea.focus();
+      setTimeout(() => this.textArea.focus(), DEFAULT_RENDER_DELAY_MS);
     }
 
     updateInputHeight = () => {

@@ -137,7 +137,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
 
     <details id=${WritePageIds.STORY_OUTLINE_SECTION}>
       <summary style="cursor: pointer; padding: ${DimensionsPx.MLARGE};">
-        ${AppText.OUTLINE}
+        ${AppText.CHAPTER_LIST}
       </summary>
       <div
           id=${WritePageIds.STORY_OUTLINE_CONTAINER}
@@ -259,38 +259,56 @@ customElements.define(
       addPageNavigationLinks(
         {
           id: "story-title",
-          text: "[ Title ]",
+          text: `[ ${AppText.TITLE} ]`,
           onClick: () => {
             window.scrollTo({ top: 0, behavior: "smooth" });
-            setTimeout(
-              () => this.storyTitleInput.focus(),
-              DEFAULT_RENDER_DELAY_MS
-            );
+            this.storyTitleInput.focus();
           },
         },
         {
           id: "story-summary-section",
-          text: "[ Summary ]",
+          text: `[ ${AppText.SUMMARY} ]`,
           onClick: () => {
             this.openSection(this.storySummarySection);
-            this.storySummarySection.scrollIntoView();
-            setTimeout(() => {
-              this.storySummaryBrainDumpInput.focus();
-            }, DEFAULT_RENDER_DELAY_MS);
+            this.storySummaryBrainDumpInput.focus();
+          },
+        },
+        {
+          id: "story-setting-section",
+          text: `[ ${AppText.SETTING} ]`,
+          onClick: () => {
+            this.openSection(this.storySummarySection, false);
+            this.storySettingInput.focus();
+          },
+        },
+        {
+          id: "story-genre-section",
+          text: `[ ${AppText.GENRE} ]`,
+          onClick: () => {
+            this.openSection(this.storySummarySection, false);
+            this.storyGenreInput.focus();
+          },
+        },
+        {
+          id: "story-style-section",
+          text: `[ ${AppText.STYLE} ]`,
+          onClick: () => {
+            this.openSection(this.storySummarySection, false);
+            this.storyStyleInput.focus();
           },
         },
         { id: "story-characters-open", text: "|" },
         {
           id: "story-characters-section",
-          text: "( Characters )",
+          text: `( ${AppText.CHARACTERS} )`,
           onClick: () => {
-            this.openSection(this.storyCharactersSection);
-            this.storyCharactersSection.scrollIntoView();
+            this.openSection(this.storyCharactersSection, false);
             this.newCharacterInput.focus();
           },
         },
         ...Object.keys(storyDocument.characters)
           .map(htmlEscape)
+          .sort()
           .map((characterName) => ({
             id: `character-${characterName}`,
             text: characterName,
@@ -306,10 +324,9 @@ customElements.define(
         { id: "story-chapters-open", text: "|" },
         {
           id: "story-outline-section",
-          text: "( Chapters )",
+          text: `( ${AppText.CHAPTER_LIST} )`,
           onClick: () => {
             this.openSection(this.storyOutlineSection);
-            this.storyOutlineSection.scrollIntoView();
             this.storyOutlineSection.focus();
           },
         },
@@ -327,7 +344,7 @@ customElements.define(
                 ?.scrollIntoView();
             },
           };
-        }),
+        })
       );
     };
 
@@ -773,13 +790,11 @@ customElements.define(
       addStoryDocumentToLocalStorage(title, storyDocument);
       this.addCharacterBtn.disabled = false;
       this.render();
-      setTimeout(() => {
-        /** @type {import ('../../../types').TextInput} */ (
-          this.charactersContainer.querySelector(
-            `[name="${result.character.name}"]`
-          )
-        )?.focus();
-      }, DEFAULT_RENDER_DELAY_MS);
+      /** @type {import('../../../types').TextInput} */ (
+        this.charactersContainer.querySelector(
+          `[name="${result.character.name}"]`
+        )
+      )?.focus();
     };
 
     generateChapterContent = async (
