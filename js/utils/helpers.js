@@ -58,6 +58,7 @@ const Page = Object.assign(
   LINE_INPUT: 'line-input';
   SITE_NAVIGATION: 'site-navigation';
   PAPER_BUTTON: 'paper-button';
+  PAGE_NAVIGATION: 'page-navigation',
   PROGRESS_INDICATOR: 'progress-indicator';
   SHARE_STORY: 'share-story';
   TEXT_INPUT: 'text-input';
@@ -73,6 +74,7 @@ const ComponentName = Object.assign(
     GEMINI_API_KEY: "gemini-api-key",
     LINE_INPUT: "line-input",
     SITE_NAVIGATION: "site-navigation",
+    PAGE_NAVIGATION: "page-navigation",
     PAPER_BUTTON: "paper-button",
     PROGRESS_INDICATOR: "progress-indicator",
     SHARE_STORY: "share-story",
@@ -134,6 +136,7 @@ const AppText = {
   GENERATE_STYLE_AND_SETTING: "Generate style and setting",
   INFINITE_STORIES: "Enter the world of infinite tales",
   INVALID_API_KEY: "Please enter a valid API Key.",
+  JUMP_TO: "Jump to",
   LOADING: "Loading...",
   NEW_CHARACTER_GUIDELINE:
     "Optionally enter the name and any traits to guide character generation.",
@@ -776,7 +779,7 @@ async function copyTextToClipboard(text) {
   }
 }
 
-function getPageDialog(contentHTML = "") {
+function getPageDialog(contentHTML = "", options = { keepOpenOnClick: true }) {
   const PAGE_DIALOG_ID = "page-dialog";
   const pageDialog = /** @type {HTMLDialogElement} */ (
     document.getElementById(PAGE_DIALOG_ID) || document.createElement("dialog")
@@ -811,10 +814,12 @@ function getPageDialog(contentHTML = "") {
   }
   if (pageDialog.firstElementChild) {
     pageDialog.firstElementChild.innerHTML = contentHTML;
-    pageDialog.firstElementChild.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-    });
+    if (options.keepOpenOnClick) {
+      pageDialog.firstElementChild.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    }
   }
   pageDialog.addEventListener("click", () => {
     pageDialog.close();
@@ -860,4 +865,17 @@ const htmlEscape = (text) => {
       .replaceAll("<br />", "\n")
       .trim()
   );
+};
+
+/** @type {Record<string, {text: string; onClick: () => void;}>} */
+const PageNavigationLinks = {}
+const addPageNavigationLinks = (
+  /** @type {({id: keyof typeof PageNavigationLinks} & (typeof PageNavigationLinks)[keyof typeof PageNavigationLinks])[]} */ ...links
+) => {
+  links.forEach(({ id, ...link }) => {
+    PageNavigationLinks[id] = { ...link };
+  });
+};
+const goToPageNavigationLink = (id) => {
+  PageNavigationLinks[id]?.onClick();
 };

@@ -30,6 +30,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
 
   return `
   <site-navigation></site-navigation>
+  <page-navigation></page-navigation>
 
   <gemini-api-key></gemini-api-key>
 
@@ -163,6 +164,41 @@ customElements.define(
     }
 
     connectComponents() {
+      addPageNavigationLinks(
+        {
+          id: "story-title",
+          text: "Story Title",
+          onClick: () => {
+            this.storyTitleInput.scrollIntoView();
+            this.storyTitleInput.focus();
+          },
+        },
+        {
+          id: "story-summary-section",
+          text: "Summary",
+          onClick: () => {
+            this.storySummarySection.scrollIntoView();
+            this.storySummarySection.focus();
+          },
+        },
+        {
+          id: "story-characters-section",
+          text: "Characters",
+          onClick: () => {
+            this.storyCharactersSection.scrollIntoView();
+            this.storyCharactersSection.focus();
+          },
+        },
+        {
+          id: "story-outline-section",
+          text: "Chapters",
+          onClick: () => {
+            this.storyOutlineSection.scrollIntoView();
+            this.storyOutlineSection.focus();
+          },
+        }
+      );
+
       this.storySummarySection.onclick = this.toggleSectionOpenOnClick;
       this.storyCharactersSection.onclick = this.toggleSectionOpenOnClick;
       this.storyOutlineSection.onclick = this.toggleSectionOpenOnClick;
@@ -334,7 +370,10 @@ customElements.define(
         const extendBtn = /** @type {import ('../../../types').PaperButton} */ (
           document.createElement(ComponentName.PAPER_BUTTON)
         );
-        extendBtn.setAttribute("title", `${AppText.EXTEND_CHAPTER} ${AppText.CHAPTER}`);
+        extendBtn.setAttribute(
+          "title",
+          `${AppText.EXTEND_CHAPTER} ${AppText.CHAPTER}`
+        );
         extendBtn.textContent = AppText.EXTEND_CHAPTER;
         const chapNum = i + 1;
         const chapterName = `${AppText.CHAPTER} ${chapNum}`;
@@ -375,7 +414,10 @@ customElements.define(
         );
         const chapNum = i + 1;
         const chapterName = `${AppText.CHAPTER} ${chapNum}`;
-        writeBtn.setAttribute("title", `${AppText.REWRITE_CHAPTER} ${chapterName}`);
+        writeBtn.setAttribute(
+          "title",
+          `${AppText.REWRITE_CHAPTER} ${chapterName}`
+        );
         writeBtn.textContent = AppText.REWRITE_CHAPTER;
         writeBtn.textIcon = "📝";
         writeBtn.handler = async () => {
@@ -462,7 +504,10 @@ customElements.define(
           outline.content || AppText.GENERATE_CHAPTER_GUIDE,
         ].join("\n");
         const chapterNum = `${AppText.CHAPTER} ${i + 1}`;
-        chapterContentInput.setAttribute("title", `${chapterNum}: ${outline.title}`);
+        chapterContentInput.setAttribute(
+          "title",
+          `${chapterNum}: ${outline.title}`
+        );
         chapterContentInput.name = chapterNum;
         chapterContentInput.setAttribute("style", TEXT_INPUT_INLINE_STYLE);
         chapterContentInput.addEventListener("input", () => {
@@ -471,7 +516,10 @@ customElements.define(
           const [chapterTitle, ...description] =
             chapterContentInput.value.split("\n");
           storyDocument.outline[i].title = chapterTitle;
-          chapterContentInput.setAttribute("title", `${chapterNum}: ${chapterTitle}`);
+          chapterContentInput.setAttribute(
+            "title",
+            `${chapterNum}: ${chapterTitle}`
+          );
           storyDocument.outline[i].content = `${chapterNum}: ${chapterTitle}`;
           storyDocument.outline[i].content = htmlEscape(description.join("\n"));
           addStoryDocumentToLocalStorage(storyTitle, storyDocument);
