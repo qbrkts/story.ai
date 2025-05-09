@@ -164,41 +164,6 @@ customElements.define(
     }
 
     connectComponents() {
-      addPageNavigationLinks(
-        {
-          id: "story-title",
-          text: "Story Title",
-          onClick: () => {
-            this.storyTitleInput.scrollIntoView();
-            this.storyTitleInput.focus();
-          },
-        },
-        {
-          id: "story-summary-section",
-          text: "Summary",
-          onClick: () => {
-            this.storySummarySection.scrollIntoView();
-            this.storySummarySection.focus();
-          },
-        },
-        {
-          id: "story-characters-section",
-          text: "Characters",
-          onClick: () => {
-            this.storyCharactersSection.scrollIntoView();
-            this.storyCharactersSection.focus();
-          },
-        },
-        {
-          id: "story-outline-section",
-          text: "Chapters",
-          onClick: () => {
-            this.storyOutlineSection.scrollIntoView();
-            this.storyOutlineSection.focus();
-          },
-        }
-      );
-
       this.storySummarySection.onclick = this.toggleSectionOpenOnClick;
       this.storyCharactersSection.onclick = this.toggleSectionOpenOnClick;
       this.storyOutlineSection.onclick = this.toggleSectionOpenOnClick;
@@ -287,6 +252,67 @@ customElements.define(
 
       this.renderCharacters(storyDocument);
       this.renderOutline(storyDocument);
+
+      addPageNavigationLinks(
+        {
+          id: "story-title",
+          text: "[ Title ]",
+          onClick: () => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            setTimeout(
+              () => this.storyTitleInput.focus(),
+              DEFAULT_RENDER_DELAY_MS
+            );
+          },
+        },
+        {
+          id: "story-summary-section",
+          text: "[ Summary ]",
+          onClick: () => {
+            this.openSection(this.storySummarySection);
+            this.storySummarySection.scrollIntoView();
+            setTimeout(() => {
+              this.storySummaryBrainDumpInput.focus();
+            }, DEFAULT_RENDER_DELAY_MS);
+          },
+        },
+        { id: "story-characters-open", text: "[" },
+        {
+          id: "story-characters-section",
+          text: "( Characters )",
+          onClick: () => {
+            this.openSection(this.storyCharactersSection);
+            this.storyCharactersSection.scrollIntoView();
+            this.newCharacterInput.focus();
+          },
+        },
+        ...Object.keys(storyDocument.characters)
+          .map(htmlEscape)
+          .map((characterName) => ({
+            id: `character-${characterName}`,
+            text: characterName,
+            onClick: () => {
+              this.openSection(this.storyCharactersSection, false);
+              this.charactersContainer
+                .querySelector(
+                  `${ComponentName.TEXT_INPUT}[title^="${characterName}"]`
+                )
+                ?.scrollIntoView();
+            },
+          })),
+        { id: "story-characters-close", text: "]" },
+        { id: "story-chapters-open", text: "[" },
+        {
+          id: "story-outline-section",
+          text: "( Chapters )",
+          onClick: () => {
+            this.openSection(this.storyOutlineSection);
+            this.storyOutlineSection.scrollIntoView();
+            this.storyOutlineSection.focus();
+          },
+        },
+        { id: "story-chapters-close", text: "]" }
+      );
     }
 
     renderCharacters = (storyDocument) => {
@@ -302,14 +328,15 @@ customElements.define(
       };
       Object.entries(storyDocument.characters)
         .sort()
-        .forEach(([name, description]) => {
+        .forEach(([nameKey, description]) => {
           const characterInput =
             /** @type {import('../../../types').TextInput} */ (
               document.createElement(ComponentName.TEXT_INPUT)
             );
           characterInput.value = description;
-          characterInput.setAttribute("title", name);
-          characterInput.setAttribute("name", name);
+          const characterName = htmlEscape(nameKey);
+          characterInput.setAttribute("title", characterName);
+          characterInput.setAttribute("name", characterName);
           characterInput.setAttribute("style", TEXT_INPUT_INLINE_STYLE);
           characterInput.style.marginBottom = "16px";
           this.charactersContainer.appendChild(characterInput);
@@ -321,12 +348,12 @@ customElements.define(
               setTimeout(() => {
                 if (shouldDeleteCharacterInput(characterInput)) {
                   characterInput.remove();
-                  delete storyDocument.characters[name];
+                  delete storyDocument.characters[nameKey];
                   addStoryDocumentToLocalStorage(currentTitle, storyDocument);
                 }
               }, CHARACTER_DELETE_TIMEOUT_MS);
             } else {
-              storyDocument.characters[name] = characterDescription;
+              storyDocument.characters[nameKey] = characterDescription;
               addStoryDocumentToLocalStorage(currentTitle, storyDocument);
             }
           });
@@ -360,7 +387,7 @@ customElements.define(
             return;
           }
           await this.generateChapterContent(i + 2, chapterPrompt);
-          this.renderOutline(getStoryDocumentByTitle(getCurrentTitle()));
+          this.render();
         };
         containerEl.appendChild(addChapterBtn);
         return addChapterBtn;
@@ -444,7 +471,7 @@ customElements.define(
                 // window.scrollTo({ left: 0, top: lockScrollY, behavior: "auto" });
               }, PAGE_LAYOUT_TIMEOUT_MS);
             };
-            this.renderOutline(getStoryDocumentByTitle(getCurrentTitle()));
+            this.render();
             resetScrollPosition();
           } finally {
             writeBtn.disabled = false;
@@ -466,7 +493,7 @@ customElements.define(
           const storyDocument = getStoryDocumentByTitle(storyTitle);
           storyDocument.outline.splice(i, 1);
           addStoryDocumentToLocalStorage(storyTitle, storyDocument);
-          this.renderOutline(storyDocument);
+          this.render();
         };
         containerEl.appendChild(deleteBtn);
         return deleteBtn;
@@ -551,13 +578,15 @@ customElements.define(
         .forEach((section) => section.removeAttribute("open"));
     };
 
-    openSection = (section) => {
+    openSection = (section, scrollIntoView = true) => {
       this.closeAllSections();
       section.setAttribute("open", true);
-      section.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+      if (scrollIntoView) {
+        section.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
     };
 
     toggleSectionOpenOnClick = (e) => {
@@ -707,11 +736,12 @@ customElements.define(
       );
       const result = await characterResultPromise;
       console.log("character result:", result);
-      const characterName =
+      const characterName = htmlEscape(
         result.character.name ||
-        result.character.Name ||
-        result.character.names ||
-        result.character.Names;
+          result.character.Name ||
+          result.character.names ||
+          result.character.Names
+      );
       storyDocument.characters[characterName] =
         result.character.description ||
         Object.entries(result.character)

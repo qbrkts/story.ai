@@ -867,7 +867,7 @@ const htmlEscape = (text) => {
   );
 };
 
-/** @type {Record<string, {text: string; onClick: () => void;}>} */
+/** @type {Record<string, {text: string; onClick?: () => void;}>} */
 const PageNavigationLinks = {}
 const addPageNavigationLinks = (
   /** @type {({id: keyof typeof PageNavigationLinks} & (typeof PageNavigationLinks)[keyof typeof PageNavigationLinks])[]} */ ...links
@@ -877,5 +877,5 @@ const addPageNavigationLinks = (
   });
 };
 const goToPageNavigationLink = (id) => {
-  PageNavigationLinks[id]?.onClick();
+  PageNavigationLinks[id]?.onClick?.();
 };

@@ -69,7 +69,11 @@ customElements.define(
       getPageDialog(
         `<div style="
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            justify-content: center;
             gap: ${DimensionsPx.MLARGE};
             padding: ${DimensionsPx.MEDIUM}">
             ${this.links
