@@ -90,7 +90,7 @@ customElements.define(
         }
         .page-navigation-cls:hover {
           font-weight: bold;
-          scale: 1.1;
+          scale: 1.03;
         }
         </style>`,
         { keepOpenOnClick: false }

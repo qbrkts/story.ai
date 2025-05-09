@@ -252,7 +252,10 @@ customElements.define(
 
       this.renderCharacters(storyDocument);
       this.renderOutline(storyDocument);
+      this.renderPageNavigation(storyDocument);
+    }
 
+    renderPageNavigation = (storyDocument) => {
       addPageNavigationLinks(
         {
           id: "story-title",
@@ -276,7 +279,7 @@ customElements.define(
             }, DEFAULT_RENDER_DELAY_MS);
           },
         },
-        { id: "story-characters-open", text: "[" },
+        { id: "story-characters-open", text: "|" },
         {
           id: "story-characters-section",
           text: "( Characters )",
@@ -300,8 +303,7 @@ customElements.define(
                 ?.scrollIntoView();
             },
           })),
-        { id: "story-characters-close", text: "]" },
-        { id: "story-chapters-open", text: "[" },
+        { id: "story-chapters-open", text: "|" },
         {
           id: "story-outline-section",
           text: "( Chapters )",
@@ -311,9 +313,23 @@ customElements.define(
             this.storyOutlineSection.focus();
           },
         },
-        { id: "story-chapters-close", text: "]" }
+        ...storyDocument.outline.map((o, i) => {
+          const chapterTitle = `${AppText.CHAPTER} ${i + 1}: ${o.title}`;
+          return {
+            id: `chapter-${i + 1}`,
+            text: chapterTitle,
+            onClick: () => {
+              this.openSection(this.storyOutlineSection, false);
+              this.storyOutlineSection
+                .querySelector(
+                  `${ComponentName.TEXT_INPUT}[title^="${chapterTitle}"]`
+                )
+                ?.scrollIntoView();
+            },
+          };
+        }),
       );
-    }
+    };
 
     renderCharacters = (storyDocument) => {
       this.charactersContainer.innerHTML = "";
