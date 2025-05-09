@@ -9,23 +9,24 @@ const StoriesPageIds = {
 const STORY_PAGE_CODE_TEMPLATE = `
   <site-navigation></site-navigation>
 
-  <div>
+  <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
     <h2>${AppText.STORY}</h2>
     <line-input
       id="${StoriesPageIds.STORY_TITLE_INPUT}"
       placeholder="${AppText.ENTER_NEW_STORY}"
       style="width: ${DimensionsPx.XXLARGE}; max-width: calc(100vw - 80px);">
     </line-input>
-    <br /><br />
-    <paper-button
-      id="${StoriesPageIds.STORY_START_BTN}"
-      title="${AppText.ENTER_NEW_STORY}">
-      ${AppText.START}
-    </paper-button>
-    <paper-button
-      id="${StoriesPageIds.RANDOM_STORY_BTN}">
-      ${AppText.RANDOM}
+    <div style="margin: ${DimensionsPx.MEDIUM} 0; display: flex; gap: ${DimensionsPx.SMALL}; justify-content: center; align-items: center;">
+      <paper-button
+        id="${StoriesPageIds.STORY_START_BTN}"
+        title="${AppText.ENTER_NEW_STORY}">
+        ${AppText.START}
       </paper-button>
+      <paper-button
+        id="${StoriesPageIds.RANDOM_STORY_BTN}">
+        ${AppText.RANDOM}
+      </paper-button>
+    </div>
   </div>
 
   <div id="${StoriesPageIds.STORIES_LIST_CONTAINER}">

@@ -11,7 +11,7 @@ style="
     border: none;
     cursor: pointer;
     position: fixed;
-    bottom: calc(${DimensionsPx.MLARGE} * 3);
+    bottom: calc(${DimensionsPx.MEDIUM} * 5);
     left: ${DimensionsPx.SMALL};
     font-weight: bold;
     z-index: ${Level.TOP};

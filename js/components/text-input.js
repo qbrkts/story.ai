@@ -2,7 +2,7 @@ const TEXT_INPUT_ID = "text-input";
 const TEXT_INPUT_CLS = "text-input-cls";
 const TEXT_INPUT_TITLE_CLS = "text-input-title";
 const TEXT_INPUT_STYLE = `
-:host, .${TEXT_INPUT_TITLE_CLS} {
+:host {
   position: relative;
 }
 
@@ -16,7 +16,7 @@ const TEXT_INPUT_STYLE = `
   cursor: pointer;
   font-family: ${Font.DEFAULT_FAMILY};
   font-size: 1em;
-  padding: ${DimensionsPx.MLARGE};
+  padding: ${DimensionsPx.MEDIUM};
   text-decoration: none;
   transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
   overflow: hidden;
@@ -131,7 +131,7 @@ customElements.define(
         const style =
           this.root.querySelector("style") || document.createElement("style");
         style.textContent = `${TEXT_INPUT_STYLE}
-.${TEXT_INPUT_TITLE_CLS}::before {
+:host::before {
 ${textInputTitleStyle(this.textArea)}
 }`;
         this.root.appendChild(style);

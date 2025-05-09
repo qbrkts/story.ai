@@ -6,22 +6,23 @@ const GeminiApiKeyIds = {
 
 const isGeminiKeySet = () => !!getGeminiKeyFromLocalStorage();
 const GEMINI_API_KEY_CODE_TEMPLATE = `
-<details id="gemini-api-key-details" style="margin: ${DimensionsPx.MLARGE}" ${
+<details id="gemini-api-key-details" style="margin: ${DimensionsPx.MLARGE} 0;" ${
   isGeminiKeySet() ? "" : "open"
 }>
   <summary style="cursor:pointer; padding: ${DimensionsPx.MEDIUM}">
     ${AppText.GEMINI_API_KEY}
   </summary>
   <br />
-  <line-input
-    id="${GeminiApiKeyIds.KEY_INPUT}"
-    placeholder="${AppText.ENTER_GEMINI_API_KEY}" style="width: ${
-  DimensionsPx.XXLARGE
-}; max-width: calc(100vw - 200px);">
-  </line-input>
-  <paper-button id="${GeminiApiKeyIds.UPDATE_BTN}">
-    ${AppText.UPDATE_GEMINI_API_KEY}
-  </paper-button>
+  <div style="display: flex; width: 100%; gap: ${DimensionsPx.MEDIUM};">
+    <line-input
+        id="${GeminiApiKeyIds.KEY_INPUT}"
+        placeholder="${AppText.ENTER_GEMINI_API_KEY}"
+        style="width: ${DimensionsPx.XXLARGE}; flex-grow: 1">
+    </line-input>
+    <paper-button id="${GeminiApiKeyIds.UPDATE_BTN}">
+        ${AppText.UPDATE_GEMINI_API_KEY}
+    </paper-button>
+  </div>
   <p>
     <a href="https://aistudio.google.com/app/apikey" target="_blank" style="text-decoration: none;">
       ${AppText.NO_API_KEY}

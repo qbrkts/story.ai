@@ -30,7 +30,7 @@ const DimensionsPx = Object.freeze({
   SMALL: "4px",
   MEDIUM: "10px",
   MLARGE: "20px",
-  LARGE: "48px",
+  LARGE: "40px",
   XLARGE: "100px",
   XXLARGE: "400px",
 
@@ -281,7 +281,6 @@ content: "${title ? title + " ▾" : ""}";
 display: block;
 font-size: 0.8em;
 font-weight: bold;
-left: ${element.offsetLeft}px;
 padding: 0.2em 1em;
 position: absolute;
 text-align: start;

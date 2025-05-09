@@ -18,7 +18,7 @@ const WritePageIds = {
   STYLE_TEXT_INPUT: "story-style",
   SUMMARY_TEXT_INPUT: "brain-dump",
 };
-const WIDTH = "calc(100vw - 30px)";
+const WIDTH = "100%";
 const TEXT_INPUT_INLINE_STYLE = `max-width: ${WIDTH}; min-width: ${WIDTH}; min-height: ${DimensionsPx.XLARGE}; font-family: ${Font.DEFAULT_FAMILY};`;
 const WRITE_PAGE_CODE_TEMPLATE = () => {
   const title = getCurrentTitle();
@@ -38,14 +38,15 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
 
   <div>
     <h2>${AppText.WRITE}</h2>
-    <div style="display: flex; flex-direction: row; justify-content: center; gap: ${
-      DimensionsPx.LARGE
-    };">
+    <div style="display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: ${DimensionsPx.MEDIUM};">
       <line-input
         title="${WritePageIds.STORY_TITLE_INPUT}"
         id="${WritePageIds.STORY_TITLE_INPUT}"
         placeholder="${AppText.ENTER_NEW_STORY}"
-        style="width: calc(100vw - 155px)" value="${getCurrentTitle()}">
+        style="width: 100%" value="${getCurrentTitle()}">
       </line-input>
       <paper-button
         id="${WritePageIds.STORY_TITLE_UPDATE_BTN}"
@@ -79,8 +80,8 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
           id="${WritePageIds.GENRE_TEXT_INPUT}"
           title="${WritePageIds.GENRE_TEXT_INPUT}"
           list="${WritePageIds.GENRE_LIST}"
-          style="width: calc(100vw - 70px);"
-          placeholder="${AppText.ENTER_GENRE}">
+          placeholder="${AppText.ENTER_GENRE}"
+          style="width: 100%">
           <datalist id="${WritePageIds.GENRE_LIST}">
             ${StoryDefaults.GENRES.map(
               (g) => `<option value="${g}"></option>`
@@ -117,18 +118,20 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
         style="display: flex; flex-direction: column;"
         id=${WritePageIds.CHARACTERS_CONTAINER}>
       </div>
-      <div style="display: flex; flex-direction: row; gap: ${
-        DimensionsPx.LARGE
-      };">
+      <div style="display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: ${DimensionsPx.MEDIUM};">
         <line-input
           id="${WritePageIds.NEW_CHARACTER_INPUT}"
           title="${WritePageIds.NEW_CHARACTER_INPUT}"
           placeholder="${AppText.NEW_CHARACTER_GUIDELINE}"
-          style="width: calc(100vw - 240px)">
+          style="flex-grow: 1;">
         </line-input>
         <paper-button
           id="${WritePageIds.ADD_CHARACTER_BTN}"
-          title="${AppText.ADD_CHARACTER}">
+          title="${AppText.ADD_CHARACTER}"
+          style="flex-grow: 0">
           ${AppText.ADD_CHARACTER}
         </paper-button>
       </div>
