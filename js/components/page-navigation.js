@@ -73,18 +73,17 @@ customElements.define(
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: ${DimensionsPx.MLARGE};
-            padding: ${DimensionsPx.MEDIUM}">
+            justify-content: center;">
             ${this.links
               .map(
                 (link) =>
-                  `<p class="page-navigation-cls" onclick="goToPageNavigationLink('${link.id}')(event)">${link.text}</p>`
+                  `<span class="page-navigation-cls" onclick="goToPageNavigationLink('${link.id}')(event)">${link.text}</span>`
               )
               .join("")}
         </div>
         <style>
         .page-navigation-cls {
+          padding: ${DimensionsPx.MLARGE};
           cursor: pointer;
           transition: scale 0.3s;
         }

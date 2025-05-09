@@ -297,7 +297,6 @@ customElements.define(
             this.storyStyleInput.focus();
           },
         },
-        { id: "story-characters-open", text: "|" },
         {
           id: "story-characters-section",
           text: `( ${AppText.CHARACTERS} )`,
@@ -321,7 +320,6 @@ customElements.define(
                 ?.scrollIntoView();
             },
           })),
-        { id: "story-chapters-open", text: "|" },
         {
           id: "story-outline-section",
           text: `( ${AppText.CHAPTER_LIST} )`,
