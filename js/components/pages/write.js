@@ -444,10 +444,9 @@ customElements.define(
             const extendInput = prompt(AppText.EXTEND_CHAPTER_GUIDE);
             if (!extendInput) return;
             const extendPrompt = htmlEscape(extendInput);
-            await this.generateChapterContent(
+            await this.extendChapterContent(
               chapNum,
-              `Extends the chapter to add the following: '${extendPrompt}'`,
-              true
+              `Extends the chapter to add writing on the following summary: '${extendPrompt}'`
             );
             const chapterContent = getStoryDocumentByTitle(getCurrentTitle())
               .outline[i].content;
@@ -798,18 +797,14 @@ customElements.define(
       )?.focus();
     };
 
-    generateChapterContent = async (
-      /** @type {number} */ chapNum,
-      /** @type {string | undefined} */ chapterPrompt,
-      isReplacement = false
-    ) => {
-      console.log("generate chapter content", { chapNum, chapterPrompt });
+    doGenerateWritingCheck = () => {
       const apiKey = getGeminiKeyFromLocalStorage();
       if (!apiKey) {
         alert(AppText.GEMINI_API_KEY_NOT_SET);
         this.geminiApiKeyComponent.grabFocus();
         return;
       }
+
       const title = getCurrentTitle();
       const storyDocument = getStoryDocumentByTitle(title);
       if (!storyDocument.title) {
@@ -817,6 +812,7 @@ customElements.define(
         this.storyTitleInput.focus();
         return;
       }
+
       const hasCharacters = Object.keys(storyDocument.characters).length > 0;
       if (!hasCharacters) {
         alert(AppText.STORY_CHARACTERS_NOT_SET);
@@ -824,6 +820,18 @@ customElements.define(
         this.newCharacterInput.focus();
         return;
       }
+
+      return { apiKey, title, storyDocument };
+    };
+
+    generateChapterContent = async (
+      /** @type {number} */ chapNum,
+      /** @type {string | undefined} */ chapterPrompt
+    ) => {
+      console.log("generate chapter content", { chapNum, chapterPrompt });
+      const checkResult = this.doGenerateWritingCheck();
+      if (!checkResult) return;
+      const { apiKey, title, storyDocument } = checkResult;
       const result = await fetchFromGemini(
         apiKey,
         [
@@ -847,12 +855,52 @@ customElements.define(
           .join("\n\n"),
         `{"chapter": {"title": "chapter title excluding the chapter number", "content": "chapter content goes here"}}`
       );
+      const isReplacement = false;
       const doReplace = Number(isReplacement);
-      storyDocument.outline.splice(chapNum - doReplace, doReplace, {
+      storyDocument.outline.splice(chapNum, doReplace, {
         title: result.chapter.title,
         content: result.chapter.content,
         characters: [],
       });
+      alert(AppText.SUCCESS_CHAPTER_GENERATION);
+      addStoryDocumentToLocalStorage(title, storyDocument);
+    };
+
+    extendChapterContent = async (chapNum, chapterPrompt) => {
+      console.log("extend chapter content", { chapNum, chapterPrompt });
+      const checkResult = this.doGenerateWritingCheck();
+      if (!checkResult) return;
+      const { apiKey, title, storyDocument } = checkResult;
+      const chapterIndex = chapNum - 1;
+      const chapterContent = storyDocument.outline[chapterIndex]?.content;
+      if (!chapterContent) {
+        // this should not happen
+        alert(AppText.NO_STORY_CONTENT);
+        return;
+      }
+      const storyCharacters = getCharactersForQuery(storyDocument);
+      const result = await fetchFromGemini(
+        apiKey,
+        [
+          `Write an extension for chapter ${chapNum} of the story "${title}"`,
+          `This is the summary of the story: "${storyDocument.summary}"`,
+          `This is the genre of the story: "${storyDocument.genre}"`,
+          `This is the setting of the story: "${storyDocument.setting}"`,
+          `These are the existing characters: ${storyCharacters}`,
+          `The chapter extension should be tailored to the story based on the synopsis.`,
+          chapterPrompt &&
+            `The extension for the chapter should adhere to the following instructions: ${chapterPrompt}`,
+          `This is the chapter content to extend:\n${chapterContent}`,
+          `CRITICAL: Include only the extension for the chapter in the result.`,
+          `CRITICAL: The extension must follow the style of the existing content/`,
+        ]
+          .filter(Boolean)
+          .join("\n\n"),
+        `{"chapter": {"content": "extension only for the chapter"}}`
+      );
+      console.log("extend chapter result:", result);
+      storyDocument.outline[chapterIndex].content +=
+        "\n\n" + result.chapter.content;
       alert(AppText.SUCCESS_CHAPTER_GENERATION);
       addStoryDocumentToLocalStorage(title, storyDocument);
     };

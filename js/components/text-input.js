@@ -33,7 +33,7 @@ const TEXT_INPUT_STYLE = `
 }
 
 .${TEXT_INPUT_CLS}:active {
-  transform: scale(0.98);
+  transform: scale(0.999);
 }
 
 .${TEXT_INPUT_CLS}:focus {
