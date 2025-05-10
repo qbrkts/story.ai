@@ -832,6 +832,7 @@ customElements.define(
       const checkResult = this.doGenerateWritingCheck();
       if (!checkResult) return;
       const { apiKey, title, storyDocument } = checkResult;
+      const chapterQuery = getCharactersForQuery(storyDocument);
       const result = await fetchFromGemini(
         apiKey,
         [
@@ -839,9 +840,7 @@ customElements.define(
           `This is the summary of the story: "${storyDocument.summary}"`,
           `This is the genre of the story: "${storyDocument.genre}"`,
           `This is the setting of the story: "${storyDocument.setting}"`,
-          `These are the existing characters: ${getCharactersForQuery(
-            storyDocument
-          )}`,
+          `These are the existing characters: ${chapterQuery}`,
           `These are the existing chapters:\n${storyDocument.outline
             .map((c) => c.content)
             .filter(Boolean)
@@ -849,7 +848,8 @@ customElements.define(
             .join("\n\n")}`,
           `The chapter should be tailored to the story based on the synopsis.`,
           chapterPrompt &&
-            `The chapter should adhere to the following instructions: ${chapterPrompt}`,
+            `CRITICAL: The chapter should adhere to the following instructions: ${chapterPrompt}`,
+          `CRITICAL: The generated story MUST strictly adhere to this writing style: ${storyDocument.style}`,
         ]
           .filter(Boolean)
           .join("\n\n"),
@@ -892,7 +892,8 @@ customElements.define(
             `The extension for the chapter should adhere to the following instructions: ${chapterPrompt}`,
           `This is the chapter content to extend:\n${chapterContent}`,
           `CRITICAL: Include only the extension for the chapter in the result.`,
-          `CRITICAL: The extension must follow the style of the existing content/`,
+          `CRITICAL: The extension MUST strictly follow the style of the existing content.`,
+          `CRITICAL: The extension MUST strictly adhere to this writing style: ${storyDocument.style}`,
         ]
           .filter(Boolean)
           .join("\n\n"),
