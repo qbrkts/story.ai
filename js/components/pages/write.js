@@ -752,12 +752,12 @@ customElements.define(
           `This is the summary of the story: "${storyDocument.summary}"`,
           `This is the genre of the story: "${storyDocument.genre}"`,
           `This is the setting of the story: "${storyDocument.setting}"`,
-          `This is the synopsis of the story: "${storyDocument.synopsis}"`,
+          `This is the style of the story: "${storyDocument.style}"`,
           `These are the existing characters: ${getCharactersForQuery(
             storyDocument
           )}`,
           `Attempt to maintain a balance between the ages, cultures and genders of characters.`,
-          `The character should be tailored to the story based on the synopsis.`,
+          `The character should be tailored to the story based on the summary.`,
           `The character should not be redundant with the existing characters.`,
           characterPrompt &&
             `The character should be inline with the given information: ${characterPrompt}`,
@@ -846,7 +846,7 @@ customElements.define(
             .filter(Boolean)
             .map((c, i) => `Chapter ${i + 1}: ${c}`)
             .join("\n\n")}`,
-          `The chapter should be tailored to the story based on the synopsis.`,
+          `The chapter should be tailored to the story based on the summary.`,
           chapterPrompt &&
             `CRITICAL: The chapter should adhere to the following instructions: ${chapterPrompt}`,
           `CRITICAL: The generated story MUST strictly adhere to this writing style: ${storyDocument.style}`,
@@ -887,7 +887,7 @@ customElements.define(
           `This is the genre of the story: "${storyDocument.genre}"`,
           `This is the setting of the story: "${storyDocument.setting}"`,
           `These are the existing characters: ${storyCharacters}`,
-          `The chapter extension should be tailored to the story based on the synopsis.`,
+          `The chapter extension should be tailored to the story based on the summary.`,
           chapterPrompt &&
             `The extension for the chapter should adhere to the following instructions: ${chapterPrompt}`,
           `This is the chapter content to extend:\n${chapterContent}`,

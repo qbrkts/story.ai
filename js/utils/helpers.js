@@ -549,8 +549,6 @@ const DEFAULT_DOCUMENT = {
   style: "",
   /** @type {string | undefined} */
   setting: undefined,
-  /** AI generated synopsis of the story for generating characters */
-  // synopsis: "",
   /**
    * AI generated characters for generating chapters
    * @type {Record<string, string>}
