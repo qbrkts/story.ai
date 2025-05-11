@@ -831,39 +831,8 @@ customElements.define(
       console.log("generate chapter content", { chapNum, chapterPrompt });
       const checkResult = this.doGenerateWritingCheck();
       if (!checkResult) return;
-      const { apiKey, title, storyDocument } = checkResult;
-      const chapterQuery = getCharactersForQuery(storyDocument);
-      const result = await fetchFromGemini(
-        apiKey,
-        [
-          `Generate chapter ${chapNum} of the story "${title}"`,
-          `This is the summary of the story: "${storyDocument.summary}"`,
-          `This is the genre of the story: "${storyDocument.genre}"`,
-          `This is the setting of the story: "${storyDocument.setting}"`,
-          `These are the existing characters: ${chapterQuery}`,
-          `These are the existing chapters:\n${storyDocument.outline
-            .map((c) => c.content)
-            .filter(Boolean)
-            .map((c, i) => `Chapter ${i + 1}: ${c}`)
-            .join("\n\n")}`,
-          `The chapter should be tailored to the story based on the summary.`,
-          chapterPrompt &&
-            `CRITICAL: The chapter should adhere to the following instructions: ${chapterPrompt}`,
-          `CRITICAL: The generated story MUST strictly adhere to this writing style: ${storyDocument.style}`,
-        ]
-          .filter(Boolean)
-          .join("\n\n"),
-        `{"chapter": {"title": "chapter title excluding the chapter number", "content": "chapter content goes here"}}`
-      );
-      const isReplacement = false;
-      const doReplace = Number(isReplacement);
-      storyDocument.outline.splice(chapNum, doReplace, {
-        title: result.chapter.title,
-        content: result.chapter.content,
-        characters: [],
-      });
+      await generateStoryContents([chapNum])
       alert(AppText.SUCCESS_CHAPTER_GENERATION);
-      addStoryDocumentToLocalStorage(title, storyDocument);
     };
 
     extendChapterContent = async (chapNum, chapterPrompt) => {

@@ -620,21 +620,13 @@ async function delay(seconds) {
   return new Promise((resolve) => setTimeout(resolve, 1000 * seconds));
 }
 
-async function generateStoryContents(
-  /** @type {number[]} */ chaptersToGenerate = []
-) {
-  const storyTitle = getCurrentTitle();
-  const storyDocument = getStoryDocumentByTitle(storyTitle);
-
-  window.__chapterCount = storyDocument.outline.length;
-  window.__chaptersGenerated = 0;
-  window.__chaptersGenerationProgress = 0;
-
-  const promptParts = [
-    // `This is the summary of the story: "${storyDocument.summary}"`,
+function getPromptParts(/** @type {typeof DEFAULT_DOCUMENT} */ storyDocument) {
+  return [
+    `This is the summary of the story: "${storyDocument.summary}"`,
     `This is the genre of the story: "${storyDocument.genre}"`,
-    // `This is the setting of the story: "${storyDocument.setting}"`,
+    `This is the setting of the story: "${storyDocument.setting}"`,
     `This is the outline of the story: ${storyDocument.outline
+      .filter((o) => o.title)
       .map((o, i) => `Chapter ${i + 1}: ${o.content}`)
       .join("\n")}`,
     `These are the main characters involved in the story: ${getCharactersForQuery(
@@ -645,6 +637,19 @@ async function generateStoryContents(
     `CRITICAL: Maintain narrative consistency with the overall story progression implied by the chapter outlines.`,
     `CRITICAL: The generated content MUST be set up that the story flows between the chapters in a natural way.`,
   ];
+}
+
+async function generateStoryContents(
+  /** @type {number[]} */ chaptersToGenerate = []
+) {
+  const storyTitle = getCurrentTitle();
+  const storyDocument = getStoryDocumentByTitle(storyTitle);
+
+  window.__chapterCount = storyDocument.outline.length;
+  window.__chaptersGenerated = 0;
+  window.__chaptersGenerationProgress = 0;
+
+  const promptParts = getPromptParts(storyDocument);
   const chapterGenerationStepSize =
     1 / ((storyDocument.outline.length ?? 0) * 2);
   let chapGenerationDelay = 0;
@@ -704,40 +709,67 @@ async function generateStoryContents(
     window.__chaptersGenerationProgress += chapterGenerationStepSize;
     // generate chapter content
     await delay(generationDelaySeconds); // wait seconds between chapter generation requests
-    console.log("Generating chapter contents", chapNum);
-    const chapterResult = await fetchFromGemini(
-      apiKey,
-      [
-        `Generate the content for chapter ${chapNum} ONLY of the story "${storyTitle}"`,
-        `Chapter ${chapNum} title: ${chapter.title}`,
-        // Iterate on the chapter content using the instructions given
-        `Chapter ${chapNum} outline: ${chapter.content}`,
-        prevChapterContext,
-        ...promptParts,
-        `CRITICAL: Write the narrative by strictly following the scenes provided above, in order.`,
-        `CRITICAL: Ensure the tone, style, and character voices are consistent with the overall style provided.`,
-        `CRITICAL: Prioritize fulfilling the scenes and narrative flow.`,
-        `CRITICAL: The chapter should be well formatted with appropriate paragraphs line breaks.`,
-        `CRITICAL: Do not include the chapter title in the contents.`,
-        `CRITICAL: Do not include scene notation in the contents.`,
-        `CRITICAL: Format the chapter content with double line spaces ensure dialog is clearly readable.`,
-      ].join("\n\n"),
-      `{content: "Full narrative content for chapter ${chapNum} in plain text, adhering strictly to existing content style."}`,
-      GeminiConfig.Temperature.BALANCED,
-      false
-    );
-    console.log(chapterResult);
-    // reload story document incase other changes have been made to it
-    const storyDocument = getStoryDocumentByTitle(storyTitle);
-    chapterResult.content = htmlEscape(chapterResult.content);
-    storyDocument.outline[i].content = chapterResult.content;
-    addStoryDocumentToLocalStorage(storyTitle, storyDocument);
+    await generateChapterContent(chapNum);
     // add chapter content to story
     window.__chaptersGenerated += 1;
     window.__chaptersGenerationProgress =
       window.__chaptersGenerated / window.__chapterCount;
   }
   return getStoryDocumentByTitle(storyTitle);
+}
+
+async function generateChapterContent(
+  /** @type {number} */ chapNum,
+  /** @type {string | undefined} */ chapterPrompt
+) {
+  const storyTitle = getCurrentTitle();
+  let storyDocument = getStoryDocumentByTitle(storyTitle);
+  const chapIdx = chapNum - 1;
+  console.log("Generating chapter contents", chapNum);
+  const apiKey = getGeminiKeyFromLocalStorage();
+  const promptParts = getPromptParts(storyDocument);
+
+  // --- Determine Previous Chapter Context (for prompt, even in parallel) ---
+  const outline = storyDocument.outline;
+  const chapter = outline[chapIdx];
+  const previousChapter = outline?.[chapIdx - 1];
+  const prevChapterContext = previousChapter
+    ? `Context from previous chapter ${chapIdx} (${previousChapter.title}):\n${
+        previousChapter.content || "N/A"
+      }`
+    : "This is the first chapter.";
+
+  const fullPrompt = [
+    `Generate the content for chapter ${chapNum} ONLY of the story "${storyTitle}"`,
+    `Chapter ${chapNum} title: ${chapter.title}`,
+    // Iterate on the chapter content using the instructions given
+    `Chapter ${chapNum} outline: ${chapter.content}`,
+    prevChapterContext,
+    ...promptParts,
+    chapterPrompt &&
+      `CRITICAL: The chapter should adhere to the following instructions: ${chapterPrompt}`,
+    `CRITICAL: Write the narrative by strictly following the scenes provided above, in order.`,
+    `CRITICAL: Ensure the tone, style, and character voices are consistent with the overall style provided.`,
+    `CRITICAL: Prioritize fulfilling the scenes and narrative flow.`,
+    `CRITICAL: The chapter should be well formatted with appropriate paragraphs line breaks.`,
+    `CRITICAL: Do not include the chapter title in the contents.`,
+    `CRITICAL: Do not include scene notation in the contents.`,
+    `CRITICAL: Format the chapter content with double line spaces ensure dialog is clearly readable.`,
+  ];
+  console.log("generate chapter content prompt:", fullPrompt);
+  const chapterResult = await fetchFromGemini(
+    apiKey,
+    fullPrompt.join("\n\n"),
+    `{content: "Full narrative content for chapter ${chapNum} in plain text, adhering strictly to existing content style."}`,
+    GeminiConfig.Temperature.BALANCED,
+    false
+  );
+  console.log(chapterResult);
+  // reload story document incase other changes have been made to it
+  storyDocument = getStoryDocumentByTitle(storyTitle);
+  chapterResult.content = htmlEscape(chapterResult.content);
+  storyDocument.outline[chapIdx].content = chapterResult.content;
+  addStoryDocumentToLocalStorage(storyTitle, storyDocument);
 }
 
 function fallbackCopyTextToClipboard(text) {
