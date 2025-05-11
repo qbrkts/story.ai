@@ -1,0 +1,28 @@
+{
+  "background_color": "#fcf8f4",
+  "theme_color": "#d9a168",
+  "name": "Story AI",
+  "short_name": "Story.AI",
+  "description": "Assists with writing stories from novel ideas.",
+  "display": "standalone",
+  "start_url": "/story.ai?page=home&ref=pwa",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/qbrkts/story.ai/refs/heads/main/favicon.ico",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/qbrkts/story.ai/refs/heads/main/favicon.ico",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/qbrkts/story.ai/refs/heads/main/favicon.ico",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

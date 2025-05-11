@@ -1,0 +1,22 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    devDependencies:
+      '@types/serviceworker':
+        specifier: ^0.0.134
+        version: 0.0.134
+
+packages:
+
+  '@types/serviceworker@0.0.134':
+    resolution: {integrity: sha512-5c2LjDitzjNaxTAfCsYRiElyAAV66iQvjuSRIvdGcb33y0em6tsg2wUHxRz7ELRnOfrevP3VmoLndcwJyIgLwg==}
+
+snapshots:
+
+  '@types/serviceworker@0.0.134': {}

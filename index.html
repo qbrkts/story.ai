@@ -8,6 +8,7 @@
   <title>Story AI</title>
   <!-- https://www.flaticon.com/free-icon/script_708881 -->
   <link href="favicon.ico" type="image/png" rel="shortcut icon">
+  <link href="/manifest.json" rel="manifest">
   <!-- externals -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,6 +47,19 @@
 <body>
   <div id="app"></div>
   <script src="./js/index.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          })
+          .catch(error => {
+            console.log('ServiceWorker registration failed: ', error);
+          });
+      });
+    }
+  </script>
 </body>
 
 </html>
