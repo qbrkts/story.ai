@@ -1,5 +1,5 @@
 const COPYRIGHT_TEMPLATE = `
-<div style="margin-top: ${DimensionsPx.XXLARGE}">
+<div style="margin-top: ${DimensionsPx.XLARGE}">
     <p style="font-size: 0.5em;">
         ${AppText.COPYRIGHT}
         <br/>©️<br/>

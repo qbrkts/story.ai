@@ -6,18 +6,20 @@ const GeminiApiKeyIds = {
 
 const isGeminiKeySet = () => !!getGeminiKeyFromLocalStorage();
 const GEMINI_API_KEY_CODE_TEMPLATE = `
-<details id="gemini-api-key-details" style="margin: ${DimensionsPx.MLARGE} 0;" ${
-  isGeminiKeySet() ? "" : "open"
-}>
+<details id="gemini-api-key-details"
+    style="margin: ${DimensionsPx.MLARGE} 0;" ${isGeminiKeySet() ? "" : "open"}>
   <summary style="cursor:pointer; padding: ${DimensionsPx.MEDIUM}">
     ${AppText.GEMINI_API_KEY}
   </summary>
   <br />
-  <div style="display: flex; width: 100%; gap: ${DimensionsPx.MEDIUM};">
+  <div
+    style="display: flex; width: 100%;
+    gap: ${DimensionsPx.MEDIUM};
+    align-items: center; justify-content: center;">
     <line-input
         id="${GeminiApiKeyIds.KEY_INPUT}"
         placeholder="${AppText.ENTER_GEMINI_API_KEY}"
-        style="width: ${DimensionsPx.XXLARGE}; flex-grow: 1">
+        style="width: 100%; max-width: ${DimensionsPx.XXLARGE}; flex-grow: 1">
     </line-input>
     <paper-button id="${GeminiApiKeyIds.UPDATE_BTN}">
         ${AppText.UPDATE_GEMINI_API_KEY}
