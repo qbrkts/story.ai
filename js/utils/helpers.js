@@ -334,7 +334,7 @@ function getCurrentTitle() {
     const titleKey = getCurrentTitleKey();
     const title = keyAsTitleCase(titleKey);
     if (title) {
-      document.title = AppText.PAGE_TITLE(`${title} (${getCurrentPage()})`);
+      document.title = AppText.PAGE_TITLE(title);
     }
     return title;
   } catch (e) {
@@ -911,5 +911,8 @@ const addPageNavigationLinks = (
 };
 const goToPageNavigationLink = (id) => (e) => {
   e?.target?.scrollIntoView?.({ block: "center" });
-  PageNavigationLinks[id]?.onClick?.();
+  setTimeout(
+    PageNavigationLinks[id]?.onClick ?? (() => undefined),
+    DEFAULT_RENDER_DELAY_MS
+  );
 };
