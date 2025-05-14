@@ -406,6 +406,7 @@ customElements.define(
         addChapterBtn.textContent = AppText.ADD_CHAPTER;
         addChapterBtn.textIcon = "➕";
         addChapterBtn.handler = async () => {
+          const nextChapNum = i + 2;
           const chapterPrompt = prompt(
             AppText.GENERATE_CHAPTER_GUIDE,
             `The chapter to generate is ` +
@@ -420,7 +421,7 @@ customElements.define(
           if (!chapterPrompt) {
             return;
           }
-          await this.generateChapterContent(i + 2, chapterPrompt);
+          await this.generateChapterContent(nextChapNum, chapterPrompt);
           this.render();
         };
         containerEl.appendChild(addChapterBtn);
@@ -498,7 +499,7 @@ customElements.define(
               return;
             }
             const lockScrollY = document.documentElement.scrollTop;
-            await generateStoryContents([chapNum]);
+            await this.generateChapterContent(chapNum);
             const resetScrollPosition = () => {
               return setTimeout(() => {
                 document.documentElement.scrollTop = lockScrollY;
@@ -836,7 +837,7 @@ customElements.define(
       console.log("generate chapter content", { chapNum, chapterPrompt });
       const checkResult = this.doGenerateWritingCheck();
       if (!checkResult) return;
-      await generateStoryContents([chapNum]);
+      await generateStoryContents([[chapNum, chapterPrompt ?? ""]]);
       alert(AppText.SUCCESS_CHAPTER_GENERATION);
     };
 

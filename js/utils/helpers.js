@@ -640,7 +640,7 @@ function getPromptParts(/** @type {typeof DEFAULT_DOCUMENT} */ storyDocument) {
 }
 
 async function generateStoryContents(
-  /** @type {number[]} */ chaptersToGenerate = []
+  /** @type {(number | string)[][]} */ chaptersToGenerate = []
 ) {
   const storyTitle = getCurrentTitle();
   const storyDocument = getStoryDocumentByTitle(storyTitle);
@@ -660,13 +660,16 @@ async function generateStoryContents(
   }
 
   const outline = storyDocument.outline;
-  const chapterIndexes =
-    chaptersToGenerate && chaptersToGenerate.length > 0
-      ? chaptersToGenerate.map((chapterNum) => chapterNum - 1)
-      : new Array(window.__chapterCount).fill(null).map((_, i) => i);
-  for (const i of chapterIndexes) {
+  if (!chaptersToGenerate?.length) {
+    const chapters = new Array(window.__chapterCount)
+      .fill(null)
+      .map((_, i) => [i + 1, ""]);
+    chaptersToGenerate.push(...chapters);
+  }
+  for (const [chapNum, chapterPrompt] of chaptersToGenerate) {
+    const chapterNumber = Number(chapNum);
+    const i = chapterNumber - 1;
     const chapter = outline[i];
-    const chapNum = i + 1;
     const generationDelaySeconds = chapGenerationDelay * 5;
 
     // --- Determine Previous Chapter Context (for prompt, even in parallel) ---
@@ -680,18 +683,18 @@ async function generateStoryContents(
     if (!chapter.content) {
       // generate chapter scenes
       await delay(generationDelaySeconds); // wait seconds between scene generation requests
-      console.log("Generating chapter scenes", chapNum);
+      console.log("Generating chapter scenes", chapterNumber);
       const sceneResult = await fetchFromGemini(
         apiKey,
         [
-          `Generate the scenes for chapter ${chapNum} ONLY of the story "${storyTitle}"`,
-          `Chapter ${chapNum} Title: ${chapter.title}`,
+          `Generate the scenes for chapter ${chapterNumber} ONLY of the story "${storyTitle}"`,
+          `Chapter ${chapterNumber} Title: ${chapter.title}`,
           "",
           prevChapterContext,
           ...promptParts,
           `CRITICAL: Base the scenes strictly on the chapter description provided above.`,
         ].join("\n\n"),
-        `{scenes: "Bulleted or numbered list of scenes for chapter ${chapNum} based *only* on its description."}`,
+        `{scenes: "Bulleted or numbered list of scenes for chapter ${chapterNumber} based *only* on its description."}`,
         GeminiConfig.Temperature.BALANCED,
         false
       );
@@ -709,7 +712,7 @@ async function generateStoryContents(
     window.__chaptersGenerationProgress += chapterGenerationStepSize;
     // generate chapter content
     await delay(generationDelaySeconds); // wait seconds between chapter generation requests
-    await generateChapterContent(chapNum);
+    await generateChapterContent(chapterNumber, chapterPrompt.toString());
     // add chapter content to story
     window.__chaptersGenerated += 1;
     window.__chaptersGenerationProgress =
@@ -746,8 +749,9 @@ async function generateChapterContent(
     `Chapter ${chapNum} outline: ${chapter.content}`,
     prevChapterContext,
     ...promptParts,
-    chapterPrompt &&
-      `CRITICAL: The chapter should adhere to the following instructions: ${chapterPrompt}`,
+    chapterPrompt
+      ? `CRITICAL: The chapter should adhere to the following instructions: ${chapterPrompt}`
+      : "",
     `CRITICAL: Write the narrative by strictly following the scenes provided above, in order.`,
     `CRITICAL: Ensure the tone, style, and character voices are consistent with the overall style provided.`,
     `CRITICAL: Prioritize fulfilling the scenes and narrative flow.`,
