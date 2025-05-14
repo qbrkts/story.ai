@@ -448,8 +448,9 @@ customElements.define(
               chapNum,
               `Extends the chapter to add writing on the following summary: '${extendPrompt}'`
             );
-            const chapterContent = getStoryDocumentByTitle(getCurrentTitle())
-              .outline[i].content;
+            const chapterContent = getChapterContentFromOutline(
+              getStoryDocumentByTitle(getCurrentTitle()).outline[i]
+            );
             const chapterContentInputEl =
               /** @type {import('../../../types').TextInput} */ (
                 this.root.querySelector(
@@ -514,6 +515,14 @@ customElements.define(
         return writeBtn;
       };
 
+      const getChapterContentFromOutline = (outline) => {
+        return [
+          outline.title,
+          "",
+          outline.content || AppText.GENERATE_CHAPTER_GUIDE,
+        ].join("\n");
+      };
+
       const addDeleteChapterBtn = (i, containerEl) => {
         const deleteBtn = /** @type {import ('../../../types').PaperButton} */ (
           document.createElement(ComponentName.PAPER_BUTTON)
@@ -558,11 +567,7 @@ customElements.define(
           "placeholder",
           AppText.GENERATE_CHAPTER_GUIDE
         );
-        chapterContentInput.value = [
-          outline.title,
-          "",
-          outline.content || AppText.GENERATE_CHAPTER_GUIDE,
-        ].join("\n");
+        chapterContentInput.value = getChapterContentFromOutline(outline);
         const chapterNum = `${AppText.CHAPTER} ${i + 1}`;
         chapterContentInput.setAttribute(
           "title",
@@ -831,7 +836,7 @@ customElements.define(
       console.log("generate chapter content", { chapNum, chapterPrompt });
       const checkResult = this.doGenerateWritingCheck();
       if (!checkResult) return;
-      await generateStoryContents([chapNum])
+      await generateStoryContents([chapNum]);
       alert(AppText.SUCCESS_CHAPTER_GENERATION);
     };
 
