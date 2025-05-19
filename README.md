@@ -2,6 +2,7 @@
 
 Assists with writing stories from novel ideas.
 
+<!--
 ## TODO
 
 - [ ] During outline generation create a changelog for the world setting, character traits and relationships
@@ -11,3 +12,4 @@ Assists with writing stories from novel ideas.
 - [ ] Replace content `innerHTML = ""` without affecting layout or scrolling
 - [ ] Tag shared story with the title of the story for easier linking (take into account multiple stories with the same title)
 - [ ] Add graphic novel visualisation
+-->
