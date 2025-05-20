@@ -25,7 +25,7 @@ const WRITE_PAGE_CODE_TEMPLATE = () => {
 
   if (!title) {
     alert(AppText.NO_STORY_SELECTED);
-    gotoPage({ page: Page.STORIES });
+    gotoPage({ page: Page.ANTHOLOGY });
   }
 
   return `

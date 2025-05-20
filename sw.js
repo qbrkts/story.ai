@@ -21,7 +21,7 @@ const urlsToCache = [
   // "/manifest.json",
 
   // == Optionally, add other important pages for offline access ==
-  "/?page=stories",
+  "/?page=anthology",
   "/?page=write",
   // '/?page=read',
 ];

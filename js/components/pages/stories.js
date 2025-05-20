@@ -40,7 +40,7 @@ const STORY_PAGE_CODE_TEMPLATE = `
 `;
 
 customElements.define(
-  ComponentName.STORIES,
+  ComponentName.ANTHOLOGY,
   class extends HTMLElement {
     constructor() {
       super();
@@ -132,6 +132,7 @@ customElements.define(
     }
 
     render() {
+      document.title = AppText.PAGE_TITLE(Page.ANTHOLOGY);
       this.loadExistingStories();
       this.startStoryButton.handler = () => {
         const title = this.storyTitleInput.value;

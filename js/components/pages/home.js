@@ -7,7 +7,7 @@ const HOME_PAGE_TEMPLATE = `
     </div>
     <br />
     <div>
-        <paper-button onclick="gotoPage({ page: Page.STORIES })">${AppText.VISIT_STORIES}</paper-button>
+        <paper-button onclick="gotoPage({ page: Page.ANTHOLOGY })">${AppText.VISIT_STORIES}</paper-button>
     </div>
     <qb-copyright></qb-copyright>
 `;
@@ -32,6 +32,8 @@ customElements.define(
       this.render();
     }
 
-    render() {}
+    render() {
+      document.title = AppText.PAGE_TITLE(Page.HOME);
+    }
   }
 );

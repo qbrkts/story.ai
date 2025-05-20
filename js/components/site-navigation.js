@@ -64,12 +64,10 @@ customElements.define(
       if (!linksContainer) {
         throw new Error("Links container not found");
       }
-      /** @type {string[]} */
-      const pagesRequiringContent = [Page.WRITE, Page.READ];
       const title = getCurrentTitle();
       for (let i = 0; i < PageNames.length; i++) {
-        const page = PageNames[i].toLowerCase();
-        if (pagesRequiringContent.includes(page)) {
+        const page = PageNames[i];
+        if (PagesRequiringContent.includes(page)) {
           // skip or disable write page if there is no story title
           if (!title) continue;
         }

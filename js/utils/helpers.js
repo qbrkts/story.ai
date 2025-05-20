@@ -39,18 +39,20 @@ const DimensionsPx = Object.freeze({
   ) => parseInt(DimensionsPx[key].toString().replace("px", "")),
 });
 
-const DEFAULT_PAGE = "HOME";
-const PageNames = [DEFAULT_PAGE, "STORIES", "WRITE", "READ"];
+const DEFAULT_PAGE = "home";
+const PageNames = [DEFAULT_PAGE, "anthology", "write", "read"];
 /** @type {{
   HOME: 'home';
   READ: 'read';
-  STORIES: 'stories';
+  ANTHOLOGY: 'anthology';
   WRITE: 'write';
 }} */
 const Page = Object.assign(
   {},
-  ...PageNames.map((page) => ({ [page]: page.toLowerCase() }))
+  ...PageNames.map((page) => ({ [page.toUpperCase()]: page }))
 );
+/** @type {string[]} */
+const PagesRequiringContent = [Page.WRITE, Page.READ];
 /** @type {{
   CHAPTER_CONTENT: 'chapter-content';
   COPYRIGHT: 'qb-copyright';
@@ -64,7 +66,7 @@ const Page = Object.assign(
   TEXT_INPUT: 'text-input';
   HOME: 'home-page';
   READ: 'read-page';
-  STORIES: 'stories-page';
+  ANTHOLOGY: 'stories-page';
   WRITE: 'write-page';
 }} */
 const ComponentName = Object.assign(
@@ -182,7 +184,7 @@ const AppText = {
   WELCOME: "Welcome",
   WRITE: "Write",
   PAGE_TITLE(pageName) {
-    return `${pageName} - ${this.STORY_AI}`;
+    return `${keyAsTitleCase(pageName)} - ${this.STORY_AI}`;
   },
 };
 
@@ -333,7 +335,8 @@ function getCurrentTitle() {
   try {
     const titleKey = getCurrentTitleKey();
     const title = keyAsTitleCase(titleKey);
-    if (title) {
+    const currentPage = getCurrentPage().toLowerCase();
+    if (title && PagesRequiringContent.includes(currentPage)) {
       document.title = AppText.PAGE_TITLE(title);
     }
     return title;
