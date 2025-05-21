@@ -1,6 +1,7 @@
 const TEXT_INPUT_ID = "text-input";
 const TEXT_INPUT_CLS = "text-input-cls";
 const TEXT_INPUT_TITLE_CLS = "text-input-title";
+const TEXT_INPUT_PADDING_PX = DimensionsPx.MEDIUM;
 const TEXT_INPUT_STYLE = `
 :host {
   position: relative;
@@ -16,7 +17,7 @@ const TEXT_INPUT_STYLE = `
   cursor: pointer;
   font-family: ${Font.DEFAULT_FAMILY};
   font-size: 1em;
-  padding: ${DimensionsPx.MEDIUM};
+  padding: ${TEXT_INPUT_PADDING_PX};
   text-decoration: none;
   transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
   overflow: hidden;
@@ -98,10 +99,10 @@ customElements.define(
       shadowTextArea.style.visibility = "hidden";
       shadowTextArea.style.position = "fixed";
       shadowTextArea.style.overflow = "scroll";
-      shadowTextArea.style.height = "";
-      shadowTextArea.style.height = shadowTextArea.scrollHeight + "px";
+      shadowTextArea.style.setProperty("height", "0px", "important");
+      const expectedHeight = `calc(${shadowTextArea.scrollHeight}px + ${TEXT_INPUT_PADDING_PX} * 4)`;
 
-      this.textArea.style.height = shadowTextArea.style.height;
+      this.textArea.style.height = expectedHeight;
 
       this.root.removeChild(shadowTextArea);
     };
