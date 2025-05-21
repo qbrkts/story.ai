@@ -74,11 +74,16 @@ customElements.define(
         .join("");
       const storyContentHTML = storyDocument.outline
         .map((o, i) => {
+          const chapNum = i + 1;
+          const chap = [AppText.CHAPTER, `${chapNum}`];
           return (
             o.content &&
-            `<chapter-content info="${AppText.CHAPTER} ${i + 1}: ${
-              o.title
-            }" text="${htmlEscape(o.content)}" readonly></chapter-content>`
+            `<chapter-content
+                id="${chap.map((s) => s.toLowerCase()).join("-")}"
+                info="${chap.join(" ")}: ${o.title}"
+                text="${htmlEscape(o.content)}"
+                readonly>
+            </chapter-content>`
           );
         })
         .filter(Boolean)

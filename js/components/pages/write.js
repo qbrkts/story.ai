@@ -520,7 +520,9 @@ customElements.define(
         return [
           outline.title,
           "",
-          outline.content || AppText.GENERATE_CHAPTER_GUIDE,
+          outline.content ||
+            outline.description ||
+            AppText.GENERATE_CHAPTER_GUIDE,
         ].join("\n");
       };
 
@@ -574,6 +576,7 @@ customElements.define(
           "title",
           `${chapterNum}: ${outline.title}`
         );
+        chapterContentInput.id = titleStorageKey(chapterNum);
         chapterContentInput.name = chapterNum;
         chapterContentInput.setAttribute("style", TEXT_INPUT_INLINE_STYLE);
         chapterContentInput.addEventListener("input", () => {
@@ -581,7 +584,9 @@ customElements.define(
           const storyDocument = getStoryDocumentByTitle(storyTitle);
           const [chapterTitle, ...description] =
             chapterContentInput.value.split("\n");
-          storyDocument.outline[i].title = chapterTitle;
+          if (chapterTitle) {
+            storyDocument.outline[i].title = chapterTitle;
+          }
           chapterContentInput.setAttribute(
             "title",
             `${chapterNum}: ${chapterTitle}`
