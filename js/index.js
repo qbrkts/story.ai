@@ -74,3 +74,29 @@ async function continueStoryFromRef() {
 }
 
 continueStoryFromRef();
+
+// Check if the user has visited the site in the last 24 hours
+// If more than 24 hours have passed show a confirm dialog
+const lastVisit = getValueFromLocalStorage(StorageKey.LAST_VISIT);
+if (!lastVisit) {
+  storeValueInLocalStorage(StorageKey.LAST_VISIT, Date.now().toString());
+}
+const lastVisitTime = parseInt(lastVisit || 0, 10);
+const currentTime = Date.now();
+const hoursInMilliseconds = 1000 * 60 * 60;
+const hoursSinceLastVisit = (currentTime - lastVisitTime) / hoursInMilliseconds;
+
+if (hoursSinceLastVisit > 24) {
+  const confirmMessage = AppText.CONFIRM_VISIT;
+  if (confirm(confirmMessage)) {
+    localStorage.removeItem(StorageKey.LAST_VISIT);
+    const NEW_SITE_URL = "https://nouvel.ink";
+    const success = window.open(NEW_SITE_URL, "_blank");
+    if (!success) {
+      alert(AppText.OPEN_LINK_FAILED + "\n\n" + NEW_SITE_URL);
+      copyTextToClipboard(NEW_SITE_URL);
+    }
+  } else {
+    localStorage.setItem(StorageKey.LAST_VISIT, currentTime.toString());
+  }
+}

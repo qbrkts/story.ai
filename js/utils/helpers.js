@@ -95,6 +95,7 @@ const StorageKey = {
   GEMINI_API: `${STORY_AI_NS}:gemini-api-key`,
   STORY_TITLES: `${STORY_AI_NS}:story-titles`,
   STORY_CONTENTS: `${STORY_AI_NS}:story-contents`,
+  LAST_VISIT: `${STORY_AI_NS}:last-visit`,
 };
 
 const Level = {
@@ -114,8 +115,12 @@ const AppText = {
     "Dump your story synopsis here. Anything goes and everything helps. If you want a more dramatic twist, add that idea here too!",
   CHAPTER: "Chapter",
   CHAPTER_LIST: "Chapters",
+  COPY_STORY_CONTENT: "Copy story",
+  CONFIRM_VISIT:
+    "Welcome back! Thanks for visiting again.\n\nStory.AI has been updated.\n\nWould you like to visit the new site?",
+  CONTINUE: "Continue",
   COPYRIGHT: "Copyright",
-  COPY_SHARE_LINK_SUCCESS: "Successfully copied share link to clipboard",
+  COPY_LINK_SUCCESS: "Successfully copied link to clipboard",
   CHARACTERS: "Characters",
   DELETE_CHAPTER: "Delete",
   DEFAULT_EMAIL: "anon@mail.com",
@@ -149,6 +154,7 @@ const AppText = {
     "This story has no content. Attempting to generate some from the outline. If you want to make any changes, return to the write page and make changes.",
   NO_STORIES_YET: "No stories yet... continue above",
   NO_STORY_SELECTED: "No story selected",
+  OPEN_LINK_FAILED: "Opening link failed.\n\nLink will be copied to clipboard.",
   OWNER_NAME: "Quantum Brackets",
   PREVIOUSLY_ON: "Previously on...",
   RANDOM: "Random",
@@ -797,7 +803,7 @@ function fallbackCopyTextToClipboard(text) {
   try {
     const successful = document.execCommand("copy");
     if (successful) {
-      alert(AppText.COPY_SHARE_LINK_SUCCESS);
+      alert(AppText.COPY_LINK_SUCCESS);
     } else {
       throw Error("document.execCommmand('copy') failed");
     }
@@ -812,7 +818,7 @@ async function copyTextToClipboard(text) {
   try {
     console.log("Copy", { text });
     await navigator.clipboard.writeText(text);
-    alert(AppText.COPY_SHARE_LINK_SUCCESS);
+    alert(AppText.COPY_LINK_SUCCESS);
   } catch (err) {
     console.error("Async: Could not copy text: ", err);
     fallbackCopyTextToClipboard(text);

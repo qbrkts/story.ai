@@ -1,4 +1,4 @@
-const HOME_PAGE_TEMPLATE = `
+const HOME_PAGE_TEMPLATE = () => `
     <h1>${AppText.STORY_AI}</h1>
     <div>
         <p>${AppText.WELCOME}</p>
@@ -7,7 +7,7 @@ const HOME_PAGE_TEMPLATE = `
     </div>
     <br />
     <div>
-        <paper-button onclick="gotoPage({ page: Page.ANTHOLOGY })">${AppText.VISIT_STORIES}</paper-button>
+        <paper-button onclick="gotoPage({ page: '${Page.ANTHOLOGY}' )">${AppText.VISIT_STORIES}</paper-button>
     </div>
     <qb-copyright></qb-copyright>
 `;
@@ -18,7 +18,7 @@ customElements.define(
     constructor() {
       super();
       this.attachShadow({ mode: "open" });
-      this.root.innerHTML = HOME_PAGE_TEMPLATE;
+      this.root.innerHTML = HOME_PAGE_TEMPLATE();
     }
 
     get root() {

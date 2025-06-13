@@ -1,5 +1,6 @@
 const ShareStoryIds = {
   COPY_LINK_BTN_ID: "copy-link",
+  COPY_STORY_BTN_ID: "copy-story",
 };
 
 const SHARE_STORY_CODE_TEMPLATE = `
@@ -15,6 +16,18 @@ const SHARE_STORY_CODE_TEMPLATE = `
     font-weight: bold;
     z-index: ${Level.TOP};
   "></paper-button>
+<paper-button
+id="${ShareStoryIds.COPY_STORY_BTN_ID}"
+title="${AppText.COPY_STORY_CONTENT}"
+style="
+  border-radius: ${DimensionsPx.SMALL};
+  border: none;
+  position: fixed;
+  bottom: ${DimensionsPx.SMALL};
+  left: ${DimensionsPx.SMALL};
+  font-weight: bold;
+  z-index: ${Level.TOP};
+"></paper-button>
 `;
 
 customElements.define(
@@ -35,6 +48,10 @@ customElements.define(
       this.copyLinkButton.handler = this.copyShareLink;
       this.copyLinkButton.textContent = AppText.SHARE_STORY;
       this.copyLinkButton.textIcon = "🔗";
+
+      this.copyStoryButton.handler = this.copyStoryLink;
+      this.copyStoryButton.textContent = AppText.COPY_STORY_CONTENT;
+      this.copyStoryButton.textIcon = "📋";
     }
 
     render() {}
@@ -56,10 +73,29 @@ customElements.define(
       return buttonEl;
     }
 
-    copyShareLink = async () => {
+    get copyStoryButton() {
+      const buttonEl = /** @type {import ('../../types').PaperButton} */ (
+        this.root.getElementById(ShareStoryIds.COPY_STORY_BTN_ID)
+      );
+      if (!buttonEl) {
+        throw new Error("Copy story button element does not exisit");
+      }
+      return buttonEl;
+    }
+
+    getStoryContents() {
       const title = getCurrentTitle();
       const storyDocument = getStoryDocumentByTitle(title);
       const storyContents = JSON.stringify(storyDocument, null, 2);
+      return storyContents;
+    }
+
+    copyStoryLink = async () => {
+      copyTextToClipboard(this.getStoryContents());
+    };
+
+    copyShareLink = async () => {
+      const storyContents = this.getStoryContents();
       if (!window.__cacheShareLinks) {
         window.__cacheShareLinks = {};
       }
